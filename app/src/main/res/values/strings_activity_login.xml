@@ -1,0 +1,14 @@
+<resources>
+    
+    <!-- Strings related to login -->
+    <string name="prompt_email">Usuario</string>
+    <string name="prompt_password">Contraseña</string>
+    <string name="action_sign_in">Ingresar</string>
+    <string name="action_sign_in_short">Ingresar</string>
+
+    <string name="error_invalid_email">El usuario es invalido o no existe.</string>
+    <string name="error_invalid_password">Esta contraseña es muy corta</string>
+    <string name="error_incorrect_password">La contraseña esta incorrecta</string>
+    <string name="error_field_required">El campo es requerido</string>
+    <string name="error_server">Error al enviar la información al servidor.</string>
+</resources>
