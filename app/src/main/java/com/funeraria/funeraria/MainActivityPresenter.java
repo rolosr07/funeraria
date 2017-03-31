@@ -17,8 +17,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.funeraria.funeraria.common.Base;
-import com.funeraria.funeraria.common.CustomAdapter;
-import com.funeraria.funeraria.common.Difunto;
+import com.funeraria.funeraria.common.Adapters.CustomAdapter;
+import com.funeraria.funeraria.common.entities.Difunto;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 

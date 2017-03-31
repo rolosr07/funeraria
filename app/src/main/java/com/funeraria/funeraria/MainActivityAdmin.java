@@ -97,6 +97,65 @@ public class MainActivityAdmin extends Activity {
             }
         });
 
+        ////////////////////////////
+
+        Button buttonVelasCompradas = (Button) findViewById(R.id.buttonVelasCompradas);
+        buttonVelasCompradas.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(MainActivityAdmin.this, VerVelasCompradasDifuntoActivity.class);
+                startActivity(i);
+            }
+        });
+
+        TextView tvVelasCompradas = (TextView) findViewById(R.id.tvVelasCompradas);
+        tvVelasCompradas.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(MainActivityAdmin.this, VerVelasCompradasDifuntoActivity.class);
+                startActivity(i);
+            }
+        });
+
+        ////////////////////////////
+
+        Button buttonFloresCompradas = (Button) findViewById(R.id.buttonFloresCompradas);
+        buttonFloresCompradas.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(MainActivityAdmin.this, VerFloresCompradasDifuntoActivity.class);
+                startActivity(i);
+            }
+        });
+
+        TextView tvFloresCompradas = (TextView) findViewById(R.id.tvFloresCompradas);
+        tvFloresCompradas.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(MainActivityAdmin.this, VerFloresCompradasDifuntoActivity.class);
+                startActivity(i);
+            }
+        });
+        ////////////////////////////
+
+        Button buttonMensajes = (Button) findViewById(R.id.buttonMensajes);
+        buttonMensajes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(MainActivityAdmin.this, VerMensajesDifuntoActivity.class);
+                startActivity(i);
+            }
+        });
+
+        TextView tvMensajes = (TextView) findViewById(R.id.tvMensajes);
+        tvMensajes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(MainActivityAdmin.this, VerMensajesDifuntoActivity.class);
+                startActivity(i);
+            }
+        });
+
         SharedPreferences prefs = getSharedPreferences("com.funeraria.funeraria", Context.MODE_PRIVATE);
         if(!prefs.getString("USER_DATA","").equals(""))
         {

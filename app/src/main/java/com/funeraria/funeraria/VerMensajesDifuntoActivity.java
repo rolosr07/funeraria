@@ -3,32 +3,23 @@ package com.funeraria.funeraria;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.content.Intent;
-import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.ParcelFileDescriptor;
-import android.provider.MediaStore;
-import android.util.Base64;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.funeraria.funeraria.common.Adapters.CustomAdapterServicio;
 import com.funeraria.funeraria.common.Base;
 import com.funeraria.funeraria.common.Adapters.CustomAdapter;
-import com.funeraria.funeraria.common.Adapters.CustomAdapterImagenes;
 import com.funeraria.funeraria.common.entities.Difunto;
-import com.funeraria.funeraria.common.entities.Imagen;
+import com.funeraria.funeraria.common.entities.Servicio;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -38,74 +29,57 @@ import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 
-import java.io.ByteArrayOutputStream;
-import java.io.FileDescriptor;
-import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.List;
 
 
-public class ImagenesDifuntoActivity extends Base {
+public class VerMensajesDifuntoActivity extends Base {
 
     private View mProgressView;
     private View mLoginFormView;
-    private TextView txNumeroImagenes;
-    private ImageView imageView;
-    private ImageView imgView;
+    private TextView txNumeroMensajes;
+    private TextView txMensaje;
 
     private String webResponse = "";
     private String webResponseImages = "";
-    private String webResponseUpload = "";
+    private String webResponseActualizar = "";
     private Thread thread;
     private Handler handler = new Handler();
     private Spinner spinner;
-    private Spinner spinnerImages;
+    private Spinner spinnerMensajes;
+
+    private TextView txNombreUsuario;
+    private TextView txFechaCompra;
+    private TextView txAutorizado;
+    private Button buttonAutorizar;
+    private int idServicioComprado;
 
     private final String METHOD_NAME_GET_DIFUNTO_LIST = "getDifuntosList";
-    private final String METHOD_NAME_GET_IMAGENES_LIST = "getImagenesDifuntoList";
-    private final String METHOD_NAME_UPLOAD_IMAGEN = "registrarImagenDifunto";
-    private String encodeImage = "";
-    private String nombreImagen = "";
-    private String typeImagen = "";
-
-    private static int RESULT_LOAD_IMAGE = 1;
+    private final String METHOD_NAME_GET_SERVICIOS_LIST = "getServiciosPorIdDifuntoYTipoDeServicioMensajesList";
+    private final String METHOD_NAME_REGISTAR_SERVICIO_COMPRADO = "actualizarServicioComprado";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_imagenes_difunto);
+        setContentView(R.layout.activity_ver_mensajes_difunto);
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
-        txNumeroImagenes = (TextView)findViewById(R.id.txNumeroImagenes);
-        imageView = (ImageView)findViewById(R.id.imageView);
-        imgView = (ImageView) findViewById(R.id.imgView);
+        txNumeroMensajes = (TextView)findViewById(R.id.txNumeroMensajes);
+        txMensaje = (TextView)findViewById(R.id.txMensaje);
         spinner = (Spinner) findViewById(R.id.spinner);
-        spinnerImages = (Spinner) findViewById(R.id.spinnerImagenes);
+        spinnerMensajes = (Spinner) findViewById(R.id.spinnerMensajes);
 
-        Button buttonLoadImage = (Button) findViewById(R.id.buttonLoadPicture);
-        buttonLoadImage.setOnClickListener(new View.OnClickListener() {
+        txNombreUsuario = (TextView)findViewById(R.id.txNombreUsuario);
+        txFechaCompra = (TextView)findViewById(R.id.txFechaCompra);
+        txAutorizado = (TextView)findViewById(R.id.txAutorizado);
+
+        buttonAutorizar = (Button) findViewById(R.id.buttonAutorizar);
+        buttonAutorizar.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View arg0) {
-
-                Intent i = new Intent(
-                        Intent.ACTION_PICK,
-                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-
-                startActivityForResult(i, RESULT_LOAD_IMAGE);
-            }
-        });
-
-        Button buttonRegistrar = (Button) findViewById(R.id.buttonRegistrar);
-        buttonRegistrar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View arg0) {
-
-                if(!encodeImage.equals("")){
-                    Difunto dif = (Difunto)spinner.getSelectedItem();
-                    showProgress(true);
-                    uploadImagen(dif.getIdDifunto(),encodeImage,nombreImagen,typeImagen);
-                }
+            public void onClick(View view) {
+                showProgress(true);
+                registrarServicioComprado(idServicioComprado);
             }
         });
 
@@ -147,7 +121,7 @@ public class ImagenesDifuntoActivity extends Base {
                 Type collectionType = new TypeToken<List<Difunto>>(){}.getType();
                 List<Difunto> lcs = new Gson().fromJson( webResponse , collectionType);
 
-                CustomAdapter adapter = new CustomAdapter(ImagenesDifuntoActivity.this, R.layout.simple_spinner_item,lcs);
+                CustomAdapter adapter = new CustomAdapter(VerMensajesDifuntoActivity.this, R.layout.simple_spinner_item,lcs);
                 adapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
                 spinner.setAdapter(adapter);
 
@@ -156,7 +130,7 @@ public class ImagenesDifuntoActivity extends Base {
                             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                                 Difunto dif = (Difunto) parent.getItemAtPosition(position);
                                 showProgress(true);
-                                loadImagenesList(dif.getIdDifunto());
+                                loadMensajesList(dif.getIdDifunto());
                             }
                             public void onNothingSelected(AdapterView<?> parent) {
                             }
@@ -222,24 +196,31 @@ public class ImagenesDifuntoActivity extends Base {
         return super.onOptionsItemSelected(item);
     }
 
-    public void loadImagenesList(final int idDifunto){
+    public void loadMensajesList(final int idDifunto){
         thread = new Thread(){
             public void run(){
                 try {
 
-                    SoapObject request = new SoapObject(NAMESPACE_DIFUNTO, METHOD_NAME_GET_IMAGENES_LIST);
+                    SoapObject request = new SoapObject(NAMESPACE_SERVICIO, METHOD_NAME_GET_SERVICIOS_LIST);
+
                     PropertyInfo fromProp = new PropertyInfo();
                     fromProp.setName("idDifunto");
                     fromProp.setValue(idDifunto);
                     fromProp.setType(int.class);
                     request.addProperty(fromProp);
 
+                    PropertyInfo fromProp1 = new PropertyInfo();
+                    fromProp1.setName("idTipoServicio");
+                    fromProp1.setValue(8);
+                    fromProp1.setType(int.class);
+                    request.addProperty(fromProp1);
+
                     SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
                     envelope.dotNet = true;
                     envelope.setOutputSoapObject(request);
-                    HttpTransportSE androidHttpTransport = new HttpTransportSE(URL_DIFUNTO);
+                    HttpTransportSE androidHttpTransport = new HttpTransportSE(URL_SERVICIO);
 
-                    androidHttpTransport.call(SOAP_ACTION_DIFUNTO, envelope);
+                    androidHttpTransport.call(SOAP_ACTION_SERVICIO, envelope);
                     Object response = envelope.getResponse();
                     webResponseImages = response.toString();
 
@@ -257,30 +238,45 @@ public class ImagenesDifuntoActivity extends Base {
 
         public void run(){
 
-            if(!webResponseImages.equals("") && !webResponseImages.equals("[]")){
-                Type collectionType = new TypeToken<List<Imagen>>(){}.getType();
-                List<Imagen> lcs = new Gson().fromJson( webResponseImages , collectionType);
+            if(webResponseImages!= null && !webResponseImages.equals("") && !webResponseImages.equals("[]")){
+                Type collectionType = new TypeToken<List<Servicio>>(){}.getType();
+                List<Servicio> lcs = new Gson().fromJson( webResponseImages , collectionType);
 
                 if(lcs.size() > 0){
 
-                    txNumeroImagenes.setText("Cantidad de Imagenes: "+ lcs.size());
-                    txNumeroImagenes.setVisibility(View.VISIBLE);
+                    txNumeroMensajes.setText("Cantidad de Imagenes: "+ lcs.size());
+                    txNumeroMensajes.setVisibility(View.VISIBLE);
 
-                    CustomAdapterImagenes adapter = new CustomAdapterImagenes(ImagenesDifuntoActivity.this, R.layout.simple_spinner_item,lcs);
+                    CustomAdapterServicio adapter = new CustomAdapterServicio(VerMensajesDifuntoActivity.this, R.layout.simple_spinner_item,lcs);
                     adapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
-                    spinnerImages.setAdapter(adapter);
-                    spinnerImages.setVisibility(View.VISIBLE);
+                    spinnerMensajes.setAdapter(adapter);
+                    spinnerMensajes.setVisibility(View.VISIBLE);
                     showProgress(false);
-                    spinnerImages.setOnItemSelectedListener(
+                    spinnerMensajes.setOnItemSelectedListener(
                             new AdapterView.OnItemSelectedListener() {
                                 public void onItemSelected(AdapterView<?> parent, View view, int position,long id) {
-                                    Imagen img = (Imagen)parent.getItemAtPosition(position);
+                                    Servicio servicio = (Servicio)parent.getItemAtPosition(position);
 
-                                    byte[] decodedString = Base64.decode(img.getImagen(), Base64.DEFAULT);
-                                    Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                                    txMensaje.setText(servicio.getTexto());
+                                    txMensaje.setVisibility(View.VISIBLE);
 
-                                    imageView.setImageBitmap(decodedByte);
-                                    imageView.setVisibility(View.VISIBLE);
+                                    txNombreUsuario.setText("Comprador: "+servicio.getNombreUsuario() + " " + servicio.getApellidoUsuario());
+                                    txNombreUsuario.setVisibility(View.VISIBLE);
+
+                                    txFechaCompra.setText("Fecha: "+servicio.getFechaCompra()+"");
+                                    txFechaCompra.setVisibility(View.VISIBLE);
+
+                                    if(servicio.getAutorizado().equals("1")){
+                                        txAutorizado.setText("Autorizado: Si");
+                                        txAutorizado.setVisibility(View.VISIBLE);
+                                        buttonAutorizar.setEnabled(false);
+                                    }else{
+                                        txAutorizado.setText("Autorizado: No");
+                                        txAutorizado.setVisibility(View.VISIBLE);
+                                        buttonAutorizar.setEnabled(true);
+                                    }
+
+                                    idServicioComprado = servicio.getIdServicioComprado();
 
                                     showProgress(false);
 
@@ -290,128 +286,70 @@ public class ImagenesDifuntoActivity extends Base {
                             }
                     );
                 }else{
-                    txNumeroImagenes.setText("Cantidad de Imagenes: "+ 0);
-                    spinnerImages.setVisibility(View.GONE);
-                    imageView.setVisibility(View.GONE);
+                    txNumeroMensajes.setText("Cantidad de Imagenes: "+ 0);
+                    spinnerMensajes.setVisibility(View.GONE);
+                    txMensaje.setVisibility(View.GONE);
+                    txNombreUsuario.setVisibility(View.GONE);
+                    txFechaCompra.setVisibility(View.GONE);
                     showProgress(false);
                 }
             }else{
                 showProgress(false);
-                imageView.setVisibility(View.GONE);
-                txNumeroImagenes.setText("Cantidad de Imagenes: "+0);
-                spinnerImages.setVisibility(View.GONE);
+                txMensaje.setVisibility(View.GONE);
+                txNumeroMensajes.setText("Cantidad de Imagenes: "+0);
+                spinnerMensajes.setVisibility(View.GONE);
+                txNombreUsuario.setVisibility(View.GONE);
+                txFechaCompra.setVisibility(View.GONE);
             }
         }
     };
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == RESULT_LOAD_IMAGE && resultCode == RESULT_OK && null != data) {
-            Uri selectedImage = data.getData();
-            String[] filePathColumn = { MediaStore.Images.Media.DATA, MediaStore.Images.Media.DISPLAY_NAME};
-
-            Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
-            cursor.moveToFirst();
-
-            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-            String picturePath = cursor.getString(columnIndex);
-
-            int fileNameIndex = cursor.getColumnIndex(filePathColumn[1]);
-            nombreImagen = cursor.getString(fileNameIndex);
-            typeImagen= nombreImagen.replaceAll("^.*\\.", "");
-            cursor.close();
-
-            Bitmap bmp = null;
-            try {
-                bmp = getBitmapFromUri(selectedImage);
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            imgView.setImageBitmap(bmp);
-            imgView.setVisibility(View.VISIBLE);
-        }
-    }
-
-    private Bitmap getBitmapFromUri(Uri uri) throws IOException {
-        ParcelFileDescriptor parcelFileDescriptor = getContentResolver().openFileDescriptor(uri, "r");
-        FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
-        Bitmap image = BitmapFactory.decodeFileDescriptor(fileDescriptor);
-
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        image.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
-        byte[] byteArrayImage = byteArrayOutputStream.toByteArray();
-        encodeImage = Base64.encodeToString(byteArrayImage, Base64.DEFAULT);
-
-        parcelFileDescriptor.close();
-        return image;
-    }
-
-    public void uploadImagen(final int idDifunto, final String image, final String nombreImagen, final String tipoImagen){
+    public void registrarServicioComprado(final int idServicioComprado){
         thread = new Thread(){
             public void run(){
                 try {
 
-                    SoapObject request = new SoapObject(NAMESPACE_DIFUNTO, METHOD_NAME_UPLOAD_IMAGEN);
+                    SoapObject request = new SoapObject(NAMESPACE_SERVICIO, METHOD_NAME_REGISTAR_SERVICIO_COMPRADO);
 
                     PropertyInfo fromProp = new PropertyInfo();
-                    fromProp.setName("idDifunto");
-                    fromProp.setValue(idDifunto);
+                    fromProp.setName("idServicioComprado");
+                    fromProp.setValue(idServicioComprado);
                     fromProp.setType(int.class);
                     request.addProperty(fromProp);
-
-                    PropertyInfo fromProp1 = new PropertyInfo();
-                    fromProp1.setName("nombreImagen");
-                    fromProp1.setValue(nombreImagen);
-                    fromProp1.setType(String.class);
-                    request.addProperty(fromProp1);
-
-                    PropertyInfo fromProp2 = new PropertyInfo();
-                    fromProp2.setName("imagen");
-                    fromProp2.setValue(image);
-                    fromProp2.setType(String.class);
-                    request.addProperty(fromProp2);
-
-                    PropertyInfo fromProp3 = new PropertyInfo();
-                    fromProp3.setName("tipoImagen");
-                    fromProp3.setValue(tipoImagen);
-                    fromProp3.setType(String.class);
-                    request.addProperty(fromProp3);
 
                     SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
                     envelope.dotNet = true;
                     envelope.setOutputSoapObject(request);
-                    HttpTransportSE androidHttpTransport = new HttpTransportSE(URL_DIFUNTO);
+                    HttpTransportSE androidHttpTransport = new HttpTransportSE(URL_SERVICIO);
 
-                    androidHttpTransport.call(SOAP_ACTION_DIFUNTO, envelope);
+                    androidHttpTransport.call(SOAP_ACTION_SERVICIO, envelope);
                     Object response = envelope.getResponse();
-                    webResponseUpload = response.toString();
+                    webResponseActualizar = response.toString();
 
                 }catch(Exception e){
                     e.printStackTrace();
                 }
-                handler.post(createUIUpload);
+                handler.post(createUIRegistroServicioComprado);
             }
         };
 
         thread.start();
     }
 
-    final Runnable createUIUpload = new Runnable() {
+    final Runnable createUIRegistroServicioComprado = new Runnable() {
 
         public void run(){
 
-            if(Boolean.valueOf(webResponseUpload)){
-                Difunto dif = (Difunto)spinner.getSelectedItem();
-                loadImagenesList(dif.getIdDifunto());
-                imgView.setVisibility(View.GONE);
-                Toast.makeText(ImagenesDifuntoActivity.this, "Imagen Registrada!", Toast.LENGTH_LONG).show();
-            }else{
+            if(!webResponseActualizar.equals("") && !webResponseActualizar.equals("[]") && Boolean.parseBoolean(webResponseActualizar)){
+                Toast.makeText(VerMensajesDifuntoActivity.this, "Mensaje Autorizado!", Toast.LENGTH_LONG).show();
                 showProgress(false);
-                Toast.makeText(ImagenesDifuntoActivity.this, "No se registro la imagen!", Toast.LENGTH_LONG).show();
+                loadDifuntosList();
+            }
+            else{
+                Toast.makeText(VerMensajesDifuntoActivity.this, "No se ha podido autorizar el mensaje!", Toast.LENGTH_LONG).show();
+                showProgress(false);
             }
         }
     };
+
 }

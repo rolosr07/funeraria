@@ -1,4 +1,4 @@
-package com.funeraria.funeraria.common;
+package com.funeraria.funeraria.common.Adapters;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -12,8 +12,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.funeraria.funeraria.R;
+import com.funeraria.funeraria.common.entities.Imagen;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

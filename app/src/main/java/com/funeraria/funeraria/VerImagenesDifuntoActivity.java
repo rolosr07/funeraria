@@ -4,22 +4,18 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.view.ViewPager;
-import android.util.Base64;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.funeraria.funeraria.common.Base;
-import com.funeraria.funeraria.common.CustomPagerAdapter;
-import com.funeraria.funeraria.common.Imagen;
+import com.funeraria.funeraria.common.Adapters.CustomPagerAdapter;
+import com.funeraria.funeraria.common.entities.Imagen;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 

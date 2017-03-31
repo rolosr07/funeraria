@@ -1,4 +1,4 @@
-package com.funeraria.funeraria.common;
+package com.funeraria.funeraria.common.Adapters;
 
 import android.content.Context;
 import android.view.View;
@@ -6,17 +6,19 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.funeraria.funeraria.common.entities.Servicio;
+
 import java.util.List;
 
 /**
  * Created by Rolo on 25/03/2017.
  */
-public class CustomAdapterImagenes extends ArrayAdapter {
+public class CustomAdapterServicio extends ArrayAdapter {
 
     private Context context;
-    private List<Imagen> itemList;
+    private List<Servicio> itemList;
 
-    public CustomAdapterImagenes(Context context, int textViewResourceId, List<Imagen> itemList) {
+    public CustomAdapterServicio(Context context, int textViewResourceId, List<Servicio> itemList) {
 
         super(context, textViewResourceId, itemList);
         this.context=context;
@@ -26,8 +28,8 @@ public class CustomAdapterImagenes extends ArrayAdapter {
     public TextView getView(int position, View convertView, ViewGroup parent) {
 
         TextView v = (TextView) super.getView(position, convertView, parent);
-        Imagen imagen = itemList.get(position);
-        v.setText(imagen.getNombre());
+        Servicio servicio = itemList.get(position);
+        v.setText(servicio.getNombre());
 
         return v;
     }
@@ -35,8 +37,8 @@ public class CustomAdapterImagenes extends ArrayAdapter {
     public TextView getDropDownView(int position, View convertView, ViewGroup parent) {
 
         TextView v = (TextView) super.getView(position, convertView, parent);
-        Imagen difunto = itemList.get(position);
-        v.setText(difunto.getNombre());
+        Servicio servicio = itemList.get(position);
+        v.setText(servicio.getNombre());
         return v;
     }
 }

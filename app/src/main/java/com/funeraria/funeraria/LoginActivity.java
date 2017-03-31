@@ -191,21 +191,11 @@ public class LoginActivity extends Base {
                     androidHttpTransport.call(SOAP_ACTION_USER, envelope);
                     Object response = envelope.getResponse();
                     webResponse = response.toString();
-                    if(!webResponse.equals("")){
-                        SharedPreferences prefs = getSharedPreferences("com.funeraria.funeraria", Context.MODE_PRIVATE);
-                        prefs.edit().putString("USER_DATA", webResponse).apply();
-                    }
 
                 }catch(Exception e){
                     e.printStackTrace();
                 }
-                if(!webResponse.equals("")){
-                    handler.post(createUI);
-                }else{
-                    showProgress(false);
-                    userNameView.setError(getString(R.string.error_invalid_email));
-                }
-
+                handler.post(createUI);
             }
         };
 
@@ -232,9 +222,18 @@ public class LoginActivity extends Base {
     final Runnable createUI = new Runnable() {
 
         public void run(){
-            String[] result = webResponse.split(",");
-            showProgress(false);
-            redirect(result[2]);
+
+            if(!webResponse.equals("")){
+                SharedPreferences prefs = getSharedPreferences("com.funeraria.funeraria", Context.MODE_PRIVATE);
+                prefs.edit().putString("USER_DATA", webResponse).apply();
+
+                String[] result = webResponse.split(",");
+                redirect(result[2]);
+                showProgress(false);
+            }else{
+                userNameView.setError(getString(R.string.error_invalid_email));
+                showProgress(false);
+            }
         }
     };
 }

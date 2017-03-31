@@ -69,6 +69,18 @@
             android:name=".VerImagenesDifuntoActivity"
             android:label="@string/title_activity_placa"
             android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".VerFloresCompradasDifuntoActivity"
+            android:label="@string/title_activity_placa"
+            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".VerVelasCompradasDifuntoActivity"
+            android:label="@string/title_activity_placa"
+            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".VerMensajesDifuntoActivity"
+            android:label="@string/title_activity_placa"
+            android:screenOrientation="portrait"></activity>
     </application>
 
 </manifest>

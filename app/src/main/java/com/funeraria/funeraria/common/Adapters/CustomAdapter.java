@@ -1,4 +1,4 @@
-package com.funeraria.funeraria.common;
+package com.funeraria.funeraria.common.Adapters;
 
 import android.content.Context;
 import android.view.View;
@@ -6,17 +6,19 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.funeraria.funeraria.common.entities.Difunto;
+
 import java.util.List;
 
 /**
  * Created by Rolo on 25/03/2017.
  */
-public class CustomAdapterRestos extends ArrayAdapter {
+public class CustomAdapter extends ArrayAdapter {
 
     private Context context;
-    private List<Restos> itemList;
+    private List<Difunto> itemList;
 
-    public CustomAdapterRestos(Context context, int textViewResourceId, List<Restos> itemList) {
+    public CustomAdapter(Context context, int textViewResourceId,List<Difunto> itemList) {
 
         super(context, textViewResourceId, itemList);
         this.context=context;
@@ -26,16 +28,17 @@ public class CustomAdapterRestos extends ArrayAdapter {
     public TextView getView(int position, View convertView, ViewGroup parent) {
 
         TextView v = (TextView) super.getView(position, convertView, parent);
-        Restos restos = itemList.get(position);
-        v.setText(restos.getNombre());
+        Difunto difunto = itemList.get(position);
+        v.setText(difunto.getNombre() + " " + difunto.getApellidos());
+
         return v;
     }
 
     public TextView getDropDownView(int position, View convertView, ViewGroup parent) {
 
         TextView v = (TextView) super.getView(position, convertView, parent);
-        Restos restos = itemList.get(position);
-        v.setText(restos.getNombre());
+        Difunto difunto = itemList.get(position);
+        v.setText(difunto.getNombre() + " " + difunto.getApellidos());
         return v;
     }
 }

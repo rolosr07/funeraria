@@ -1,4 +1,4 @@
-package com.funeraria.funeraria.common;
+package com.funeraria.funeraria.common.entities;
 
 /**
  * Created by ZeptooUser on 26/03/2017.
@@ -16,6 +16,12 @@ public class Servicio {
     private String activo;
     private String borrado;
     private String fechaCreacion;
+
+    private String nombreUsuario;
+    private String apellidoUsuario;
+    private String fechaCompra;
+    private String autorizado;
+    private int idServicioComprado;
 
     public Servicio(){
     }
@@ -98,5 +104,45 @@ public class Servicio {
 
     public void setFechaCreacion(String fechaCreacion) {
         this.fechaCreacion = fechaCreacion;
+    }
+
+    public String getNombreUsuario() {
+        return nombreUsuario;
+    }
+
+    public void setNombreUsuario(String nombreUsuario) {
+        this.nombreUsuario = nombreUsuario;
+    }
+
+    public String getApellidoUsuario() {
+        return apellidoUsuario;
+    }
+
+    public void setApellidoUsuario(String apellidoUsuario) {
+        this.apellidoUsuario = apellidoUsuario;
+    }
+
+    public String getFechaCompra() {
+        return fechaCompra;
+    }
+
+    public void setFechaCompra(String fechaCompra) {
+        this.fechaCompra = fechaCompra;
+    }
+
+    public String getAutorizado() {
+        return autorizado;
+    }
+
+    public void setAutorizado(String autorizado) {
+        this.autorizado = autorizado;
+    }
+
+    public int getIdServicioComprado() {
+        return idServicioComprado;
+    }
+
+    public void setIdServicioComprado(int idServicioComprado) {
+        this.idServicioComprado = idServicioComprado;
     }
 }

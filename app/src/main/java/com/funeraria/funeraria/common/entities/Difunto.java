@@ -1,4 +1,4 @@
-package com.funeraria.funeraria.common;
+package com.funeraria.funeraria.common.entities;
 
 /**
  * Created by Rolo on 25/03/2017.

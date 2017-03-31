@@ -13,22 +13,11 @@ import android.util.Base64;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.funeraria.funeraria.common.Base;
-import com.funeraria.funeraria.common.CustomAdapter;
-import com.funeraria.funeraria.common.CustomAdapterRestos;
-import com.funeraria.funeraria.common.CustomAdapterServicio;
-import com.funeraria.funeraria.common.Difunto;
-import com.funeraria.funeraria.common.PlacaInformation;
-import com.funeraria.funeraria.common.Restos;
-import com.funeraria.funeraria.common.Servicio;
+import com.funeraria.funeraria.common.entities.PlacaInformation;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -42,7 +31,6 @@ import java.lang.reflect.Type;
 import java.text.DateFormatSymbols;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
