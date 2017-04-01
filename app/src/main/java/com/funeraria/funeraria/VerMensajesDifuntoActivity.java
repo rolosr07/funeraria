@@ -244,7 +244,7 @@ public class VerMensajesDifuntoActivity extends Base {
 
                 if(lcs.size() > 0){
 
-                    txNumeroMensajes.setText("Cantidad de Imagenes: "+ lcs.size());
+                    txNumeroMensajes.setText("Cantidad de Mensajes: "+ lcs.size()+"");
                     txNumeroMensajes.setVisibility(View.VISIBLE);
 
                     CustomAdapterServicio adapter = new CustomAdapterServicio(VerMensajesDifuntoActivity.this, R.layout.simple_spinner_item,lcs);
@@ -269,37 +269,39 @@ public class VerMensajesDifuntoActivity extends Base {
                                     if(servicio.getAutorizado().equals("1")){
                                         txAutorizado.setText("Autorizado: Si");
                                         txAutorizado.setVisibility(View.VISIBLE);
-                                        buttonAutorizar.setEnabled(false);
+                                        buttonAutorizar.setVisibility(View.GONE);
                                     }else{
                                         txAutorizado.setText("Autorizado: No");
                                         txAutorizado.setVisibility(View.VISIBLE);
-                                        buttonAutorizar.setEnabled(true);
+                                        buttonAutorizar.setVisibility(View.VISIBLE);
                                     }
 
                                     idServicioComprado = servicio.getIdServicioComprado();
-
                                     showProgress(false);
-
                                 }
                                 public void onNothingSelected(AdapterView<?> parent) {
                                 }
                             }
                     );
                 }else{
-                    txNumeroMensajes.setText("Cantidad de Imagenes: "+ 0);
+                    txNumeroMensajes.setText("Cantidad de Mensajes: "+ 0+"");
                     spinnerMensajes.setVisibility(View.GONE);
                     txMensaje.setVisibility(View.GONE);
                     txNombreUsuario.setVisibility(View.GONE);
                     txFechaCompra.setVisibility(View.GONE);
+                    buttonAutorizar.setVisibility(View.GONE);
+                    txAutorizado.setVisibility(View.GONE);
                     showProgress(false);
                 }
             }else{
                 showProgress(false);
                 txMensaje.setVisibility(View.GONE);
-                txNumeroMensajes.setText("Cantidad de Imagenes: "+0);
+                txNumeroMensajes.setText("Cantidad de Mensajes: "+0+"");
                 spinnerMensajes.setVisibility(View.GONE);
                 txNombreUsuario.setVisibility(View.GONE);
                 txFechaCompra.setVisibility(View.GONE);
+                buttonAutorizar.setVisibility(View.GONE);
+                txAutorizado.setVisibility(View.GONE);
             }
         }
     };

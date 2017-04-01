@@ -205,5 +205,7 @@ public class VerImagenesDifuntoActivity extends Base {
     protected void onPause() {
         super.onPause();
         handler.removeCallbacks(runnable);
+        finishAffinity();
+        finish();
     }
 }

@@ -136,6 +136,7 @@ public class MainActivityAdmin extends Activity {
                 startActivity(i);
             }
         });
+
         ////////////////////////////
 
         Button buttonMensajes = (Button) findViewById(R.id.buttonMensajes);
@@ -152,6 +153,26 @@ public class MainActivityAdmin extends Activity {
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(MainActivityAdmin.this, VerMensajesDifuntoActivity.class);
+                startActivity(i);
+            }
+        });
+
+        ////////////////////////////
+
+        Button buttonAutorizarUsuarios = (Button) findViewById(R.id.buttonAutorizarUsuarios);
+        buttonAutorizarUsuarios.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(MainActivityAdmin.this, AutorizarUsuariosDifuntoActivity.class);
+                startActivity(i);
+            }
+        });
+
+        TextView tvAutorizarUsuarios = (TextView) findViewById(R.id.tvAutorizarUsuarios);
+        tvAutorizarUsuarios.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(MainActivityAdmin.this, AutorizarUsuariosDifuntoActivity.class);
                 startActivity(i);
             }
         });

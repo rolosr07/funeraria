@@ -81,6 +81,14 @@
             android:name=".VerMensajesDifuntoActivity"
             android:label="@string/title_activity_placa"
             android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".AutorizarUsuariosDifuntoActivity"
+            android:label="@string/title_activity_placa"
+            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".RegistrarUsuarioActivity"
+            android:label="@string/title_activity_placa"
+            android:screenOrientation="portrait"></activity>
     </application>
 
 </manifest>

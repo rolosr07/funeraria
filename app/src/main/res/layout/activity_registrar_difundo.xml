@@ -36,7 +36,7 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:textStyle="bold"
-        android:textSize="22dp"
+        android:textSize="28dp"
         android:gravity="center"
         android:layout_gravity="center"/>
 
@@ -45,7 +45,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Nombre"
-        android:inputType="textEmailAddress"
+        android:inputType="textCapWords"
         android:maxLines="1"
         android:singleLine="true"
         android:gravity="center_horizontal"
@@ -57,7 +57,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Apellidos"
-            android:inputType="textEmailAddress"
+            android:inputType="textCapWords"
             android:maxLines="1"
             android:singleLine="true"
             android:gravity="center_horizontal"
@@ -70,7 +70,8 @@
             android:layout_height="wrap_content"
             android:hint="Fecha Nacimiento"
             android:gravity="center"
-            android:layout_marginTop="10dp"/>
+            android:layout_marginTop="10dp"
+            android:inputType="date"/>
 
         <Button
             android:id="@+id/btnChangeDateNacimiento"
@@ -85,7 +86,8 @@
             android:layout_height="wrap_content"
             android:hint="Fecha Deceso"
             android:gravity="center"
-            android:layout_marginTop="10dp"/>
+            android:layout_marginTop="10dp"
+            android:inputType="date"/>
 
         <Button
             android:id="@+id/btnChangeDateDeceso"

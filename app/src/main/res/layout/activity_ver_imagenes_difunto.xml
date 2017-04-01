@@ -38,7 +38,7 @@
                 android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"
                 android:textStyle="bold"
-                android:textSize="25dp"
+                android:textSize="28dp"
                 android:gravity="center"
                 android:layout_gravity="center"
                 android:id="@+id/tvNombre"/>
