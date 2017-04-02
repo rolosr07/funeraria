@@ -20,7 +20,6 @@ import android.widget.TextView;
 
 import com.funeraria.funeraria.common.Base;
 import com.funeraria.funeraria.common.entities.Logo;
-import com.funeraria.funeraria.common.entities.Servicio;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
