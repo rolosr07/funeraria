@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import com.funeraria.funeraria.common.Base;
 import com.funeraria.funeraria.common.entities.Logo;
+import com.funeraria.funeraria.common.entities.Usuario;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -59,8 +60,9 @@ public class LoginActivity extends Base {
         SharedPreferences prefs = getSharedPreferences("com.funeraria.funeraria", Context.MODE_PRIVATE);
         if(!prefs.getString("USER_DATA","").equals(""))
         {
-            String[] userData = prefs.getString("USER_DATA","").split(",");
-            redirect(userData[2]);
+            Type collectionType = new TypeToken<List<Usuario>>(){}.getType();
+            List<Usuario> usuarios = new Gson().fromJson( prefs.getString("USER_DATA","") , collectionType);
+            redirect(usuarios.get(0).getRol(), usuarios.get(0).getIdDifunto());
         }
 
         userNameView = (EditText) findViewById(R.id.userName);
@@ -189,7 +191,7 @@ public class LoginActivity extends Base {
         thread.start();
     }
 
-    private void redirect(String rol){
+    private void redirect(String rol, int idDifunto){
 
         if(rol.equals("admin")){
             Intent i = new Intent(LoginActivity.this, MainActivityAdmin.class);
@@ -200,7 +202,8 @@ public class LoginActivity extends Base {
             finish();
             startActivity(i);
         }else if(rol.equals("presenter")){
-            Intent i = new Intent(LoginActivity.this, MainActivityPresenter.class);
+            Intent i = new Intent(LoginActivity.this, VerPlacaActivity.class);
+            i.putExtra("idDifunto", idDifunto);
             finish();
             startActivity(i);
         }
@@ -210,12 +213,14 @@ public class LoginActivity extends Base {
 
         public void run(){
 
-            if(!webResponse.equals("")){
+            if(!webResponse.equals("") && !webResponse.equals("[]")){
+                Type collectionType = new TypeToken<List<Usuario>>(){}.getType();
+                List<Usuario> usuarios = new Gson().fromJson( webResponse , collectionType);
+
                 SharedPreferences prefs = getSharedPreferences("com.funeraria.funeraria", Context.MODE_PRIVATE);
                 prefs.edit().putString("USER_DATA", webResponse).apply();
 
-                String[] result = webResponse.split(",");
-                redirect(result[2]);
+                redirect(usuarios.get(0).getRol(), usuarios.get(0).getIdDifunto());
                 showProgress(false);
             }else{
                 userNameView.setError(getString(R.string.error_invalid_email));

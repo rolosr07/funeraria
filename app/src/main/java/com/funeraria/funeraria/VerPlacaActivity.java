@@ -205,11 +205,9 @@ public class VerPlacaActivity extends Base {
     }
     @Override
     public void onBackPressed() {
-        Intent intent = new Intent(VerPlacaActivity.this, MainActivityPresenter.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
         finishAffinity();
         finish();
-        startActivity(intent);
     }
 
     @Override

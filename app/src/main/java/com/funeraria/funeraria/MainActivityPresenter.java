@@ -15,6 +15,7 @@ import android.widget.TextView;
 import com.funeraria.funeraria.common.Base;
 import com.funeraria.funeraria.common.Adapters.CustomAdapter;
 import com.funeraria.funeraria.common.entities.Difunto;
+import com.funeraria.funeraria.common.entities.Usuario;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -54,9 +55,11 @@ public class MainActivityPresenter extends Base {
         SharedPreferences prefs = getSharedPreferences("com.funeraria.funeraria", Context.MODE_PRIVATE);
         if(!prefs.getString("USER_DATA","").equals(""))
         {
-            String[] userData = prefs.getString("USER_DATA","").split(",");
+            Type collectionType = new TypeToken<List<Usuario>>(){}.getType();
+            List<Usuario> usuarios = new Gson().fromJson( prefs.getString("USER_DATA","") , collectionType);
+
             TextView nameAdmin = (TextView) findViewById(R.id.nameAdmin);
-            nameAdmin.setText(userData[0]+" "+userData[1]);
+            nameAdmin.setText(usuarios.get(0).getNombre()+" "+usuarios.get(0).getApellido());
         }
 
         Button buttonRegistrar = (Button) findViewById(R.id.buttonRegistrar);

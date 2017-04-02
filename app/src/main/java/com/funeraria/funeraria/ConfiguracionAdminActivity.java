@@ -15,12 +15,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.funeraria.funeraria.common.Base;
+import com.funeraria.funeraria.common.entities.Usuario;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.PropertyInfo;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
+
+import java.lang.reflect.Type;
+import java.util.List;
 
 
 public class ConfiguracionAdminActivity extends Base {
@@ -30,7 +36,7 @@ public class ConfiguracionAdminActivity extends Base {
     private EditText tvNombreAdmin;
     private EditText tvApellidoAdmin;
     private EditText tvEmailAdmin;
-    private EditText tvpasswordAdmin;
+    private EditText tvPasswordAdmin;
 
     private String webResponse = "";
     private Thread thread;
@@ -48,7 +54,7 @@ public class ConfiguracionAdminActivity extends Base {
         tvNombreAdmin = (EditText) findViewById(R.id.tvNombreAdmin);
         tvApellidoAdmin = (EditText) findViewById(R.id.tvApellidoAdmin);
         tvEmailAdmin = (EditText) findViewById(R.id.tvEmailAdmin);
-        tvpasswordAdmin = (EditText) findViewById(R.id.tvpasswordAdmin);
+        tvPasswordAdmin = (EditText) findViewById(R.id.tvPasswordAdmin);
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
@@ -56,14 +62,15 @@ public class ConfiguracionAdminActivity extends Base {
         SharedPreferences prefs = getSharedPreferences("com.funeraria.funeraria", Context.MODE_PRIVATE);
         if(!prefs.getString("USER_DATA","").equals(""))
         {
-            String[] userData = prefs.getString("USER_DATA","").split(",");
+            Type collectionType = new TypeToken<List<Usuario>>(){}.getType();
+            List<Usuario> usuarios = new Gson().fromJson( prefs.getString("USER_DATA","") , collectionType);
 
-            tvCodigoAdmin.setText(userData[5]);
-            tvUserNameAdmin.setText(userData[7]);
-            tvNombreAdmin.setText(userData[0]);
-            tvApellidoAdmin.setText(userData[1]);
-            tvEmailAdmin.setText(userData[3]);
-            tvpasswordAdmin.setText(userData[6]);
+            tvCodigoAdmin.setText(String.valueOf(usuarios.get(0).getIdUsuario()));
+            tvUserNameAdmin.setText(usuarios.get(0).getUserName());
+            tvNombreAdmin.setText(usuarios.get(0).getNombre());
+            tvApellidoAdmin.setText(usuarios.get(0).getApellido());
+            tvEmailAdmin.setText(usuarios.get(0).getEmail());
+            tvPasswordAdmin.setText(usuarios.get(0).getPassword());
         }
 
         Button btnCerrarSession = (Button) findViewById(R.id.btnCerrarSession);
@@ -111,13 +118,13 @@ public class ConfiguracionAdminActivity extends Base {
         tvNombreAdmin.setError(null);
         tvApellidoAdmin.setError(null);
         tvEmailAdmin.setError(null);
-        tvpasswordAdmin.setError(null);
+        tvPasswordAdmin.setError(null);
 
         // Store values at the time of the login attempt.
         String nombre = tvNombreAdmin.getText().toString();
         String apellido = tvApellidoAdmin.getText().toString();
         String email = tvEmailAdmin.getText().toString();
-        String password = tvpasswordAdmin.getText().toString();
+        String password = tvPasswordAdmin.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
@@ -148,8 +155,8 @@ public class ConfiguracionAdminActivity extends Base {
         }
 
         if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
-            tvpasswordAdmin.setError(getString(R.string.error_invalid_password));
-            focusView = tvpasswordAdmin;
+            tvPasswordAdmin.setError(getString(R.string.error_invalid_password));
+            focusView = tvPasswordAdmin;
             cancel = true;
         }
 
@@ -175,11 +182,12 @@ public class ConfiguracionAdminActivity extends Base {
 
                     SharedPreferences prefs = getSharedPreferences("com.funeraria.funeraria", Context.MODE_PRIVATE);
 
-                    String[] userData = prefs.getString("USER_DATA","").split(",");
+                    Type collectionType = new TypeToken<List<Usuario>>(){}.getType();
+                    List<Usuario> usuarios = new Gson().fromJson( prefs.getString("USER_DATA","") , collectionType);
 
                     PropertyInfo fromProp = new PropertyInfo();
                     fromProp.setName("idUsuario");
-                    fromProp.setValue(userData[5]);
+                    fromProp.setValue(usuarios.get(0).getIdUsuario());
                     fromProp.setType(String.class);
                     request.addProperty(fromProp);
 
@@ -197,7 +205,7 @@ public class ConfiguracionAdminActivity extends Base {
 
                     PropertyInfo fromProp3 = new PropertyInfo();
                     fromProp3.setName("userName");
-                    fromProp3.setValue(userData[7]);
+                    fromProp3.setValue(usuarios.get(0).getUserName());
                     fromProp3.setType(String.class);
                     request.addProperty(fromProp3);
 
@@ -215,7 +223,7 @@ public class ConfiguracionAdminActivity extends Base {
 
                     PropertyInfo fromProp6 = new PropertyInfo();
                     fromProp6.setName("rol");
-                    fromProp6.setValue(userData[2]);
+                    fromProp6.setValue(usuarios.get(0).getRol());
                     fromProp6.setType(String.class);
                     request.addProperty(fromProp6);
 

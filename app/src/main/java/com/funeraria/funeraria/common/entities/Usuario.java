@@ -19,6 +19,7 @@ public class Usuario {
     private String autorizado;
     private String fechaAutorizacion;
     private int idUsuarioAutorizado;
+    private int idDifunto;
 
     public Usuario(){
 
@@ -126,5 +127,13 @@ public class Usuario {
 
     public void setIdUsuarioAutorizado(int idUsuarioAutorizado) {
         this.idUsuarioAutorizado = idUsuarioAutorizado;
+    }
+
+    public int getIdDifunto() {
+        return idDifunto;
+    }
+
+    public void setIdDifunto(int idDifunto) {
+        this.idDifunto = idDifunto;
     }
 }
