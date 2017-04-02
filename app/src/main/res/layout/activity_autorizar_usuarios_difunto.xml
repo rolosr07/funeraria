@@ -96,17 +96,30 @@
                 android:id="@+id/txFechaCreacion"/>
 
             <TextView
-                android:text=""
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true"
-                android:textStyle="bold"
-                android:textSize="16dp"
-                android:gravity="center"
-                android:layout_gravity="center"
-                android:visibility="gone"
-                android:id="@+id/txAutorizado"/>
+            android:text=""
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:textStyle="bold"
+            android:textSize="16dp"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            android:id="@+id/txAutorizado"/>
+
+        <TextView
+            android:text=""
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:textStyle="bold"
+            android:textSize="16dp"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            android:id="@+id/txTipoUsuario"/>
 
             <Button
                 android:id="@+id/buttonAutorizar"

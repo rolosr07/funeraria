@@ -41,6 +41,7 @@ public class AutorizarUsuariosDifuntoActivity extends Base {
     private TextView txNumeroUsuarios;
     private TextView txFechaCreacion;
     private TextView txAutorizado;
+    private TextView txTipoUsuario;
 
     private String webResponse = "";
     private String webResponseUsuarios = "";
@@ -69,6 +70,7 @@ public class AutorizarUsuariosDifuntoActivity extends Base {
         txNumeroUsuarios = (TextView)findViewById(R.id.txNumeroUsuarios);
         txFechaCreacion = (TextView)findViewById(R.id.txFechaCreacion);
         txAutorizado = (TextView)findViewById(R.id.txAutorizado);
+        txTipoUsuario = (TextView)findViewById(R.id.txTipoUsuario);
 
         spinnerDifuntos = (Spinner) findViewById(R.id.spinner);
         spinnerUsuarios = (Spinner) findViewById(R.id.spinnerImagenes);
@@ -274,6 +276,15 @@ public class AutorizarUsuariosDifuntoActivity extends Base {
                                     txAutorizado.setVisibility(View.VISIBLE);
                                     buttonAutorizar.setVisibility(View.VISIBLE);
                                 }
+
+                                if(usuario.getRol().equals("user")){
+                                    txTipoUsuario.setText("Tipo: Cliente");
+                                    txTipoUsuario.setVisibility(View.VISIBLE);
+                                }else{
+                                    txTipoUsuario.setText("Tipo: Presentador");
+                                    txTipoUsuario.setVisibility(View.VISIBLE);
+                                }
+
                                 idAutorizarUsuario = usuario.getIdUsuarioAutorizado();
                                 showProgress(false);
                             }
@@ -286,6 +297,7 @@ public class AutorizarUsuariosDifuntoActivity extends Base {
                     spinnerUsuarios.setVisibility(View.GONE);
                     txFechaCreacion.setVisibility(View.GONE);
                     txAutorizado.setVisibility(View.GONE);
+                    txTipoUsuario.setVisibility(View.GONE);
                     showProgress(false);
                 }
             }else{
@@ -294,6 +306,7 @@ public class AutorizarUsuariosDifuntoActivity extends Base {
                 spinnerUsuarios.setVisibility(View.GONE);
                 txFechaCreacion.setVisibility(View.GONE);
                 txAutorizado.setVisibility(View.GONE);
+                txTipoUsuario.setVisibility(View.GONE);
             }
         }
     };

@@ -7,6 +7,7 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,12 +16,18 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.funeraria.funeraria.common.Adapters.CustomAdapter;
+import com.funeraria.funeraria.common.Adapters.CustomAdapterString;
 import com.funeraria.funeraria.common.Base;
+import com.funeraria.funeraria.common.entities.Difunto;
 
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.PropertyInfo;
@@ -28,7 +35,9 @@ import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 
 public class RegistrarUsuarioActivity extends Base {
@@ -42,6 +51,7 @@ public class RegistrarUsuarioActivity extends Base {
     private EditText editApellido;
     private EditText editEmail;
 
+    private Spinner spinner;
 
     private String webResponse = "";
     private Thread thread;
@@ -102,21 +112,37 @@ public class RegistrarUsuarioActivity extends Base {
             cancel = true;
         }
 
-        if (TextUtils.isEmpty(email)) {
-            editEmail.setError(getString(R.string.error_field_required));
-            focusView = editEmail;
+        if(spinner.getSelectedItemPosition() == 0){
+            TextView errorText = (TextView)spinner.getSelectedView();
+            errorText.setError("");
+            errorText.setTextColor(Color.RED);
+            errorText.setText("Seleccione el tipo!");
             cancel = true;
+            focusView = spinner;
+        }
+        if(spinner.getSelectedItemPosition() != 2){
+            if (TextUtils.isEmpty(email)) {
+                editEmail.setError(getString(R.string.error_field_required));
+                focusView = editEmail;
+                cancel = true;
+            }
         }
 
         if (cancel) {
             focusView.requestFocus();
             showProgress(false);
         } else {
-            registrarUsuario(name,apellido,email);
+            String tipoUsuario = "";
+            if(spinner.getSelectedItemPosition()==1){
+                tipoUsuario = "user";
+            }else if(spinner.getSelectedItemPosition()==2){
+                tipoUsuario = "presenter";
+            }
+            registrarUsuario(name,apellido,email,tipoUsuario);
         }
     }
 
-    public void registrarUsuario(final String nombre, final String apellido, final String email){
+    public void registrarUsuario(final String nombre, final String apellido, final String email, final String tipoUsuario){
         thread = new Thread(){
             public void run(){
                 try {
@@ -144,6 +170,12 @@ public class RegistrarUsuarioActivity extends Base {
                     fromProp4.setValue(idDifunto);
                     fromProp4.setType(int.class);
                     request.addProperty(fromProp4);
+
+                    PropertyInfo fromProp5 = new PropertyInfo();
+                    fromProp5.setName("tipoUsuario");
+                    fromProp5.setValue(tipoUsuario);
+                    fromProp5.setType(String.class);
+                    request.addProperty(fromProp5);
 
                     SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
                     envelope.dotNet = true;
@@ -254,5 +286,30 @@ public class RegistrarUsuarioActivity extends Base {
         mProgressView = findViewById(R.id.login_progress);
 
         btnRegistrarUsuario = (Button) findViewById(R.id.btnRegistrarUsuario);
+
+        spinner = (Spinner) findViewById(R.id.spinner);
+
+        List<String> lcs = new ArrayList<String>();
+        lcs.add("Seleccione el tipo");
+        lcs.add("Cliente");
+        lcs.add("Presentador");
+
+        CustomAdapterString adapter = new CustomAdapterString(RegistrarUsuarioActivity.this, R.layout.simple_spinner_item,lcs);
+        adapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+
+        spinner.setOnItemSelectedListener(
+                new AdapterView.OnItemSelectedListener() {
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        if(spinner.getSelectedItemPosition() == 2){
+                            editEmail.setVisibility(View.GONE);
+                        }else{
+                            editEmail.setVisibility(View.VISIBLE);
+                        }
+                    }
+                    public void onNothingSelected(AdapterView<?> parent) {
+                    }
+                }
+        );
     }
 }
