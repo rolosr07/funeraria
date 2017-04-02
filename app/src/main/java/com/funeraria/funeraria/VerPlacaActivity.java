@@ -254,4 +254,11 @@ public class VerPlacaActivity extends Base {
         finish();
         startActivity(intent);
     }
+    
+    @Override
+    protected void onPause() {
+        super.onPause();
+        finishAffinity();
+        finish();
+    }
 }
