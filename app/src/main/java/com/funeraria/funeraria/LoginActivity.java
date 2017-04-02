@@ -1,24 +1,28 @@
 package com.funeraria.funeraria;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.funeraria.funeraria.common.Base;
+import com.funeraria.funeraria.common.entities.Logo;
+import com.funeraria.funeraria.common.entities.Servicio;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.PropertyInfo;
@@ -26,21 +30,27 @@ import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 
+import java.lang.reflect.Type;
+import java.util.List;
+
 /**
  * A login screen that offers login via email/password.
 
  */
 public class LoginActivity extends Base {
 
-    // UI references.
     private EditText userNameView;
     private EditText mPasswordView;
 
     private String webResponse = "";
+    private String webResponseLogo = "";
     private Thread thread;
     private Handler handler = new Handler();
 
+    private ImageView logo;
+
     private final String METHOD_NAME = "login";
+    private final String METHOD_NAME_LOGO = "loadLogo";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +88,22 @@ public class LoginActivity extends Base {
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+
+        logo = (ImageView) findViewById(R.id.logo);
+
+        if(!prefs.getString("LOGO_APP","").equals(""))
+        {
+            String image = prefs.getString("LOGO_APP","");
+
+            byte[] decodedString = Base64.decode(image, Base64.DEFAULT);
+            Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+
+            logo.setImageBitmap(decodedByte);
+
+        }else{
+            showProgress(true);
+            loadLogo();
+        }
     }
 
     /**
@@ -194,6 +220,54 @@ public class LoginActivity extends Base {
                 showProgress(false);
             }else{
                 userNameView.setError(getString(R.string.error_invalid_email));
+                showProgress(false);
+            }
+        }
+    };
+
+    public void loadLogo(){
+        thread = new Thread(){
+            public void run(){
+                try {
+                    SoapObject request = new SoapObject(NAMESPACE_USER, METHOD_NAME_LOGO);
+
+                    SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+                    envelope.dotNet = true;
+                    envelope.setOutputSoapObject(request);
+                    HttpTransportSE androidHttpTransport = new HttpTransportSE(URL_USER);
+
+                    androidHttpTransport.call(SOAP_ACTION_USER, envelope);
+                    Object response = envelope.getResponse();
+                    webResponseLogo = response.toString();
+
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+                handler.post(createUILoadLogo);
+            }
+        };
+
+        thread.start();
+    }
+
+    final Runnable createUILoadLogo = new Runnable() {
+
+        public void run(){
+
+            if(!webResponseLogo.equals("")){
+
+                Type collectionType = new TypeToken<List<Logo>>(){}.getType();
+                List<Logo> logoList = new Gson().fromJson( webResponseLogo , collectionType);
+
+                SharedPreferences prefs = getSharedPreferences("com.funeraria.funeraria", Context.MODE_PRIVATE);
+                prefs.edit().putString("LOGO_APP", logoList.get(0).getImagen()).apply();
+
+                byte[] decodedString = Base64.decode(logoList.get(0).getImagen(), Base64.DEFAULT);
+                Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                logo.setImageBitmap(decodedByte);
+
+                showProgress(false);
+            }else{
                 showProgress(false);
             }
         }
