@@ -37,6 +37,7 @@ public class AutorizarUsuariosDifuntoActivity extends Base {
     private TextView txFechaCreacion;
     private TextView txAutorizado;
     private TextView txTipoUsuario;
+    private TextView txEmail;
 
     private String webResponse = "";
     private String webResponseUsuarios = "";
@@ -66,6 +67,7 @@ public class AutorizarUsuariosDifuntoActivity extends Base {
         txFechaCreacion = (TextView)findViewById(R.id.txFechaCreacion);
         txAutorizado = (TextView)findViewById(R.id.txAutorizado);
         txTipoUsuario = (TextView)findViewById(R.id.txTipoUsuario);
+        txEmail = (TextView)findViewById(R.id.txEmail);
 
         spinnerDifuntos = (Spinner) findViewById(R.id.spinner);
         spinnerUsuarios = (Spinner) findViewById(R.id.spinnerImagenes);
@@ -245,6 +247,9 @@ public class AutorizarUsuariosDifuntoActivity extends Base {
                                     txTipoUsuario.setVisibility(View.VISIBLE);
                                 }
 
+                                txEmail.setText("Email: "+usuario.getEmail());
+                                txEmail.setVisibility(View.VISIBLE);
+
                                 idAutorizarUsuario = usuario.getIdUsuarioAutorizado();
                                 showProgress(false);
                             }
@@ -258,6 +263,7 @@ public class AutorizarUsuariosDifuntoActivity extends Base {
                     txFechaCreacion.setVisibility(View.GONE);
                     txAutorizado.setVisibility(View.GONE);
                     txTipoUsuario.setVisibility(View.GONE);
+                    txEmail.setVisibility(View.GONE);
                     showProgress(false);
                 }
             }else{
@@ -267,6 +273,7 @@ public class AutorizarUsuariosDifuntoActivity extends Base {
                 txFechaCreacion.setVisibility(View.GONE);
                 txAutorizado.setVisibility(View.GONE);
                 txTipoUsuario.setVisibility(View.GONE);
+                txEmail.setVisibility(View.GONE);
             }
         }
     };
