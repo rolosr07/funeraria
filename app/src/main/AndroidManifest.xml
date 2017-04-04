@@ -89,6 +89,14 @@
             android:name=".RegistrarUsuarioActivity"
             android:label="@string/title_activity_placa"
             android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".ComprarVelasActivity"
+            android:label="@string/title_activity_placa"
+            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".ConfiguracionUsuarioActivity"
+            android:label="@string/title_activity_placa"
+            android:screenOrientation="portrait"></activity>
     </application>
 
 </manifest>

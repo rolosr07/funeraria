@@ -1,9 +1,13 @@
 package com.funeraria.funeraria;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 
 
 public class MainActivityUser extends Activity {
@@ -12,6 +16,47 @@ public class MainActivityUser extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_activity_user);
+
+        ////////////////////////////
+
+        Button buttonComprarVelas = (Button) findViewById(R.id.buttonComprarVelas);
+        buttonComprarVelas.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(MainActivityUser.this, ComprarVelasActivity.class);
+                startActivity(i);
+            }
+        });
+
+        TextView tvComprarVelas = (TextView) findViewById(R.id.tvComprarVelas);
+        tvComprarVelas.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(MainActivityUser.this, ComprarVelasActivity.class);
+                startActivity(i);
+            }
+        });
+
+        //////////////////////////
+
+        Button configButton = (Button) findViewById(R.id.configButton);
+        configButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(MainActivityUser.this, ConfiguracionUsuarioActivity.class);
+                startActivity(i);
+            }
+        });
+
+        TextView configText = (TextView) findViewById(R.id.configText);
+        configText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(MainActivityUser.this, ConfiguracionUsuarioActivity.class);
+                startActivity(i);
+            }
+        });
+
     }
 
 

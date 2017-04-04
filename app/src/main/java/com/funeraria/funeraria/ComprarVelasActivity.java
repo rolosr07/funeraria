@@ -1,5 +1,8 @@
 package com.funeraria.funeraria;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -9,15 +12,18 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.funeraria.funeraria.common.Adapters.CustomAdapter;
 import com.funeraria.funeraria.common.Adapters.CustomAdapterServicio;
 import com.funeraria.funeraria.common.Base;
-import com.funeraria.funeraria.common.Adapters.CustomAdapter;
 import com.funeraria.funeraria.common.entities.Difunto;
 import com.funeraria.funeraria.common.entities.Servicio;
+import com.funeraria.funeraria.common.entities.Usuario;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -31,28 +37,31 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 
-public class VerVelasCompradasDifuntoActivity extends Base {
+public class ComprarVelasActivity extends Base {
 
     private TextView txNumeroVelas;
     private ImageView imageView;
+    private TextView txDuracion;
+    private TextView  txPrecio;
 
     private String webResponse = "";
     private String webResponseImages = "";
+    private String webResponseComprar = "";
     private Thread thread;
     private Handler handler = new Handler();
     private Spinner spinner;
     private Spinner spinnerVelas;
 
-    private TextView txNombreUsuario;
-    private TextView txFechaCompra;
+    private final String METHOD_NAME_GET_DIFUNTO_LIST = "getDifuntosPorUsuarioList";
+    private final String METHOD_NAME_GET_SERVICIOS_LIST = "getServiciosPorTipoDeServicioList";
+    private final String METHOD_NAME_COMPRAR_SERVICIO = "comprarServicio";
 
-    private final String METHOD_NAME_GET_DIFUNTO_LIST = "getDifuntosList";
-    private final String METHOD_NAME_GET_SERVICIOS_LIST = "getServiciosPorIdDifuntoYTipoDeServicioList";
+    private Usuario usuarioActual;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_ver_velas_compradas_difunto);
+        setContentView(R.layout.activity_comprar_velas);
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
@@ -61,11 +70,34 @@ public class VerVelasCompradasDifuntoActivity extends Base {
         spinner = (Spinner) findViewById(R.id.spinner);
         spinnerVelas = (Spinner) findViewById(R.id.spinnerVelas);
 
-        txNombreUsuario = (TextView)findViewById(R.id.txNombreUsuario);
-        txFechaCompra = (TextView)findViewById(R.id.txFechaCompra);
+        txDuracion = (TextView)findViewById(R.id.txDuracion);
+        txPrecio = (TextView)findViewById(R.id.txPrecio);
 
         showProgress(true);
+
+        SharedPreferences prefs = getSharedPreferences("com.funeraria.funeraria", Context.MODE_PRIVATE);
+        if(!prefs.getString("USER_DATA","").equals(""))
+        {
+            Type collectionType = new TypeToken<List<Usuario>>(){}.getType();
+            List<Usuario> usuarios = new Gson().fromJson( prefs.getString("USER_DATA","") , collectionType);
+            usuarioActual = usuarios.get(0);
+        }
+
         loadDifuntosList();
+        showProgress(true);
+        loadVelasList();
+
+        Button buttonComprar = (Button) findViewById(R.id.buttonComprar);
+        buttonComprar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showProgress(true);
+                int u = usuarioActual.getIdUsuario();
+                Difunto d = (Difunto) spinner.getSelectedItem();
+                Servicio s = (Servicio)spinnerVelas.getSelectedItem();
+                comprarServicio(u,d.getIdDifunto(),s.getIdServicio());
+            }
+        });
     }
 
     public void loadDifuntosList(){
@@ -74,6 +106,12 @@ public class VerVelasCompradasDifuntoActivity extends Base {
                 try {
 
                     SoapObject request = new SoapObject(NAMESPACE_DIFUNTO, METHOD_NAME_GET_DIFUNTO_LIST);
+
+                    PropertyInfo fromProp = new PropertyInfo();
+                    fromProp.setName("idUsuario");
+                    fromProp.setValue(usuarioActual.getIdUsuario());
+                    fromProp.setType(int.class);
+                    request.addProperty(fromProp);
 
                     SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
                     envelope.dotNet = true;
@@ -102,16 +140,14 @@ public class VerVelasCompradasDifuntoActivity extends Base {
                 Type collectionType = new TypeToken<List<Difunto>>(){}.getType();
                 List<Difunto> lcs = new Gson().fromJson( webResponse , collectionType);
 
-                CustomAdapter adapter = new CustomAdapter(VerVelasCompradasDifuntoActivity.this, R.layout.simple_spinner_item,lcs);
+                CustomAdapter adapter = new CustomAdapter(ComprarVelasActivity.this, R.layout.simple_spinner_item,lcs);
                 adapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
                 spinner.setAdapter(adapter);
 
                 spinner.setOnItemSelectedListener(
                         new AdapterView.OnItemSelectedListener() {
                             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                                Difunto dif = (Difunto) parent.getItemAtPosition(position);
-                                showProgress(true);
-                                loadVelasList(dif.getIdDifunto());
+
                             }
                             public void onNothingSelected(AdapterView<?> parent) {
                             }
@@ -141,18 +177,12 @@ public class VerVelasCompradasDifuntoActivity extends Base {
         return id == R.id.action_settings || super.onOptionsItemSelected(item);
     }
 
-    public void loadVelasList(final int idDifunto){
+    public void loadVelasList(){
         thread = new Thread(){
             public void run(){
                 try {
 
                     SoapObject request = new SoapObject(NAMESPACE_SERVICIO, METHOD_NAME_GET_SERVICIOS_LIST);
-
-                    PropertyInfo fromProp = new PropertyInfo();
-                    fromProp.setName("idDifunto");
-                    fromProp.setValue(idDifunto);
-                    fromProp.setType(int.class);
-                    request.addProperty(fromProp);
 
                     PropertyInfo fromProp1 = new PropertyInfo();
                     fromProp1.setName("idTipoServicio");
@@ -189,10 +219,10 @@ public class VerVelasCompradasDifuntoActivity extends Base {
 
                 if(lcs.size() > 0){
 
-                    txNumeroVelas.setText("Cantidad de Velas: "+ lcs.size());
+                    txNumeroVelas.setText("Velas disponibles: "+ lcs.size());
                     txNumeroVelas.setVisibility(View.VISIBLE);
 
-                    CustomAdapterServicio adapter = new CustomAdapterServicio(VerVelasCompradasDifuntoActivity.this, R.layout.simple_spinner_item,lcs);
+                    CustomAdapterServicio adapter = new CustomAdapterServicio(ComprarVelasActivity.this, R.layout.simple_spinner_item,lcs);
                     adapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
                     spinnerVelas.setAdapter(adapter);
                     spinnerVelas.setVisibility(View.VISIBLE);
@@ -208,11 +238,11 @@ public class VerVelasCompradasDifuntoActivity extends Base {
                                     imageView.setImageBitmap(decodedByte);
                                     imageView.setVisibility(View.VISIBLE);
 
-                                    txNombreUsuario.setText("Comprador: "+servicio.getNombreUsuario() + " " + servicio.getApellidoUsuario());
-                                    txNombreUsuario.setVisibility(View.VISIBLE);
+                                    txDuracion.setText("Duración en pantalla: "+servicio.getTiempoMostrar()+" minutos");
+                                    txDuracion.setVisibility(View.VISIBLE);
 
-                                    txFechaCompra.setText("Fecha: "+servicio.getFechaCompra()+"");
-                                    txFechaCompra.setVisibility(View.VISIBLE);
+                                    txPrecio.setText("Precio: $"+servicio.getPrecio());
+                                    txPrecio.setVisibility(View.VISIBLE);
 
                                     showProgress(false);
 
@@ -225,18 +255,86 @@ public class VerVelasCompradasDifuntoActivity extends Base {
                     txNumeroVelas.setText("Cantidad de Velas: "+ 0);
                     spinnerVelas.setVisibility(View.GONE);
                     imageView.setVisibility(View.GONE);
-                    txNombreUsuario.setVisibility(View.GONE);
-                    txFechaCompra.setVisibility(View.GONE);
+                    txDuracion.setVisibility(View.GONE);
+                    txPrecio.setVisibility(View.GONE);
                     showProgress(false);
                 }
             }else{
                 showProgress(false);
                 imageView.setVisibility(View.GONE);
                 txNumeroVelas.setText("Cantidad de Velas: "+0);
-                txNombreUsuario.setVisibility(View.GONE);
-                txFechaCompra.setVisibility(View.GONE);
                 spinnerVelas.setVisibility(View.GONE);
+                txDuracion.setVisibility(View.GONE);
+                txPrecio.setVisibility(View.GONE);
             }
+        }
+    };
+
+    public void comprarServicio(final int idUsuario, final int idDifunto, final int idServicio){
+        thread = new Thread(){
+            public void run(){
+                try {
+
+                    SoapObject request = new SoapObject(NAMESPACE_SERVICIO, METHOD_NAME_COMPRAR_SERVICIO);
+
+                    PropertyInfo fromProp = new PropertyInfo();
+                    fromProp.setName("idServicio");
+                    fromProp.setValue(idServicio);
+                    fromProp.setType(int.class);
+                    request.addProperty(fromProp);
+
+                    PropertyInfo fromProp1 = new PropertyInfo();
+                    fromProp1.setName("idUsuario");
+                    fromProp1.setValue(idUsuario);
+                    fromProp1.setType(int.class);
+                    request.addProperty(fromProp1);
+
+                    PropertyInfo fromProp2 = new PropertyInfo();
+                    fromProp2.setType(int.class);
+                    fromProp2.setName("idDifunto");
+                    fromProp2.setValue(idDifunto);
+                    request.addProperty(fromProp2);
+
+                    SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+                    envelope.dotNet = true;
+                    envelope.setOutputSoapObject(request);
+                    HttpTransportSE androidHttpTransport = new HttpTransportSE(URL_SERVICIO);
+
+                    androidHttpTransport.call(SOAP_ACTION_SERVICIO, envelope);
+                    Object response = envelope.getResponse();
+                    webResponseComprar = response.toString();
+
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+                handler.post(createUICompra);
+            }
+        };
+
+        thread.start();
+    }
+
+    final Runnable createUICompra = new Runnable() {
+
+        public void run(){
+
+            if(!webResponseComprar.equals("") && !webResponseComprar.equals("[]") && Boolean.parseBoolean(webResponseComprar)){
+                Toast.makeText(ComprarVelasActivity.this, "Compra realizada!, ahora se podrá ver la vela en la placa de su familiar!", Toast.LENGTH_LONG).show();
+                showProgress(false);
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    public void run() {
+                        Intent i = new Intent(ComprarVelasActivity.this, MainActivityUser.class);
+                        finish();
+                        startActivity(i);
+                    }
+                }, 2000);
+            }
+            else{
+                Toast.makeText(ComprarVelasActivity.this, "No se ha podido realizar la compra!", Toast.LENGTH_LONG).show();
+                showProgress(false);
+            }
+
         }
     };
 

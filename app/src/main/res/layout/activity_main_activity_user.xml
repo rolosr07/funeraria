@@ -39,7 +39,7 @@
                 android:layout_marginTop="10dp">
 
                 <Button
-                    android:id="@+id/email_sign_in_butto23"
+                    android:id="@+id/buttonComprarVelas"
                     style="?android:textAppearanceSmall"
                     android:layout_width="0dp"
                     android:layout_height="90dp"
@@ -81,10 +81,11 @@
                     android:textStyle="bold"
                     android:textSize="16dp"
                     android:gravity="center"
-                    android:layout_weight="1"/>
+                    android:layout_weight="1"
+                    android:id="@+id/tvComprarVelas"/>
 
                 <TextView
-                    android:text="Enviar Flores"
+                    android:text="Enviar      Flores"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:textStyle="bold"
@@ -126,7 +127,8 @@
                     android:layout_height="70dp"
                     android:textStyle="bold"
                     android:background="@drawable/carro"
-                    android:layout_weight="1"/>
+                    android:layout_weight="1"
+                    android:visibility="gone"/>
 
                 <Button
                     android:id="@+id/configButton"
@@ -166,10 +168,11 @@
                     android:textStyle="bold"
                     android:textSize="16dp"
                     android:gravity="center"
-                    android:layout_weight="1"/>
+                    android:layout_weight="1"
+                    android:visibility="gone"/>
 
                 <TextView
-                    android:text="Configurar"
+                    android:text="Configuración"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_alignParentTop="true"
@@ -178,7 +181,7 @@
                     android:textSize="16dp"
                     android:gravity="center"
                     android:id="@+id/configText"
-                    android:layout_weight="1"/>
+                    android:layout_weight="1.1"/>
 
             </LinearLayout>
         </LinearLayout>
