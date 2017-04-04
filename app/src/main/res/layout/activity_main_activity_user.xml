@@ -48,7 +48,7 @@
                     android:layout_weight="1"/>
 
                 <Button
-                    android:id="@+id/email_sign_in_buttob14"
+                    android:id="@+id/buttonComprarFlores"
                     style="?android:textAppearanceSmall"
                     android:layout_width="0dp"
                     android:layout_height="90dp"
@@ -91,7 +91,8 @@
                     android:textStyle="bold"
                     android:textSize="16dp"
                     android:gravity="center"
-                    android:layout_weight="1"/>
+                    android:layout_weight="1"
+                    android:id="@+id/tvComprarFlores"/>
 
                 <TextView
                     android:text="Enviar Mensajes"

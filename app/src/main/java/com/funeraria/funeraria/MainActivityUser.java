@@ -57,6 +57,26 @@ public class MainActivityUser extends Activity {
             }
         });
 
+        //////////////////////////
+
+        Button buttonComprarFlores = (Button) findViewById(R.id.buttonComprarFlores);
+        buttonComprarFlores.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(MainActivityUser.this, ComprarFloresActivity.class);
+                startActivity(i);
+            }
+        });
+
+        TextView tvComprarFlores = (TextView) findViewById(R.id.tvComprarFlores);
+        tvComprarFlores.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(MainActivityUser.this, ComprarFloresActivity.class);
+                startActivity(i);
+            }
+        });
+
     }
 
 

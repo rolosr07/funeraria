@@ -8,7 +8,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".ComprarVelasActivity">
+    tools:context=".ComprarFloresActivity">
 
     <ProgressBar
         android:id="@+id/login_progress"
@@ -38,7 +38,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:text="Encender Velas"
+                android:text="Enviar Flores"
                 android:textSize="28dp"
                 android:textStyle="bold" />
 
@@ -62,7 +62,7 @@
                 android:spinnerMode="dialog" />
 
             <TextView
-                android:id="@+id/txNumeroVelas"
+                android:id="@+id/txNumeroFlores"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
@@ -75,7 +75,7 @@
                 android:visibility="gone" />
 
             <Spinner
-                android:id="@+id/spinnerVelas"
+                android:id="@+id/spinnerFlores"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -123,7 +123,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="Encender"
+                android:text="Enviar"
                 android:background="#505251"
                 android:textColor="@color/common_signin_btn_light_text_pressed"
                 android:id="@+id/buttonComprar"/>
