@@ -3,8 +3,6 @@ package com.funeraria.funeraria;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Base64;
@@ -18,6 +16,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.funeraria.funeraria.common.Adapters.CustomAdapter;
 import com.funeraria.funeraria.common.Adapters.CustomAdapterServicio;
 import com.funeraria.funeraria.common.Base;
@@ -233,10 +232,9 @@ public class ComprarVelasActivity extends Base {
                                     Servicio servicio = (Servicio)parent.getItemAtPosition(position);
 
                                     byte[] decodedString = Base64.decode(servicio.getImagen(), Base64.DEFAULT);
-                                    Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-
-                                    imageView.setImageBitmap(decodedByte);
                                     imageView.setVisibility(View.VISIBLE);
+
+                                    Glide.with(ComprarVelasActivity.this).load(decodedString).into(imageView);
 
                                     txDuracion.setText("Duración en pantalla: "+servicio.getTiempoMostrar()+" minutos");
                                     txDuracion.setVisibility(View.VISIBLE);
@@ -245,7 +243,6 @@ public class ComprarVelasActivity extends Base {
                                     txPrecio.setVisibility(View.VISIBLE);
 
                                     showProgress(false);
-
                                 }
                                 public void onNothingSelected(AdapterView<?> parent) {
                                 }
@@ -334,8 +331,6 @@ public class ComprarVelasActivity extends Base {
                 Toast.makeText(ComprarVelasActivity.this, "No se ha podido realizar la compra!", Toast.LENGTH_LONG).show();
                 showProgress(false);
             }
-
         }
     };
-
 }

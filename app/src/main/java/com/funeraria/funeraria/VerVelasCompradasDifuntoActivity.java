@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.funeraria.funeraria.common.Adapters.CustomAdapterServicio;
 import com.funeraria.funeraria.common.Base;
 import com.funeraria.funeraria.common.Adapters.CustomAdapter;
@@ -203,9 +204,7 @@ public class VerVelasCompradasDifuntoActivity extends Base {
                                     Servicio servicio = (Servicio)parent.getItemAtPosition(position);
 
                                     byte[] decodedString = Base64.decode(servicio.getImagen(), Base64.DEFAULT);
-                                    Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-
-                                    imageView.setImageBitmap(decodedByte);
+                                    Glide.with(VerVelasCompradasDifuntoActivity.this).load(decodedString).into(imageView);
                                     imageView.setVisibility(View.VISIBLE);
 
                                     txNombreUsuario.setText("Comprador: "+servicio.getNombreUsuario() + " " + servicio.getApellidoUsuario());
