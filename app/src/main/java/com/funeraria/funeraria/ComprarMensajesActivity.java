@@ -1,5 +1,8 @@
 package com.funeraria.funeraria;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
@@ -7,15 +10,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.funeraria.funeraria.common.Adapters.CustomAdapter;
 import com.funeraria.funeraria.common.Adapters.CustomAdapterServicio;
 import com.funeraria.funeraria.common.Base;
-import com.funeraria.funeraria.common.Adapters.CustomAdapter;
 import com.funeraria.funeraria.common.entities.Difunto;
 import com.funeraria.funeraria.common.entities.Servicio;
+import com.funeraria.funeraria.common.entities.Usuario;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -29,56 +34,77 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 
-public class VerMensajesDifuntoActivity extends Base {
+public class ComprarMensajesActivity extends Base {
 
-    private TextView txNumeroMensajes;
+    private TextView txNumeroVelas;
+    private TextView txDuracion;
+    private TextView  txPrecio;
     private TextView txMensaje;
+    private EditText edMensajePersonal;
 
     private String webResponse = "";
     private String webResponseImages = "";
-    private String webResponseActualizar = "";
+    private String webResponseComprar = "";
     private Thread thread;
     private Handler handler = new Handler();
     private Spinner spinner;
     private Spinner spinnerMensajes;
 
-    private TextView txNombreUsuario;
-    private TextView txFechaCompra;
-    private TextView txAutorizado;
-    private Button buttonAutorizar;
-    private int idServicioComprado;
+    private final String METHOD_NAME_GET_DIFUNTO_LIST = "getDifuntosPorUsuarioList";
+    private final String METHOD_NAME_GET_SERVICIOS_LIST = "getServiciosPorTipoDeServicioList";
+    private final String METHOD_NAME_COMPRAR_SERVICIO = "comprarMensaje";
 
-    private final String METHOD_NAME_GET_DIFUNTO_LIST = "getDifuntosList";
-    private final String METHOD_NAME_GET_SERVICIOS_LIST = "getServiciosPorIdDifuntoYTipoDeServicioMensajesList";
-    private final String METHOD_NAME_REGISTAR_SERVICIO_COMPRADO = "actualizarServicioComprado";
+    private Usuario usuarioActual;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_ver_mensajes_difunto);
+        setContentView(R.layout.activity_comprar_mensajes);
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
-        txNumeroMensajes = (TextView)findViewById(R.id.txNumeroMensajes);
-        txMensaje = (TextView)findViewById(R.id.txMensaje);
+        txNumeroVelas = (TextView)findViewById(R.id.txNumeroVelas);
         spinner = (Spinner) findViewById(R.id.spinner);
         spinnerMensajes = (Spinner) findViewById(R.id.spinnerMensajes);
 
-        txNombreUsuario = (TextView)findViewById(R.id.txNombreUsuario);
-        txFechaCompra = (TextView)findViewById(R.id.txFechaCompra);
-        txAutorizado = (TextView)findViewById(R.id.txAutorizado);
+        txMensaje = (TextView)findViewById(R.id.txMensaje);
 
-        buttonAutorizar = (Button) findViewById(R.id.buttonAutorizar);
-        buttonAutorizar.setOnClickListener(new View.OnClickListener() {
+        txDuracion = (TextView)findViewById(R.id.txDuracion);
+        txPrecio = (TextView)findViewById(R.id.txPrecio);
+
+        edMensajePersonal = (EditText) findViewById(R.id.edMensajePersonal);
+
+        showProgress(true);
+
+        SharedPreferences prefs = getSharedPreferences("com.funeraria.funeraria", Context.MODE_PRIVATE);
+        if(!prefs.getString("USER_DATA","").equals(""))
+        {
+            Type collectionType = new TypeToken<List<Usuario>>(){}.getType();
+            List<Usuario> usuarios = new Gson().fromJson( prefs.getString("USER_DATA","") , collectionType);
+            usuarioActual = usuarios.get(0);
+        }
+
+        loadDifuntosList();
+        showProgress(true);
+        loadEsquelasList();
+
+        Button buttonComprar = (Button) findViewById(R.id.buttonComprar);
+        buttonComprar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 showProgress(true);
-                registrarServicioComprado(idServicioComprado);
+                int u = usuarioActual.getIdUsuario();
+                Difunto d = (Difunto) spinner.getSelectedItem();
+                Servicio s = (Servicio) spinnerMensajes.getSelectedItem();
+
+                String mensajePersonal = "";
+                if(!edMensajePersonal.getText().equals("")){
+                    mensajePersonal = edMensajePersonal.getText().toString();
+                }
+
+                comprarServicio(u,d.getIdDifunto(),s.getIdServicio(),mensajePersonal);
             }
         });
-
-        showProgress(true);
-        loadDifuntosList();
     }
 
     public void loadDifuntosList(){
@@ -87,6 +113,12 @@ public class VerMensajesDifuntoActivity extends Base {
                 try {
 
                     SoapObject request = new SoapObject(NAMESPACE_DIFUNTO, METHOD_NAME_GET_DIFUNTO_LIST);
+
+                    PropertyInfo fromProp = new PropertyInfo();
+                    fromProp.setName("idUsuario");
+                    fromProp.setValue(usuarioActual.getIdUsuario());
+                    fromProp.setType(int.class);
+                    request.addProperty(fromProp);
 
                     SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
                     envelope.dotNet = true;
@@ -111,20 +143,18 @@ public class VerMensajesDifuntoActivity extends Base {
 
         public void run(){
 
-            if(!webResponse.equals("")){
+            if(webResponse != null && !webResponse.equals("")){
                 Type collectionType = new TypeToken<List<Difunto>>(){}.getType();
                 List<Difunto> lcs = new Gson().fromJson( webResponse , collectionType);
 
-                CustomAdapter adapter = new CustomAdapter(VerMensajesDifuntoActivity.this, R.layout.simple_spinner_item,lcs);
+                CustomAdapter adapter = new CustomAdapter(ComprarMensajesActivity.this, R.layout.simple_spinner_item,lcs);
                 adapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
                 spinner.setAdapter(adapter);
 
                 spinner.setOnItemSelectedListener(
                         new AdapterView.OnItemSelectedListener() {
                             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                                Difunto dif = (Difunto) parent.getItemAtPosition(position);
-                                showProgress(true);
-                                loadMensajesList(dif.getIdDifunto());
+
                             }
                             public void onNothingSelected(AdapterView<?> parent) {
                             }
@@ -154,18 +184,18 @@ public class VerMensajesDifuntoActivity extends Base {
         return id == R.id.action_settings || super.onOptionsItemSelected(item);
     }
 
-    public void loadMensajesList(final int idDifunto){
+    public void loadEsquelasList(){
         thread = new Thread(){
             public void run(){
                 try {
 
                     SoapObject request = new SoapObject(NAMESPACE_SERVICIO, METHOD_NAME_GET_SERVICIOS_LIST);
 
-                    PropertyInfo fromProp = new PropertyInfo();
-                    fromProp.setName("idDifunto");
-                    fromProp.setValue(idDifunto);
-                    fromProp.setType(int.class);
-                    request.addProperty(fromProp);
+                    PropertyInfo fromProp1 = new PropertyInfo();
+                    fromProp1.setName("idTipoServicio");
+                    fromProp1.setValue(9);
+                    fromProp1.setType(int.class);
+                    request.addProperty(fromProp1);
 
                     SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
                     envelope.dotNet = true;
@@ -190,16 +220,16 @@ public class VerMensajesDifuntoActivity extends Base {
 
         public void run(){
 
-            if(webResponseImages!= null && !webResponseImages.equals("") && !webResponseImages.equals("[]")){
+            if(!webResponseImages.equals("") && !webResponseImages.equals("[]")){
                 Type collectionType = new TypeToken<List<Servicio>>(){}.getType();
                 List<Servicio> lcs = new Gson().fromJson( webResponseImages , collectionType);
 
                 if(lcs.size() > 0){
 
-                    txNumeroMensajes.setText("Cantidad de Mensajes: "+ lcs.size()+"");
-                    txNumeroMensajes.setVisibility(View.VISIBLE);
+                    txNumeroVelas.setText("Esquelas disponibles: "+ lcs.size());
+                    txNumeroVelas.setVisibility(View.VISIBLE);
 
-                    CustomAdapterServicio adapter = new CustomAdapterServicio(VerMensajesDifuntoActivity.this, R.layout.simple_spinner_item,lcs);
+                    CustomAdapterServicio adapter = new CustomAdapterServicio(ComprarMensajesActivity.this, R.layout.simple_spinner_item,lcs);
                     adapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
                     spinnerMensajes.setAdapter(adapter);
                     spinnerMensajes.setVisibility(View.VISIBLE);
@@ -209,26 +239,15 @@ public class VerMensajesDifuntoActivity extends Base {
                                 public void onItemSelected(AdapterView<?> parent, View view, int position,long id) {
                                     Servicio servicio = (Servicio)parent.getItemAtPosition(position);
 
+                                    txDuracion.setText("Duración en pantalla: "+servicio.getTiempoMostrar()+" minutos");
+                                    txDuracion.setVisibility(View.VISIBLE);
+
+                                    txPrecio.setText("Precio: $"+servicio.getPrecio());
+                                    txPrecio.setVisibility(View.VISIBLE);
+
                                     txMensaje.setText(servicio.getTexto());
                                     txMensaje.setVisibility(View.VISIBLE);
 
-                                    txNombreUsuario.setText("Comprador: "+servicio.getNombreUsuario() + " " + servicio.getApellidoUsuario());
-                                    txNombreUsuario.setVisibility(View.VISIBLE);
-
-                                    txFechaCompra.setText("Fecha: "+servicio.getFechaCompra()+"");
-                                    txFechaCompra.setVisibility(View.VISIBLE);
-
-                                    if(servicio.getAutorizado().equals("1")){
-                                        txAutorizado.setText("Autorizado: Si");
-                                        txAutorizado.setVisibility(View.VISIBLE);
-                                        buttonAutorizar.setVisibility(View.GONE);
-                                    }else{
-                                        txAutorizado.setText("Autorizado: No");
-                                        txAutorizado.setVisibility(View.VISIBLE);
-                                        buttonAutorizar.setVisibility(View.VISIBLE);
-                                    }
-
-                                    idServicioComprado = servicio.getIdServicioComprado();
                                     showProgress(false);
                                 }
                                 public void onNothingSelected(AdapterView<?> parent) {
@@ -236,40 +255,52 @@ public class VerMensajesDifuntoActivity extends Base {
                             }
                     );
                 }else{
-                    txNumeroMensajes.setText("Cantidad de Mensajes: "+ 0+"");
+                    txNumeroVelas.setText("Cantidad de Esquelas: "+ 0);
                     spinnerMensajes.setVisibility(View.GONE);
-                    txMensaje.setVisibility(View.GONE);
-                    txNombreUsuario.setVisibility(View.GONE);
-                    txFechaCompra.setVisibility(View.GONE);
-                    buttonAutorizar.setVisibility(View.GONE);
-                    txAutorizado.setVisibility(View.GONE);
+                    txDuracion.setVisibility(View.GONE);
+                    txPrecio.setVisibility(View.GONE);
                     showProgress(false);
                 }
             }else{
                 showProgress(false);
-                txMensaje.setVisibility(View.GONE);
-                txNumeroMensajes.setText("Cantidad de Mensajes: "+0+"");
+                txNumeroVelas.setText("Cantidad de Esquelas: "+0);
                 spinnerMensajes.setVisibility(View.GONE);
-                txNombreUsuario.setVisibility(View.GONE);
-                txFechaCompra.setVisibility(View.GONE);
-                buttonAutorizar.setVisibility(View.GONE);
-                txAutorizado.setVisibility(View.GONE);
+                txDuracion.setVisibility(View.GONE);
+                txPrecio.setVisibility(View.GONE);
             }
         }
     };
 
-    public void registrarServicioComprado(final int idServicioComprado){
+    public void comprarServicio(final int idUsuario, final int idDifunto, final int idServicio, final String mensajePersonal){
         thread = new Thread(){
             public void run(){
                 try {
 
-                    SoapObject request = new SoapObject(NAMESPACE_SERVICIO, METHOD_NAME_REGISTAR_SERVICIO_COMPRADO);
+                    SoapObject request = new SoapObject(NAMESPACE_SERVICIO, METHOD_NAME_COMPRAR_SERVICIO);
 
                     PropertyInfo fromProp = new PropertyInfo();
-                    fromProp.setName("idServicioComprado");
-                    fromProp.setValue(idServicioComprado);
+                    fromProp.setName("idServicio");
+                    fromProp.setValue(idServicio);
                     fromProp.setType(int.class);
                     request.addProperty(fromProp);
+
+                    PropertyInfo fromProp1 = new PropertyInfo();
+                    fromProp1.setName("idUsuario");
+                    fromProp1.setValue(idUsuario);
+                    fromProp1.setType(int.class);
+                    request.addProperty(fromProp1);
+
+                    PropertyInfo fromProp2 = new PropertyInfo();
+                    fromProp2.setType(int.class);
+                    fromProp2.setName("idDifunto");
+                    fromProp2.setValue(idDifunto);
+                    request.addProperty(fromProp2);
+
+                    PropertyInfo fromProp3 = new PropertyInfo();
+                    fromProp3.setName("mensajePersonal");
+                    fromProp3.setValue(mensajePersonal);
+                    fromProp3.setType(String.class);
+                    request.addProperty(fromProp3);
 
                     SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
                     envelope.dotNet = true;
@@ -278,32 +309,33 @@ public class VerMensajesDifuntoActivity extends Base {
 
                     androidHttpTransport.call(SOAP_ACTION_SERVICIO, envelope);
                     Object response = envelope.getResponse();
-                    webResponseActualizar = response.toString();
+                    webResponseComprar = response.toString();
 
                 }catch(Exception e){
                     e.printStackTrace();
                 }
-                handler.post(createUIRegistroServicioComprado);
+                handler.post(createUICompra);
             }
         };
 
         thread.start();
     }
 
-    final Runnable createUIRegistroServicioComprado = new Runnable() {
+    final Runnable createUICompra = new Runnable() {
 
         public void run(){
 
-            if(!webResponseActualizar.equals("") && !webResponseActualizar.equals("[]") && Boolean.parseBoolean(webResponseActualizar)){
-                Toast.makeText(VerMensajesDifuntoActivity.this, "Mensaje Autorizado!", Toast.LENGTH_LONG).show();
+            if(!webResponseComprar.equals("") && !webResponseComprar.equals("[]") && Boolean.parseBoolean(webResponseComprar)){
+                Toast.makeText(ComprarMensajesActivity.this, "Compra realizada!, ahora se podrá ver la vela en la placa de su familiar!", Toast.LENGTH_LONG).show();
                 showProgress(false);
-                loadDifuntosList();
+                Intent i = new Intent(ComprarMensajesActivity.this, CompraExitoActivity.class);
+                finish();
+                startActivity(i);
             }
             else{
-                Toast.makeText(VerMensajesDifuntoActivity.this, "No se ha podido autorizar el mensaje!", Toast.LENGTH_LONG).show();
+                Toast.makeText(ComprarMensajesActivity.this, "No se ha podido realizar la compra!", Toast.LENGTH_LONG).show();
                 showProgress(false);
             }
         }
     };
-
 }

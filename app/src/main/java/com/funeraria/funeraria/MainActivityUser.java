@@ -77,6 +77,28 @@ public class MainActivityUser extends Activity {
             }
         });
 
+        //////////////////////////
+
+        Button mensajesButton = (Button) findViewById(R.id.buttonMensajes);
+        mensajesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(MainActivityUser.this, ComprarMensajesActivity.class);
+                startActivity(i);
+            }
+        });
+
+        TextView tvMensajes = (TextView) findViewById(R.id.tvMensajes);
+        tvMensajes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(MainActivityUser.this, ComprarMensajesActivity.class);
+                startActivity(i);
+            }
+        });
+
+
+
     }
 
 
