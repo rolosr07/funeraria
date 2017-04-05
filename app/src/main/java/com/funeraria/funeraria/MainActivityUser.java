@@ -97,8 +97,25 @@ public class MainActivityUser extends Activity {
             }
         });
 
+        //////////////////////////
 
+        Button imagenesButton = (Button) findViewById(R.id.imagenesButton);
+        imagenesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(MainActivityUser.this, ComprarImagenesActivity.class);
+                startActivity(i);
+            }
+        });
 
+        TextView tvImagenes = (TextView) findViewById(R.id.tvImagenesDifunto);
+        tvImagenes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(MainActivityUser.this, ComprarImagenesActivity.class);
+                startActivity(i);
+            }
+        });
     }
 
 

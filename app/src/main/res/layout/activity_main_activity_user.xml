@@ -114,7 +114,7 @@
                 android:layout_marginTop="10dp">
 
                 <Button
-                    android:id="@+id/buttonImagenesDifunto"
+                    android:id="@+id/imagenesButton"
                     style="?android:textAppearanceSmall"
                     android:layout_width="0dp"
                     android:layout_height="90dp"
