@@ -318,14 +318,9 @@ public class ComprarVelasActivity extends Base {
             if(!webResponseComprar.equals("") && !webResponseComprar.equals("[]") && Boolean.parseBoolean(webResponseComprar)){
                 Toast.makeText(ComprarVelasActivity.this, "Compra realizada!, ahora se podrá ver la vela en la placa de su familiar!", Toast.LENGTH_LONG).show();
                 showProgress(false);
-                Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    public void run() {
-                        Intent i = new Intent(ComprarVelasActivity.this, MainActivityUser.class);
-                        finish();
-                        startActivity(i);
-                    }
-                }, 2000);
+                Intent i = new Intent(ComprarVelasActivity.this, CompraExitoActivity.class);
+                finish();
+                startActivity(i);
             }
             else{
                 Toast.makeText(ComprarVelasActivity.this, "No se ha podido realizar la compra!", Toast.LENGTH_LONG).show();

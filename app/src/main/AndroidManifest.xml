@@ -99,7 +99,11 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize"></activity>
         <activity
-            android:name=".ComprarFloresActivity"
+        android:name=".ComprarFloresActivity"
+        android:label="@string/title_activity_placa"
+        android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".CompraExitoActivity"
             android:label="@string/title_activity_placa"
             android:screenOrientation="portrait"></activity>
     </application>
