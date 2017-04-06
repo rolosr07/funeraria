@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Base64;
@@ -43,6 +44,7 @@ public class VerPlacaActivity extends Base {
 
     private String webResponseServices = "";
     private String nombreDifunto = "";
+    private String  imagenOrla = "";
 
     private Thread thread;
     private Handler handler = new Handler();
@@ -50,6 +52,8 @@ public class VerPlacaActivity extends Base {
     private final String METHOD_NAME_GET_PLACA_INFORMATION = "getPlacaInformation";
 
     private int idDifunto = 0;
+
+    private MediaPlayer mPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +78,8 @@ public class VerPlacaActivity extends Base {
 
         showProgress(true);
         loadServicesList(idDifunto);
+        mPlayer = MediaPlayer.create(VerPlacaActivity.this, R.raw.music);
+        mPlayer.start();
 
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
@@ -81,6 +87,7 @@ public class VerPlacaActivity extends Base {
                 Intent i = new Intent(VerPlacaActivity.this, VerImagenesDifuntoActivity.class);
                 i.putExtra("idDifunto", idDifunto);
                 i.putExtra("nombreDifunto", nombreDifunto);
+                i.putExtra("imagenOrla", imagenOrla);
                 startActivity(i);
             }
         }, 25000);
@@ -177,17 +184,13 @@ public class VerPlacaActivity extends Base {
                         e.printStackTrace();
                     }
 
+                    imagenOrla = placaInformation.getImagenOrla();
                     byte[] decodedStringImagenOrla = Base64.decode(placaInformation.getImagenOrla(), Base64.DEFAULT);
                     Bitmap imagenOrla = BitmapFactory.decodeByteArray(decodedStringImagenOrla, 0, decodedStringImagenOrla.length);
 
                     imageViewImagenOrla.setImageBitmap(imagenOrla);
-
                     tvEsquela.setText(placaInformation.getEsquela());
-
-                    byte[] decodedStringImagenOrlaFinal = Base64.decode(placaInformation.getImagenOrla(), Base64.DEFAULT);
-                    Bitmap imagenOrlaFinal = BitmapFactory.decodeByteArray(decodedStringImagenOrlaFinal, 0, decodedStringImagenOrlaFinal.length);
-
-                    imageViewImagenOrlaFinal.setImageBitmap(imagenOrlaFinal);
+                    imageViewImagenOrlaFinal.setImageBitmap(imagenOrla);
                 }
             }
         }
@@ -215,5 +218,13 @@ public class VerPlacaActivity extends Base {
         super.onPause();
         finishAffinity();
         finish();
+    }
+
+    @Override
+    public void onDestroy() {
+        mPlayer.stop();
+        finishAffinity();
+        finish();
+        super.onDestroy();
     }
 }

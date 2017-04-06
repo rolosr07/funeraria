@@ -1,11 +1,17 @@
 package com.funeraria.funeraria;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.view.ViewPager;
+import android.util.Base64;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.funeraria.funeraria.common.Base;
@@ -40,6 +46,13 @@ public class VerImagenesDifuntoActivity extends Base {
     private final String METHOD_NAME_GET_IMAGENES_LIST = "getImagenesDifuntoList";
 
     private int idDifunto = 0;
+    private String nombreDifunto = "";
+    private String imagenOrla = "";
+
+    private MediaPlayer mPlayer;
+
+    private ImageView imageViewImagenOrla;
+    private ImageView imageViewImagenOrlaFinal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,8 +64,13 @@ public class VerImagenesDifuntoActivity extends Base {
         tvNombre = (TextView)findViewById(R.id.tvNombre);
         pager = (ViewPager) findViewById(R.id.pager);
 
+        imageViewImagenOrla = (ImageView) findViewById(R.id.imageViewImagenOrla);
+        imageViewImagenOrlaFinal = (ImageView) findViewById(R.id.imageViewImagenFinal);
+
+        mPlayer = MediaPlayer.create(VerImagenesDifuntoActivity.this, R.raw.music);
+        mPlayer.start();
+
         showProgress(true);
-        String nombreDifunto = "";
 
         if(getIntent().getExtras().containsKey("nombreDifunto")){
             nombreDifunto = getIntent().getExtras().getString("nombreDifunto");
@@ -62,14 +80,25 @@ public class VerImagenesDifuntoActivity extends Base {
         if(getIntent().getExtras().containsKey("idDifunto")){
             idDifunto = getIntent().getExtras().getInt("idDifunto");
         }
+        if(getIntent().getExtras().containsKey("imagenOrla")){
+            imagenOrla = getIntent().getExtras().getString("imagenOrla");
+            byte[] decodedStringImagenOrla = Base64.decode(getIntent().getExtras().getString("imagenOrla"), Base64.DEFAULT);
+            Bitmap imagenOrla = BitmapFactory.decodeByteArray(decodedStringImagenOrla, 0, decodedStringImagenOrla.length);
 
+            imageViewImagenOrla.setImageBitmap(imagenOrla);
+            imageViewImagenOrla.setVisibility(View.VISIBLE);
+            imageViewImagenOrlaFinal.setImageBitmap(imagenOrla);
+            imageViewImagenOrlaFinal.setVisibility(View.VISIBLE);
+        }
         loadImagenesList(idDifunto);
 
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             public void run() {
-                Intent i = new Intent(VerImagenesDifuntoActivity.this, VerPlacaActivity.class);
+                Intent i = new Intent(VerImagenesDifuntoActivity.this, VerFloresActivity.class);
                 i.putExtra("idDifunto", idDifunto);
+                i.putExtra("nombreDifunto", nombreDifunto);
+                i.putExtra("imagenOrla", imagenOrla);
                 finish();
                 startActivity(i);
             }
@@ -159,9 +188,17 @@ public class VerImagenesDifuntoActivity extends Base {
 
     @Override
     protected void onPause() {
-        super.onPause();
         handler.removeCallbacks(runnable);
         finishAffinity();
         finish();
+        super.onPause();
+    }
+
+    @Override
+    public void onDestroy() {
+        mPlayer.stop();
+        finishAffinity();
+        finish();
+        super.onDestroy();
     }
 }

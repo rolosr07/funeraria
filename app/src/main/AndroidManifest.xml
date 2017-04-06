@@ -116,6 +116,18 @@
             android:label="@string/title_activity_placa"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateAlwaysHidden|adjustResize"></activity>
+        <activity
+            android:name=".VerFloresActivity"
+            android:label="@string/title_activity_placa"
+            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".VerVelasActivity"
+            android:label="@string/title_activity_placa"
+            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".VerMensajesActivity"
+            android:label="@string/title_activity_placa"
+            android:screenOrientation="portrait"></activity>
     </application>
 
 </manifest>
