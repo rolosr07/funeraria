@@ -15,6 +15,7 @@ import android.util.Base64;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -96,8 +97,6 @@ public class ComprarImagenesActivity extends Base {
             }
         });
 
-        showProgress(true);
-
         SharedPreferences prefs = getSharedPreferences("com.funeraria.funeraria", Context.MODE_PRIVATE);
         if(!prefs.getString("USER_DATA","").equals(""))
         {
@@ -106,6 +105,7 @@ public class ComprarImagenesActivity extends Base {
             usuarioActual = usuarios.get(0);
         }
 
+        showProgress(true);
         loadDifuntosList();
     }
 
@@ -152,7 +152,15 @@ public class ComprarImagenesActivity extends Base {
                 CustomAdapter adapter = new CustomAdapter(ComprarImagenesActivity.this, R.layout.simple_spinner_item,lcs);
                 adapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
                 spinner.setAdapter(adapter);
+                spinner.setOnItemSelectedListener(
+                        new AdapterView.OnItemSelectedListener() {
+                            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
+                            }
+                            public void onNothingSelected(AdapterView<?> parent) {
+                            }
+                        }
+                );
                 showProgress(false);
             }
             else{

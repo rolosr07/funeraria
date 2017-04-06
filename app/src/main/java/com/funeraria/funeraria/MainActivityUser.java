@@ -7,15 +7,30 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 
 public class MainActivityUser extends Activity {
 
+    private EditText edTextoBusqueda;
+    private Button buttonBuscar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_activity_user);
+
+        edTextoBusqueda = (EditText)findViewById(R.id.edTextoBusqueda);
+        buttonBuscar = (Button) findViewById(R.id.buttonBuscar);
+        buttonBuscar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(MainActivityUser.this, BuscarDifuntoActivity.class);
+                i.putExtra("textoBusqueda",edTextoBusqueda.getText().toString());
+                startActivity(i);
+            }
+        });
 
         ////////////////////////////
 

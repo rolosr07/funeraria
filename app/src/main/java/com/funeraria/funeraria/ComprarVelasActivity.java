@@ -146,7 +146,7 @@ public class ComprarVelasActivity extends Base {
                 spinner.setOnItemSelectedListener(
                         new AdapterView.OnItemSelectedListener() {
                             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
+                                showProgress(true);
                             }
                             public void onNothingSelected(AdapterView<?> parent) {
                             }
@@ -229,6 +229,7 @@ public class ComprarVelasActivity extends Base {
                     spinnerVelas.setOnItemSelectedListener(
                             new AdapterView.OnItemSelectedListener() {
                                 public void onItemSelected(AdapterView<?> parent, View view, int position,long id) {
+                                    showProgress(true);
                                     Servicio servicio = (Servicio)parent.getItemAtPosition(position);
 
                                     byte[] decodedString = Base64.decode(servicio.getImagen(), Base64.DEFAULT);

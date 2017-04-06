@@ -73,8 +73,6 @@ public class ComprarFloresActivity extends Base {
         txDuracion = (TextView)findViewById(R.id.txDuracion);
         txPrecio = (TextView)findViewById(R.id.txPrecio);
 
-        showProgress(true);
-
         SharedPreferences prefs = getSharedPreferences("com.funeraria.funeraria", Context.MODE_PRIVATE);
         if(!prefs.getString("USER_DATA","").equals(""))
         {
@@ -82,10 +80,10 @@ public class ComprarFloresActivity extends Base {
             List<Usuario> usuarios = new Gson().fromJson( prefs.getString("USER_DATA","") , collectionType);
             usuarioActual = usuarios.get(0);
         }
-
+        showProgress(true);
         loadDifuntosList();
         showProgress(true);
-        loadVelasList();
+        loadFloresList();
 
         Button buttonComprar = (Button) findViewById(R.id.buttonComprar);
         buttonComprar.setOnClickListener(new View.OnClickListener() {
@@ -147,7 +145,7 @@ public class ComprarFloresActivity extends Base {
                 spinner.setOnItemSelectedListener(
                         new AdapterView.OnItemSelectedListener() {
                             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
+                                showProgress(true);
                             }
                             public void onNothingSelected(AdapterView<?> parent) {
                             }
@@ -177,7 +175,7 @@ public class ComprarFloresActivity extends Base {
         return id == R.id.action_settings || super.onOptionsItemSelected(item);
     }
 
-    public void loadVelasList(){
+    public void loadFloresList(){
         thread = new Thread(){
             public void run(){
                 try {
@@ -226,10 +224,10 @@ public class ComprarFloresActivity extends Base {
                     adapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
                     spinnerFlores.setAdapter(adapter);
                     spinnerFlores.setVisibility(View.VISIBLE);
-                    showProgress(false);
                     spinnerFlores.setOnItemSelectedListener(
                             new AdapterView.OnItemSelectedListener() {
                                 public void onItemSelected(AdapterView<?> parent, View view, int position,long id) {
+                                    showProgress(true);
                                     Servicio servicio = (Servicio)parent.getItemAtPosition(position);
 
                                     byte[] decodedString = Base64.decode(servicio.getImagen(), Base64.DEFAULT);
@@ -243,14 +241,13 @@ public class ComprarFloresActivity extends Base {
 
                                     txPrecio.setText("Precio: $"+servicio.getPrecio());
                                     txPrecio.setVisibility(View.VISIBLE);
-
                                     showProgress(false);
-
                                 }
                                 public void onNothingSelected(AdapterView<?> parent) {
                                 }
                             }
                     );
+                    showProgress(false);
                 }else{
                     txNumeroFlores.setText("Cantidad de Velas: "+ 0);
                     spinnerFlores.setVisibility(View.GONE);

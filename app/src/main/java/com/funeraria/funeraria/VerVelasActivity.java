@@ -69,8 +69,6 @@ public class VerVelasActivity extends Base {
         mPlayer = MediaPlayer.create(VerVelasActivity.this, R.raw.music);
         mPlayer.start();
 
-        showProgress(true);
-
         if(getIntent().getExtras().containsKey("idDifunto")){
             idDifunto = getIntent().getExtras().getInt("idDifunto");
         }
@@ -90,7 +88,7 @@ public class VerVelasActivity extends Base {
             imageViewImagenOrlaFinal.setImageBitmap(imagenOrla);
             imageViewImagenOrlaFinal.setVisibility(View.VISIBLE);
         }
-
+        showProgress(true);
         loadVelasList(idDifunto);
 
         Handler handler = new Handler();

@@ -74,8 +74,6 @@ public class ComprarMensajesActivity extends Base {
 
         edMensajePersonal = (EditText) findViewById(R.id.edMensajePersonal);
 
-        showProgress(true);
-
         SharedPreferences prefs = getSharedPreferences("com.funeraria.funeraria", Context.MODE_PRIVATE);
         if(!prefs.getString("USER_DATA","").equals(""))
         {
@@ -84,6 +82,7 @@ public class ComprarMensajesActivity extends Base {
             usuarioActual = usuarios.get(0);
         }
 
+        showProgress(true);
         loadDifuntosList();
         showProgress(true);
         loadEsquelasList();
@@ -98,7 +97,7 @@ public class ComprarMensajesActivity extends Base {
                 Servicio s = (Servicio) spinnerMensajes.getSelectedItem();
 
                 String mensajePersonal = "";
-                if(!edMensajePersonal.getText().equals("")){
+                if(!edMensajePersonal.getText().toString().equals("")){
                     mensajePersonal = edMensajePersonal.getText().toString();
                 }
 
@@ -154,7 +153,7 @@ public class ComprarMensajesActivity extends Base {
                 spinner.setOnItemSelectedListener(
                         new AdapterView.OnItemSelectedListener() {
                             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
+                                showProgress(true);
                             }
                             public void onNothingSelected(AdapterView<?> parent) {
                             }
@@ -233,10 +232,10 @@ public class ComprarMensajesActivity extends Base {
                     adapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
                     spinnerMensajes.setAdapter(adapter);
                     spinnerMensajes.setVisibility(View.VISIBLE);
-                    showProgress(false);
                     spinnerMensajes.setOnItemSelectedListener(
                             new AdapterView.OnItemSelectedListener() {
                                 public void onItemSelected(AdapterView<?> parent, View view, int position,long id) {
+                                    showProgress(true);
                                     Servicio servicio = (Servicio)parent.getItemAtPosition(position);
 
                                     txDuracion.setText("Duración en pantalla: "+servicio.getTiempoMostrar()+" minutos");
@@ -247,13 +246,13 @@ public class ComprarMensajesActivity extends Base {
 
                                     txMensaje.setText(servicio.getTexto());
                                     txMensaje.setVisibility(View.VISIBLE);
-
                                     showProgress(false);
                                 }
                                 public void onNothingSelected(AdapterView<?> parent) {
                                 }
                             }
                     );
+                    showProgress(false);
                 }else{
                     txNumeroVelas.setText("Cantidad de Esquelas: "+ 0);
                     spinnerMensajes.setVisibility(View.GONE);

@@ -43,7 +43,8 @@
         </activity>
         <activity android:name=".MainActivityUser"
             android:label="@string/title_activity_main_activity_user"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize"></activity>
         <activity
             android:name=".MainActivityPresenter"
             android:label="@string/title_activity_main_activity_presenter"
@@ -128,6 +129,11 @@
             android:name=".VerMensajesActivity"
             android:label="@string/title_activity_placa"
             android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".BuscarDifuntoActivity"
+            android:label="@string/title_activity_placa"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize"></activity>
     </application>
 
 </manifest>
