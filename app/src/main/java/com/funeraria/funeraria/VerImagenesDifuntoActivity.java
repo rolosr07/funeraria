@@ -68,7 +68,7 @@ public class VerImagenesDifuntoActivity extends Base {
         imageViewImagenOrlaFinal = (ImageView) findViewById(R.id.imageViewImagenFinal);
 
         mPlayer = MediaPlayer.create(VerImagenesDifuntoActivity.this, R.raw.music);
-        mPlayer.start();
+        //mPlayer.start();
 
         showProgress(true);
 

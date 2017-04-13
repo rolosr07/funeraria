@@ -51,6 +51,7 @@ public class ImagenesDifuntoActivity extends Base {
     private String webResponse = "";
     private String webResponseImages = "";
     private String webResponseUpload = "";
+    private String webResponseBorrar = "";
     private Thread thread;
     private Handler handler = new Handler();
     private Spinner spinner;
@@ -59,6 +60,7 @@ public class ImagenesDifuntoActivity extends Base {
     private final String METHOD_NAME_GET_DIFUNTO_LIST = "getDifuntosList";
     private final String METHOD_NAME_GET_IMAGENES_LIST = "getImagenesDifuntoList";
     private final String METHOD_NAME_UPLOAD_IMAGEN = "registrarImagenDifunto";
+    private final String METHOD_NAME_BORRAR_IMAGEN = "borrarImagenDifunto";
     private String encodeImage = "";
     private String nombreImagen = "";
     private String typeImagen = "";
@@ -101,6 +103,18 @@ public class ImagenesDifuntoActivity extends Base {
                     showProgress(true);
                     uploadImagen(dif.getIdDifunto(),encodeImage,nombreImagen,typeImagen);
                 }
+            }
+        });
+
+        Button buttonBorrarImagen = (Button) findViewById(R.id.buttonBorrarImagen);
+        buttonBorrarImagen.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+
+                Difunto dif = (Difunto)spinner.getSelectedItem();
+                Imagen imagen = (Imagen)spinnerImages.getSelectedItem();
+                showProgress(true);
+                borrarImagen(dif.getIdDifunto(),imagen.getIdImagenes());
             }
         });
 
@@ -379,6 +393,60 @@ public class ImagenesDifuntoActivity extends Base {
             }else{
                 showProgress(false);
                 Toast.makeText(ImagenesDifuntoActivity.this, "No se registro la imagen!", Toast.LENGTH_LONG).show();
+            }
+        }
+    };
+
+    public void borrarImagen(final int idDifunto, final int idImagen){
+        thread = new Thread(){
+            public void run(){
+                try {
+
+                    SoapObject request = new SoapObject(NAMESPACE_DIFUNTO, METHOD_NAME_BORRAR_IMAGEN);
+
+                    PropertyInfo fromProp = new PropertyInfo();
+                    fromProp.setName("idDifunto");
+                    fromProp.setValue(idDifunto);
+                    fromProp.setType(int.class);
+                    request.addProperty(fromProp);
+
+                    PropertyInfo fromProp1 = new PropertyInfo();
+                    fromProp1.setName("idImagen");
+                    fromProp1.setValue(idImagen);
+                    fromProp1.setType(int.class);
+                    request.addProperty(fromProp1);
+
+                    SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+                    envelope.dotNet = true;
+                    envelope.setOutputSoapObject(request);
+                    HttpTransportSE androidHttpTransport = new HttpTransportSE(URL_DIFUNTO);
+
+                    androidHttpTransport.call(SOAP_ACTION_DIFUNTO, envelope);
+                    Object response = envelope.getResponse();
+                    webResponseBorrar = response.toString();
+
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+                handler.post(createUIBorrar);
+            }
+        };
+
+        thread.start();
+    }
+
+    final Runnable createUIBorrar = new Runnable() {
+
+        public void run(){
+
+            if(Boolean.valueOf(webResponseBorrar)){
+                Difunto dif = (Difunto)spinner.getSelectedItem();
+                loadImagenesList(dif.getIdDifunto());
+                imgView.setVisibility(View.GONE);
+                Toast.makeText(ImagenesDifuntoActivity.this, "Imagen Borrada!", Toast.LENGTH_LONG).show();
+            }else{
+                showProgress(false);
+                Toast.makeText(ImagenesDifuntoActivity.this, "No se pudo borrar la imagen!", Toast.LENGTH_LONG).show();
             }
         }
     };

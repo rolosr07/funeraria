@@ -79,7 +79,7 @@ public class VerPlacaActivity extends Base {
         showProgress(true);
         loadServicesList(idDifunto);
         mPlayer = MediaPlayer.create(VerPlacaActivity.this, R.raw.music);
-        mPlayer.start();
+        //mPlayer.start();
 
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {

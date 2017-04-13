@@ -42,6 +42,7 @@ public class AutorizarUsuariosDifuntoActivity extends Base {
     private String webResponse = "";
     private String webResponseUsuarios = "";
     private String webResponseAutorizar = "";
+    private String webResponseBorrar = "";
     private Thread thread;
     private Handler handler = new Handler();
     private Spinner spinnerDifuntos;
@@ -54,6 +55,7 @@ public class AutorizarUsuariosDifuntoActivity extends Base {
     private final String METHOD_NAME_GET_DIFUNTO_LIST = "getDifuntosList";
     private final String METHOD_NAME_GET_USUARIOS_LIST = "getUsuariosAutorizadosDifuntoList";
     private final String METHOD_NAME_AUTORIZAR_USUARIO = "autorizarUsuario";
+    private final String METHOD_NAME_BORRAR_USUARIO = "borrarUsuarioDifunto";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +93,18 @@ public class AutorizarUsuariosDifuntoActivity extends Base {
                 i.putExtra("idDifunto", dif.getIdDifunto());
                 startActivity(i);
                 showProgress(false);
+            }
+        });
+
+        Button buttonBorrarUsuario = (Button) findViewById(R.id.buttonBorrarUsuario);
+        buttonBorrarUsuario.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+
+                Difunto dif = (Difunto)spinnerDifuntos.getSelectedItem();
+                Usuario usuario = (Usuario)spinnerUsuarios.getSelectedItem();
+                showProgress(true);
+                borrarUsuario(usuario.getIdUsuarioAutorizado());
             }
         });
 
@@ -334,4 +348,52 @@ public class AutorizarUsuariosDifuntoActivity extends Base {
         finish();
         startActivity(intent);
     }
+
+    public void borrarUsuario(final int idUsuarioAutorizado){
+        thread = new Thread(){
+            public void run(){
+                try {
+
+                    SoapObject request = new SoapObject(NAMESPACE_DIFUNTO, METHOD_NAME_BORRAR_USUARIO);
+
+                    PropertyInfo fromProp = new PropertyInfo();
+                    fromProp.setName("idUsuarioAutorizado");
+                    fromProp.setValue(idUsuarioAutorizado);
+                    fromProp.setType(int.class);
+                    request.addProperty(fromProp);
+
+                    SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+                    envelope.dotNet = true;
+                    envelope.setOutputSoapObject(request);
+                    HttpTransportSE androidHttpTransport = new HttpTransportSE(URL_DIFUNTO);
+
+                    androidHttpTransport.call(SOAP_ACTION_DIFUNTO, envelope);
+                    Object response = envelope.getResponse();
+                    webResponseBorrar = response.toString();
+
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+                handler.post(createUIBorrar);
+            }
+        };
+
+        thread.start();
+    }
+
+    final Runnable createUIBorrar = new Runnable() {
+
+        public void run(){
+
+            if(Boolean.valueOf(webResponseBorrar)){
+                Difunto dif = (Difunto)spinnerDifuntos.getSelectedItem();
+                loadUsuariosList(dif.getIdDifunto());
+
+                Toast.makeText(AutorizarUsuariosDifuntoActivity.this, "Usuario Borrado!", Toast.LENGTH_LONG).show();
+            }else{
+                showProgress(false);
+                Toast.makeText(AutorizarUsuariosDifuntoActivity.this, "No se pudo borrar el Usuario!", Toast.LENGTH_LONG).show();
+            }
+        }
+    };
 }

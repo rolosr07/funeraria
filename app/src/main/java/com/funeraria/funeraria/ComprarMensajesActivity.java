@@ -36,22 +36,16 @@ import java.util.List;
 
 public class ComprarMensajesActivity extends Base {
 
-    private TextView txNumeroVelas;
-    private TextView txDuracion;
-    private TextView  txPrecio;
-    private TextView txMensaje;
+
     private EditText edMensajePersonal;
 
     private String webResponse = "";
-    private String webResponseImages = "";
     private String webResponseComprar = "";
     private Thread thread;
     private Handler handler = new Handler();
     private Spinner spinner;
-    private Spinner spinnerMensajes;
 
     private final String METHOD_NAME_GET_DIFUNTO_LIST = "getDifuntosPorUsuarioList";
-    private final String METHOD_NAME_GET_SERVICIOS_LIST = "getServiciosPorTipoDeServicioList";
     private final String METHOD_NAME_COMPRAR_SERVICIO = "comprarMensaje";
 
     private Usuario usuarioActual;
@@ -63,14 +57,7 @@ public class ComprarMensajesActivity extends Base {
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
-        txNumeroVelas = (TextView)findViewById(R.id.txNumeroVelas);
         spinner = (Spinner) findViewById(R.id.spinner);
-        spinnerMensajes = (Spinner) findViewById(R.id.spinnerMensajes);
-
-        txMensaje = (TextView)findViewById(R.id.txMensaje);
-
-        txDuracion = (TextView)findViewById(R.id.txDuracion);
-        txPrecio = (TextView)findViewById(R.id.txPrecio);
 
         edMensajePersonal = (EditText) findViewById(R.id.edMensajePersonal);
 
@@ -84,8 +71,6 @@ public class ComprarMensajesActivity extends Base {
 
         showProgress(true);
         loadDifuntosList();
-        showProgress(true);
-        loadEsquelasList();
 
         Button buttonComprar = (Button) findViewById(R.id.buttonComprar);
         buttonComprar.setOnClickListener(new View.OnClickListener() {
@@ -94,14 +79,14 @@ public class ComprarMensajesActivity extends Base {
                 showProgress(true);
                 int u = usuarioActual.getIdUsuario();
                 Difunto d = (Difunto) spinner.getSelectedItem();
-                Servicio s = (Servicio) spinnerMensajes.getSelectedItem();
 
-                String mensajePersonal = "";
                 if(!edMensajePersonal.getText().toString().equals("")){
-                    mensajePersonal = edMensajePersonal.getText().toString();
+                    String mensajePersonal = edMensajePersonal.getText().toString();
+                    comprarServicio(u,d.getIdDifunto(),mensajePersonal);
+                }else{
+                    edMensajePersonal.setError(getString(R.string.error_field_required));
+                    edMensajePersonal.requestFocus();
                 }
-
-                comprarServicio(u,d.getIdDifunto(),s.getIdServicio(),mensajePersonal);
             }
         });
     }
@@ -150,15 +135,6 @@ public class ComprarMensajesActivity extends Base {
                 adapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
                 spinner.setAdapter(adapter);
 
-                spinner.setOnItemSelectedListener(
-                        new AdapterView.OnItemSelectedListener() {
-                            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                                showProgress(true);
-                            }
-                            public void onNothingSelected(AdapterView<?> parent) {
-                            }
-                        }
-                );
                 showProgress(false);
             }
             else{
@@ -183,105 +159,12 @@ public class ComprarMensajesActivity extends Base {
         return id == R.id.action_settings || super.onOptionsItemSelected(item);
     }
 
-    public void loadEsquelasList(){
-        thread = new Thread(){
-            public void run(){
-                try {
-
-                    SoapObject request = new SoapObject(NAMESPACE_SERVICIO, METHOD_NAME_GET_SERVICIOS_LIST);
-
-                    PropertyInfo fromProp1 = new PropertyInfo();
-                    fromProp1.setName("idTipoServicio");
-                    fromProp1.setValue(9);
-                    fromProp1.setType(int.class);
-                    request.addProperty(fromProp1);
-
-                    SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
-                    envelope.dotNet = true;
-                    envelope.setOutputSoapObject(request);
-                    HttpTransportSE androidHttpTransport = new HttpTransportSE(URL_SERVICIO);
-
-                    androidHttpTransport.call(SOAP_ACTION_SERVICIO, envelope);
-                    Object response = envelope.getResponse();
-                    webResponseImages = response.toString();
-
-                }catch(Exception e){
-                    e.printStackTrace();
-                }
-                handler.post(createUIImages);
-            }
-        };
-
-        thread.start();
-    }
-
-    final Runnable createUIImages = new Runnable() {
-
-        public void run(){
-
-            if(!webResponseImages.equals("") && !webResponseImages.equals("[]")){
-                Type collectionType = new TypeToken<List<Servicio>>(){}.getType();
-                List<Servicio> lcs = new Gson().fromJson( webResponseImages , collectionType);
-
-                if(lcs.size() > 0){
-
-                    txNumeroVelas.setText("Esquelas disponibles: "+ lcs.size());
-                    txNumeroVelas.setVisibility(View.VISIBLE);
-
-                    CustomAdapterServicio adapter = new CustomAdapterServicio(ComprarMensajesActivity.this, R.layout.simple_spinner_item,lcs);
-                    adapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
-                    spinnerMensajes.setAdapter(adapter);
-                    spinnerMensajes.setVisibility(View.VISIBLE);
-                    spinnerMensajes.setOnItemSelectedListener(
-                            new AdapterView.OnItemSelectedListener() {
-                                public void onItemSelected(AdapterView<?> parent, View view, int position,long id) {
-                                    showProgress(true);
-                                    Servicio servicio = (Servicio)parent.getItemAtPosition(position);
-
-                                    txDuracion.setText("Duración en pantalla: "+servicio.getTiempoMostrar()+" minutos");
-                                    txDuracion.setVisibility(View.VISIBLE);
-
-                                    txPrecio.setText("Precio: $"+servicio.getPrecio());
-                                    txPrecio.setVisibility(View.VISIBLE);
-
-                                    txMensaje.setText(servicio.getTexto());
-                                    txMensaje.setVisibility(View.VISIBLE);
-                                    showProgress(false);
-                                }
-                                public void onNothingSelected(AdapterView<?> parent) {
-                                }
-                            }
-                    );
-                    showProgress(false);
-                }else{
-                    txNumeroVelas.setText("Cantidad de Esquelas: "+ 0);
-                    spinnerMensajes.setVisibility(View.GONE);
-                    txDuracion.setVisibility(View.GONE);
-                    txPrecio.setVisibility(View.GONE);
-                    showProgress(false);
-                }
-            }else{
-                showProgress(false);
-                txNumeroVelas.setText("Cantidad de Esquelas: "+0);
-                spinnerMensajes.setVisibility(View.GONE);
-                txDuracion.setVisibility(View.GONE);
-                txPrecio.setVisibility(View.GONE);
-            }
-        }
-    };
-
-    public void comprarServicio(final int idUsuario, final int idDifunto, final int idServicio, final String mensajePersonal){
+    public void comprarServicio(final int idUsuario, final int idDifunto, final String mensajePersonal){
         thread = new Thread(){
             public void run(){
                 try {
 
                     SoapObject request = new SoapObject(NAMESPACE_SERVICIO, METHOD_NAME_COMPRAR_SERVICIO);
-
-                    PropertyInfo fromProp = new PropertyInfo();
-                    fromProp.setName("idServicio");
-                    fromProp.setValue(idServicio);
-                    fromProp.setType(int.class);
-                    request.addProperty(fromProp);
 
                     PropertyInfo fromProp1 = new PropertyInfo();
                     fromProp1.setName("idUsuario");

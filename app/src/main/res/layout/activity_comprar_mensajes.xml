@@ -61,77 +61,6 @@
                 android:layout_weight="1"
                 android:spinnerMode="dialog" />
 
-            <TextView
-                android:id="@+id/txNumeroVelas"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:text=""
-                android:textSize="16dp"
-                android:textStyle="bold"
-                android:visibility="gone" />
-
-            <Spinner
-                android:id="@+id/spinnerMensajes"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:spinnerMode="dialog"
-                android:visibility="gone" />
-
-            <TextView
-                android:id="@+id/txMensaje"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:text=""
-                android:textSize="22dp"
-                android:textStyle="bold"
-                android:visibility="gone"/>
-
-            <TextView
-                android:text=""
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true"
-                android:textStyle="bold"
-                android:textSize="16dp"
-                android:gravity="center"
-                android:layout_gravity="center"
-                android:visibility="gone"
-                android:id="@+id/txDuracion"/>
-
-            <TextView
-                android:text=""
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true"
-                android:textStyle="bold"
-                android:textSize="16dp"
-                android:gravity="center"
-                android:layout_gravity="center"
-                android:visibility="gone"
-                android:id="@+id/txPrecio"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:text="También puede enviar un mensaje personal:"
-                android:textSize="18dp"
-                android:layout_marginTop="10dp"/>
-
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -139,7 +68,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:hint="Mensaje Personal"
+                android:hint="Mensaje"
                 android:textSize="18dp"
                 android:id="@+id/edMensajePersonal"/>
 

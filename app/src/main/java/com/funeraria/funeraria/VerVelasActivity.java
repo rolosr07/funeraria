@@ -67,7 +67,7 @@ public class VerVelasActivity extends Base {
         imageViewImagenOrlaFinal = (ImageView) findViewById(R.id.imageViewImagenFinal);
 
         mPlayer = MediaPlayer.create(VerVelasActivity.this, R.raw.music);
-        mPlayer.start();
+        //mPlayer.start();
 
         if(getIntent().getExtras().containsKey("idDifunto")){
             idDifunto = getIntent().getExtras().getInt("idDifunto");

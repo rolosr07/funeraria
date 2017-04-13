@@ -94,6 +94,13 @@
                 android:visibility="gone"/>
 
             <Button
+                android:id="@+id/buttonBorrarImagen"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Borrar Foto"/>
+
+            <Button
                 android:id="@+id/buttonLoadPicture"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

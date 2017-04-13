@@ -67,7 +67,7 @@ public class VerMensajesActivity extends Base {
         imageViewImagenOrlaFinal = (ImageView) findViewById(R.id.imageViewImagenFinal);
 
         mPlayer = MediaPlayer.create(VerMensajesActivity.this, R.raw.music);
-        mPlayer.start();
+        //mPlayer.start();
 
         if(getIntent().getExtras().containsKey("imagenOrla")){
             imagenOrla = getIntent().getExtras().getString("imagenOrla");
