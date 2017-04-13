@@ -90,7 +90,7 @@ public class VerPlacaActivity extends Base {
                 i.putExtra("imagenOrla", imagenOrla);
                 startActivity(i);
             }
-        }, 25000);
+        }, 20000);
     }
 
     @Override

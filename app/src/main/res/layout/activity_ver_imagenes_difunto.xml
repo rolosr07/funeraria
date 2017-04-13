@@ -25,43 +25,63 @@
         android:layout_height="match_parent">
 
         <LinearLayout
-            android:id="@+id/email_login_form"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:gravity="center">
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:weightSum="1">
 
-            <ImageView
-                android:id="@+id/imageViewImagenOrla"
+            <LinearLayout
+                android:id="@+id/email_login_form"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                android:layout_weight="0.6">
+
+                <ImageView
+                    android:id="@+id/imageViewImagenOrla"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/orla1"
+                    android:layout_marginBottom="-10dp"/>
+
+                <TextView
+                    android:text="Nombre"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_centerHorizontal="true"
+                    android:textStyle="bold"
+                    android:textSize="28dp"
+                    android:gravity="center"
+                    android:layout_gravity="center"
+                    android:id="@+id/tvNombre"/>
+
+                <ImageView
+                    android:id="@+id/imageViewImagenFinal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:rotation="180"
+                    android:src="@drawable/orla1"
+                    android:layout_marginTop="-5dp"/>
+
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:src="@drawable/orla1"/>
-
-            <TextView
-                android:text="Nombre"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true"
-                android:textStyle="bold"
-                android:textSize="28dp"
+                android:orientation="vertical"
                 android:gravity="center"
-                android:layout_gravity="center"
-                android:id="@+id/tvNombre"/>
+                android:layout_weight="0.4">
 
-            <ImageView
-                android:id="@+id/imageViewImagenFinal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:rotation="180"
-                android:src="@drawable/orla1"/>
+                <android.support.v4.view.ViewPager xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:id="@+id/pager"
+                    android:layout_width="match_parent"
+                    android:layout_height="400dp"/>
 
-            <android.support.v4.view.ViewPager xmlns:android="http://schemas.android.com/apk/res/android"
-                android:id="@+id/pager"
-                android:layout_width="match_parent"
-                android:layout_height="500dp"/>
+            </LinearLayout>
 
         </LinearLayout>
     </ScrollView>
-
 </LinearLayout>

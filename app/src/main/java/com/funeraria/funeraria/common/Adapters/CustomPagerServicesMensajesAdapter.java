@@ -50,7 +50,7 @@ public class CustomPagerServicesMensajesAdapter extends PagerAdapter {
         TextView txNombre = (TextView) itemView.findViewById(R.id.txNombre);
         TextView txTexto = (TextView) itemView.findViewById(R.id.txTexto);
 
-        txNombre.setText("Enviado por: "+this.arrayList.get(position).getNombreUsuario()+" "+this.arrayList.get(position).getApellidoUsuario());
+        txNombre.setText("Enviado por: "+this.arrayList.get(position).getNombreUsuario()+" "+this.arrayList.get(position).getApellidoUsuario()+".");
         txTexto.setText(this.arrayList.get(position).getTexto());
         container.addView(itemView);
 
