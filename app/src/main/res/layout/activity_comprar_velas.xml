@@ -124,7 +124,17 @@
                 android:text="Encender"
                 android:background="#505251"
                 android:textColor="@color/common_signin_btn_light_text_pressed"
-                android:id="@+id/buttonComprar"/>
+                android:id="@+id/buttonComprar"
+                android:visibility="gone"/>
+
+            <RelativeLayout
+                android:id="@+id/RelativeLayout01"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:gravity="center"
+                android:layout_gravity="center">
+
+            </RelativeLayout>
 
         </LinearLayout>
     </ScrollView>

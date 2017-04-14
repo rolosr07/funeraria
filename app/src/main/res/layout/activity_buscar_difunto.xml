@@ -114,31 +114,14 @@
                 android:id="@+id/imageView"
                 android:visibility="gone"/>
 
-            <TextView
-                android:id="@+id/txNombreUsuario"
-                android:layout_width="wrap_content"
+            <Button
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:text=""
-                android:textSize="16dp"
-                android:textStyle="bold"
-                android:visibility="gone" />
-
-            <TextView
-                android:id="@+id/txFechaCompra"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:layout_centerHorizontal="true"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:text=""
-                android:textSize="16dp"
-                android:textStyle="bold"
-                android:visibility="gone" />
+                android:layout_marginTop="10dp"
+                android:text="Solicitar Acceso"
+                android:background="#505251"
+                android:textColor="@color/common_signin_btn_light_text_pressed"
+                android:id="@+id/buttonSolicitarAcceso"/>
 
         </LinearLayout>
     </ScrollView>
