@@ -84,7 +84,7 @@ public class VerPlacaActivity extends Base {
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             public void run() {
-                Intent i = new Intent(VerPlacaActivity.this, VerImagenesDifuntoActivity.class);
+                Intent i = new Intent(VerPlacaActivity.this, VerImagenesYMensajesActivity.class);
                 i.putExtra("idDifunto", idDifunto);
                 i.putExtra("nombreDifunto", nombreDifunto);
                 i.putExtra("imagenOrla", imagenOrla);

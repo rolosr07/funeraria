@@ -118,7 +118,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:text="Solicitar Acceso"
+                android:text="Seleccionar"
                 android:background="#505251"
                 android:textColor="@color/common_signin_btn_light_text_pressed"
                 android:id="@+id/buttonSolicitarAcceso"/>

@@ -52,12 +52,22 @@ public class CustomPagerServicesAdapter extends PagerAdapter {
 
         ImageView imageView = (ImageView) itemView.findViewById(R.id.imageView);
         TextView txNombre = (TextView) itemView.findViewById(R.id.txNombre);
+        TextView txMensaje = (TextView) itemView.findViewById(R.id.txMensaje);
 
         byte[] decodedString = Base64.decode(this.arrayList.get(position).getImagen(), Base64.DEFAULT);
 
         Glide.with(mContext).load(decodedString).into(imageView);
 
-        txNombre.setText("Enviado por: "+this.arrayList.get(position).getNombreUsuario()+" "+this.arrayList.get(position).getApellidoUsuario());
+        if(this.arrayList.get(position).getIdTipoServicio()==4){
+            txNombre.setText(this.arrayList.get(position).getNombreUsuario()+" "+this.arrayList.get(position).getApellidoUsuario()+".");
+            txMensaje.setText("Le envia un ramo de flores el "+this.arrayList.get(position).getFechaCompra()+".");
+        }else if(this.arrayList.get(position).getIdTipoServicio()==3){
+            txNombre.setText(this.arrayList.get(position).getNombreUsuario()+" "+this.arrayList.get(position).getApellidoUsuario());
+            txMensaje.setText("Le enciende unas velas el "+this.arrayList.get(position).getFechaCompra()+".");
+        }else{
+            txNombre.setText("Enviado por: "+this.arrayList.get(position).getNombreUsuario()+" "+this.arrayList.get(position).getApellidoUsuario());
+            txMensaje.setText("Le envia un presente el "+this.arrayList.get(position).getFechaCompra()+".");
+        }
 
         container.addView(itemView);
 

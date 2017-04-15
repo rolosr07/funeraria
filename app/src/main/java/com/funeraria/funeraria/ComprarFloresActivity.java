@@ -96,8 +96,6 @@ public class ComprarFloresActivity extends Base {
         }
         showProgress(true);
         loadDifuntosList();
-        showProgress(true);
-        loadFloresList();
 
         Button buttonComprar = (Button) findViewById(R.id.buttonComprar);
         buttonComprar.setOnClickListener(new View.OnClickListener() {
@@ -284,6 +282,16 @@ public class ComprarFloresActivity extends Base {
                 adapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
                 spinner.setAdapter(adapter);
 
+                spinner.setOnItemSelectedListener(
+                        new AdapterView.OnItemSelectedListener() {
+                            public void onItemSelected(AdapterView<?> parent, View view, int position,long id) {
+                                showProgress(true);
+                                loadFloresList();
+                            }
+                            public void onNothingSelected(AdapterView<?> parent) {
+                            }
+                        }
+                );
                 showProgress(false);
             }
             else{

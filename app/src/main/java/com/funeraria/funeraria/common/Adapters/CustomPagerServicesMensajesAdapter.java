@@ -47,11 +47,27 @@ public class CustomPagerServicesMensajesAdapter extends PagerAdapter {
         View itemView = mLayoutInflater.inflate(R.layout.pager_item_mensajes, container, false);
 
 
-        TextView txNombre = (TextView) itemView.findViewById(R.id.txNombre);
-        TextView txTexto = (TextView) itemView.findViewById(R.id.txTexto);
+        TextView txNombre1 = (TextView) itemView.findViewById(R.id.txNombre1);
+        TextView txTexto1 = (TextView) itemView.findViewById(R.id.txTexto1);
 
-        txNombre.setText("Enviado por: "+this.arrayList.get(position).getNombreUsuario()+" "+this.arrayList.get(position).getApellidoUsuario()+".");
-        txTexto.setText(this.arrayList.get(position).getTexto());
+        TextView txNombre2 = (TextView) itemView.findViewById(R.id.txNombre2);
+        TextView txTexto2 = (TextView) itemView.findViewById(R.id.txTexto2);
+
+        TextView txNombre3 = (TextView) itemView.findViewById(R.id.txNombre3);
+        TextView txTexto3 = (TextView) itemView.findViewById(R.id.txTexto3);
+
+        txNombre1.setText(this.arrayList.get(position).getNombreUsuario()+" "+this.arrayList.get(position).getApellidoUsuario()+".");
+        txTexto1.setText(this.arrayList.get(position).getTexto());
+
+        if(this.arrayList.size()> (position+1)) {
+            txNombre2.setText(this.arrayList.get(position + 1).getNombreUsuario() + " " + this.arrayList.get(position + 1).getApellidoUsuario() + ".");
+            txTexto2.setText(this.arrayList.get(position + 1).getTexto());
+
+            if(this.arrayList.size()> (position+2)) {
+                txNombre3.setText(this.arrayList.get(position + 2).getNombreUsuario() + " " + this.arrayList.get(position + 2).getApellidoUsuario() + ".");
+                txTexto3.setText(this.arrayList.get(position + 2).getTexto());
+            }
+        }
         container.addView(itemView);
 
         return itemView;

@@ -12,7 +12,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/logoapp"
+        android:icon="@drawable/logocoral"
         android:label="@string/app_name"
         android:theme="@style/Theme.Base.Light">
         <activity
@@ -138,6 +138,11 @@
         <activity android:name = "com.paypal.android.MEP.PayPalActivity"
             android:theme = "@android:style/Theme.Translucent.NoTitleBar"
             android:configChanges = "keyboardHidden|orientation"/>
+        <activity
+            android:name=".VerImagenesYMensajesActivity"
+            android:label="@string/title_activity_placa"
+            android:screenOrientation="landscape"></activity>
+
     </application>
 
 </manifest>

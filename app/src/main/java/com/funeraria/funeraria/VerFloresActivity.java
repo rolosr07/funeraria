@@ -33,7 +33,7 @@ public class VerFloresActivity extends Base {
 
     private TextView tvNombre;
 
-    private String webResponseImages = "";
+    private String webResponseFlores = "";
     private Thread thread;
     private Handler handler = new Handler();
 
@@ -43,8 +43,8 @@ public class VerFloresActivity extends Base {
 
     private int page = 0;
     private int delay = 5000; //milliseconds
-    private ViewPager pager;
-    private CustomPagerServicesAdapter mCustomPagerAdapter;
+    private ViewPager pagerFlores;
+    private CustomPagerServicesAdapter mCustomPagerAdapterFlores;
 
     private MediaPlayer mPlayer;
 
@@ -61,7 +61,7 @@ public class VerFloresActivity extends Base {
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
         tvNombre = (TextView)findViewById(R.id.tvNombre);
-        pager = (ViewPager) findViewById(R.id.pager);
+        pagerFlores = (ViewPager) findViewById(R.id.pager);
         imageViewImagenOrla = (ImageView) findViewById(R.id.imageViewImagenOrla);
         imageViewImagenOrlaFinal = (ImageView) findViewById(R.id.imageViewImagenFinal);
 
@@ -147,30 +147,30 @@ public class VerFloresActivity extends Base {
 
                     androidHttpTransport.call(SOAP_ACTION_SERVICIO, envelope);
                     Object response = envelope.getResponse();
-                    webResponseImages = response.toString();
+                    webResponseFlores = response.toString();
 
                 }catch(Exception e){
                     e.printStackTrace();
                 }
-                handler.post(createUIImages);
+                handler.post(createUIFlores);
             }
         };
 
         thread.start();
     }
 
-    final Runnable createUIImages = new Runnable() {
+    final Runnable createUIFlores = new Runnable() {
 
         public void run(){
 
-            if(!webResponseImages.equals("") && !webResponseImages.equals("[]")){
+            if(!webResponseFlores.equals("") && !webResponseFlores.equals("[]")){
                 showProgress(false);
 
                 Type collectionType = new TypeToken<List<Servicio>>(){}.getType();
-                List<Servicio> lcs = new Gson().fromJson( webResponseImages , collectionType);
+                List<Servicio> lcs = new Gson().fromJson(webResponseFlores, collectionType);
 
-                mCustomPagerAdapter = new CustomPagerServicesAdapter(VerFloresActivity.this, lcs);
-                pager.setAdapter(mCustomPagerAdapter);
+                mCustomPagerAdapterFlores = new CustomPagerServicesAdapter(VerFloresActivity.this, lcs);
+                pagerFlores.setAdapter(mCustomPagerAdapterFlores);
 
                 handler.postDelayed(runnable, delay);
 
@@ -183,12 +183,12 @@ public class VerFloresActivity extends Base {
 
     Runnable runnable = new Runnable() {
         public void run() {
-            if (mCustomPagerAdapter.getCount() == page) {
+            if (mCustomPagerAdapterFlores.getCount() == page) {
                 page = 0;
             } else {
                 page++;
             }
-            pager.setCurrentItem(page, true);
+            pagerFlores.setCurrentItem(page, true);
             handler.postDelayed(this, delay);
         }
     };

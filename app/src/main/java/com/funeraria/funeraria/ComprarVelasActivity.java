@@ -95,8 +95,6 @@ public class ComprarVelasActivity extends Base {
 
         showProgress(true);
         loadDifuntosList();
-        showProgress(true);
-        loadVelasList();
 
         Button buttonComprar = (Button) findViewById(R.id.buttonComprar);
         buttonComprar.setOnClickListener(new View.OnClickListener() {
@@ -281,6 +279,16 @@ public class ComprarVelasActivity extends Base {
                 CustomAdapter adapter = new CustomAdapter(ComprarVelasActivity.this, R.layout.simple_spinner_item,lcs);
                 adapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
                 spinner.setAdapter(adapter);
+                spinner.setOnItemSelectedListener(
+                        new AdapterView.OnItemSelectedListener() {
+                            public void onItemSelected(AdapterView<?> parent, View view, int position,long id) {
+                                showProgress(true);
+                                loadVelasList();
+                            }
+                            public void onNothingSelected(AdapterView<?> parent) {
+                            }
+                        }
+                );
                 showProgress(false);
             }
             else{
