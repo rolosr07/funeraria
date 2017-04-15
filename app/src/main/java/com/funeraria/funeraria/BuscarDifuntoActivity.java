@@ -307,13 +307,13 @@ public class BuscarDifuntoActivity extends Base {
         public void run(){
 
             if(!webResponseSolicitarAcceso.equals("") && !webResponseSolicitarAcceso.equals("[]") && Boolean.parseBoolean(webResponseSolicitarAcceso)){
-                Toast.makeText(BuscarDifuntoActivity.this, "Solicitud Enviada, esta debe ser Aprobada!", Toast.LENGTH_LONG).show();
+                Toast.makeText(BuscarDifuntoActivity.this, "Solicitud realizada exitosamente!", Toast.LENGTH_LONG).show();
                 showProgress(false);
                 Intent i = new Intent(BuscarDifuntoActivity.this, MainActivityUser.class);
                 finish();
                 startActivity(i);
             } else if(!webResponseSolicitarAcceso.equals("") && !webResponseSolicitarAcceso.equals("[]") && webResponseSolicitarAcceso.equals("AccesoDado")){
-                Toast.makeText(BuscarDifuntoActivity.this, "Solicitud ya ha sido enviada previamente, por favor espere su aprobación!", Toast.LENGTH_LONG).show();
+                Toast.makeText(BuscarDifuntoActivity.this, "Solicitud ya ha sido realizada!", Toast.LENGTH_LONG).show();
                 showProgress(false);
             }
             else{
