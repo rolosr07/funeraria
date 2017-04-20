@@ -40,7 +40,7 @@ public class VerImagenesYMensajesActivity extends Base {
     private Handler handler = new Handler();
     private int page = 0;
     private int pageFlores = 0;
-    private int delay = 12000; //milliseconds
+    private int delay = 5000; //milliseconds
     private ViewPager pager;
     private ViewPager pagerMensajes;
     private CustomPagerAdapter mCustomPagerAdapter;
