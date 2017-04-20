@@ -29,11 +29,15 @@ import com.funeraria.funeraria.common.entities.Usuario;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.paypal.android.MEP.CheckoutButton;
+import com.paypal.android.MEP.MEPAddress;
+import com.paypal.android.MEP.MEPAmounts;
+import com.paypal.android.MEP.MEPReceiverAmounts;
 import com.paypal.android.MEP.PayPal;
 import com.paypal.android.MEP.PayPalActivity;
 import com.paypal.android.MEP.PayPalInvoiceData;
 import com.paypal.android.MEP.PayPalInvoiceItem;
 import com.paypal.android.MEP.PayPalPayment;
+import com.paypal.android.MEP.PaymentAdjuster;
 
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.PropertyInfo;
@@ -44,6 +48,7 @@ import org.ksoap2.transport.HttpTransportSE;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Vector;
 
 
 public class ComprarVelasActivity extends Base {
@@ -152,6 +157,7 @@ public class ComprarVelasActivity extends Base {
                 // Create a basic PayPal payment
                 PayPalPayment payment = createPayment();
                 Intent checkoutIntent = PayPal.getInstance().checkout(payment, getApplicationContext());
+
                 startActivityForResult(checkoutIntent,PAYPAL_REQUEST_CODE);
             }
         });
@@ -173,7 +179,7 @@ public class ComprarVelasActivity extends Base {
         // Create a basic PayPalPayment.
         PayPalPayment payment = new PayPalPayment();
         // Sets the currency type for this payment.
-        payment.setCurrencyType("USD");
+        payment.setCurrencyType("EUR");
         // Sets the recipient for the payment. This can also be a phone number.
         payment.setRecipient(RECIPIENT);
         // Sets the amount of the payment, not including tax and shipping amounts.
@@ -377,7 +383,7 @@ public class ComprarVelasActivity extends Base {
                                     txDuracion.setText("Duración en pantalla: "+servicio.getTiempoMostrar()+" minutos");
                                     txDuracion.setVisibility(View.VISIBLE);
 
-                                    txPrecio.setText("Precio: $"+servicio.getPrecio());
+                                    txPrecio.setText("Precio: €"+servicio.getPrecio());
                                     txPrecio.setVisibility(View.VISIBLE);
 
                                     showProgress(false);

@@ -175,7 +175,7 @@ public class ComprarFloresActivity extends Base {
         // Create a basic PayPalPayment.
         PayPalPayment payment = new PayPalPayment();
         // Sets the currency type for this payment.
-        payment.setCurrencyType("USD");
+        payment.setCurrencyType("EUR");
         // Sets the recipient for the payment. This can also be a phone number.
         payment.setRecipient(RECIPIENT);
         // Sets the amount of the payment, not including tax and shipping amounts.
@@ -380,7 +380,7 @@ public class ComprarFloresActivity extends Base {
                                     txDuracion.setText("Duración en pantalla: "+servicio.getTiempoMostrar()+" minutos");
                                     txDuracion.setVisibility(View.VISIBLE);
 
-                                    txPrecio.setText("Precio: $"+servicio.getPrecio());
+                                    txPrecio.setText("Precio: €"+servicio.getPrecio());
                                     txPrecio.setVisibility(View.VISIBLE);
                                     showProgress(false);
                                 }
