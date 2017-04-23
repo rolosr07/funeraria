@@ -10,21 +10,18 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
+import android.support.v4.view.ViewPager;
 import android.util.Base64;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.funeraria.funeraria.common.Adapters.CustomPagerAdapter;
 import com.funeraria.funeraria.common.Base;
-import com.funeraria.funeraria.common.Adapters.CustomAdapter;
-import com.funeraria.funeraria.common.Adapters.CustomAdapterImagenes;
-import com.funeraria.funeraria.common.entities.Difunto;
 import com.funeraria.funeraria.common.entities.Imagen;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -45,19 +42,17 @@ import java.util.List;
 public class ImagenesDifuntoActivity extends Base {
 
     private TextView txNumeroImagenes;
-    private ImageView imageView;
     private ImageView imgView;
 
-    private String webResponse = "";
     private String webResponseImages = "";
     private String webResponseUpload = "";
     private String webResponseBorrar = "";
     private Thread thread;
     private Handler handler = new Handler();
-    private Spinner spinner;
-    private Spinner spinnerImages;
 
-    private final String METHOD_NAME_GET_DIFUNTO_LIST = "getDifuntosList";
+    private ViewPager pagerImagenes;
+    private List<Imagen> imagenesList;
+
     private final String METHOD_NAME_GET_IMAGENES_LIST = "getImagenesDifuntoList";
     private final String METHOD_NAME_UPLOAD_IMAGEN = "registrarImagenDifunto";
     private final String METHOD_NAME_BORRAR_IMAGEN = "borrarImagenDifunto";
@@ -75,10 +70,9 @@ public class ImagenesDifuntoActivity extends Base {
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
         txNumeroImagenes = (TextView)findViewById(R.id.txNumeroImagenes);
-        imageView = (ImageView)findViewById(R.id.imageView);
         imgView = (ImageView) findViewById(R.id.imgView);
-        spinner = (Spinner) findViewById(R.id.spinner);
-        spinnerImages = (Spinner) findViewById(R.id.spinnerImagenes);
+
+        pagerImagenes = (ViewPager) findViewById(R.id.pagerImagenes);
 
         Button buttonLoadImage = (Button) findViewById(R.id.buttonLoadPicture);
         buttonLoadImage.setOnClickListener(new View.OnClickListener() {
@@ -99,9 +93,9 @@ public class ImagenesDifuntoActivity extends Base {
             public void onClick(View arg0) {
 
                 if(!encodeImage.equals("")){
-                    Difunto dif = (Difunto)spinner.getSelectedItem();
+
                     showProgress(true);
-                    uploadImagen(dif.getIdDifunto(),encodeImage,nombreImagen,typeImagen);
+                    uploadImagen(getCurrentUser().getIdDifunto(),encodeImage,nombreImagen,typeImagen);
                 }
             }
         });
@@ -111,73 +105,15 @@ public class ImagenesDifuntoActivity extends Base {
             @Override
             public void onClick(View arg0) {
 
-                Difunto dif = (Difunto)spinner.getSelectedItem();
-                Imagen imagen = (Imagen)spinnerImages.getSelectedItem();
+                Imagen imagen = imagenesList.get(pagerImagenes.getCurrentItem());
                 showProgress(true);
-                borrarImagen(dif.getIdDifunto(),imagen.getIdImagenes());
+                borrarImagen(getCurrentUser().getIdDifunto(),imagen.getIdImagenes());
             }
         });
 
         showProgress(true);
-        loadDifuntosList();
+        loadImagenesList(getCurrentUser().getIdDifunto());
     }
-
-    public void loadDifuntosList(){
-        thread = new Thread(){
-            public void run(){
-                try {
-
-                    SoapObject request = new SoapObject(NAMESPACE_DIFUNTO, METHOD_NAME_GET_DIFUNTO_LIST);
-
-                    SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
-                    envelope.dotNet = true;
-                    envelope.setOutputSoapObject(request);
-                    HttpTransportSE androidHttpTransport = new HttpTransportSE(URL_DIFUNTO);
-
-                    androidHttpTransport.call(SOAP_ACTION_DIFUNTO, envelope);
-                    Object response = envelope.getResponse();
-                    webResponse = response.toString();
-
-                }catch(Exception e){
-                    e.printStackTrace();
-                }
-                handler.post(createUI);
-            }
-        };
-
-        thread.start();
-    }
-
-    final Runnable createUI = new Runnable() {
-
-        public void run(){
-
-            if(!webResponse.equals("")){
-                Type collectionType = new TypeToken<List<Difunto>>(){}.getType();
-                List<Difunto> lcs = new Gson().fromJson( webResponse , collectionType);
-
-                CustomAdapter adapter = new CustomAdapter(ImagenesDifuntoActivity.this, R.layout.simple_spinner_item,lcs);
-                adapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
-                spinner.setAdapter(adapter);
-
-                spinner.setOnItemSelectedListener(
-                        new AdapterView.OnItemSelectedListener() {
-                            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                                Difunto dif = (Difunto) parent.getItemAtPosition(position);
-                                showProgress(true);
-                                loadImagenesList(dif.getIdDifunto());
-                            }
-                            public void onNothingSelected(AdapterView<?> parent) {
-                            }
-                        }
-                );
-                showProgress(false);
-            }
-            else{
-                showProgress(false);
-            }
-        }
-    };
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -233,47 +169,27 @@ public class ImagenesDifuntoActivity extends Base {
 
             if(!webResponseImages.equals("") && !webResponseImages.equals("[]")){
                 Type collectionType = new TypeToken<List<Imagen>>(){}.getType();
-                List<Imagen> lcs = new Gson().fromJson( webResponseImages , collectionType);
+                imagenesList = new Gson().fromJson( webResponseImages , collectionType);
 
-                if(lcs.size() > 0){
+                if(imagenesList.size() > 0){
 
-                    txNumeroImagenes.setText("Cantidad de Imagenes: "+ lcs.size());
+                    txNumeroImagenes.setText("Cantidad de Imagenes: "+ imagenesList.size());
                     txNumeroImagenes.setVisibility(View.VISIBLE);
 
-                    CustomAdapterImagenes adapter = new CustomAdapterImagenes(ImagenesDifuntoActivity.this, R.layout.simple_spinner_item,lcs);
-                    adapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
-                    spinnerImages.setAdapter(adapter);
-                    spinnerImages.setVisibility(View.VISIBLE);
+                    CustomPagerAdapter mCustomPagerAdapter = new CustomPagerAdapter(getApplicationContext(), imagenesList);
+                    pagerImagenes.setAdapter(mCustomPagerAdapter);
+                    pagerImagenes.setVisibility(View.VISIBLE);
                     showProgress(false);
-                    spinnerImages.setOnItemSelectedListener(
-                            new AdapterView.OnItemSelectedListener() {
-                                public void onItemSelected(AdapterView<?> parent, View view, int position,long id) {
-                                    Imagen img = (Imagen)parent.getItemAtPosition(position);
 
-                                    byte[] decodedString = Base64.decode(img.getImagen(), Base64.DEFAULT);
-                                    Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-
-                                    imageView.setImageBitmap(decodedByte);
-                                    imageView.setVisibility(View.VISIBLE);
-
-                                    showProgress(false);
-
-                                }
-                                public void onNothingSelected(AdapterView<?> parent) {
-                                }
-                            }
-                    );
                 }else{
                     txNumeroImagenes.setText("Cantidad de Imagenes: "+ 0);
-                    spinnerImages.setVisibility(View.GONE);
-                    imageView.setVisibility(View.GONE);
+                    pagerImagenes.setVisibility(View.GONE);
                     showProgress(false);
                 }
             }else{
                 showProgress(false);
-                imageView.setVisibility(View.GONE);
+                pagerImagenes.setVisibility(View.GONE);
                 txNumeroImagenes.setText("Cantidad de Imagenes: "+0);
-                spinnerImages.setVisibility(View.GONE);
             }
         }
     };
@@ -289,9 +205,7 @@ public class ImagenesDifuntoActivity extends Base {
             Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
             if (cursor != null) {
                 cursor.moveToFirst();
-                int columnIndex;
-                columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                String picturePath = cursor.getString(columnIndex);
+
                 int fileNameIndex = cursor.getColumnIndex(filePathColumn[1]);
                 nombreImagen = cursor.getString(fileNameIndex);
 
@@ -386,8 +300,7 @@ public class ImagenesDifuntoActivity extends Base {
         public void run(){
 
             if(Boolean.valueOf(webResponseUpload)){
-                Difunto dif = (Difunto)spinner.getSelectedItem();
-                loadImagenesList(dif.getIdDifunto());
+                loadImagenesList(getCurrentUser().getIdDifunto());
                 imgView.setVisibility(View.GONE);
                 Toast.makeText(ImagenesDifuntoActivity.this, "Imagen Registrada!", Toast.LENGTH_LONG).show();
             }else{
@@ -440,8 +353,7 @@ public class ImagenesDifuntoActivity extends Base {
         public void run(){
 
             if(Boolean.valueOf(webResponseBorrar)){
-                Difunto dif = (Difunto)spinner.getSelectedItem();
-                loadImagenesList(dif.getIdDifunto());
+                loadImagenesList(getCurrentUser().getIdDifunto());
                 imgView.setVisibility(View.GONE);
                 Toast.makeText(ImagenesDifuntoActivity.this, "Imagen Borrada!", Toast.LENGTH_LONG).show();
             }else{
