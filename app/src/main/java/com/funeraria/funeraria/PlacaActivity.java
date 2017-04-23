@@ -1,12 +1,9 @@
 package com.funeraria.funeraria;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.view.ViewPager;
-import android.util.Base64;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -20,10 +17,8 @@ import android.widget.Toast;
 
 import com.funeraria.funeraria.common.Adapters.CustomPagerServicesPlacaAdapter;
 import com.funeraria.funeraria.common.Base;
-import com.funeraria.funeraria.common.Adapters.CustomAdapter;
 import com.funeraria.funeraria.common.Adapters.CustomAdapterRestos;
 import com.funeraria.funeraria.common.Adapters.CustomAdapterServicio;
-import com.funeraria.funeraria.common.entities.Difunto;
 import com.funeraria.funeraria.common.entities.PlacaInformation;
 import com.funeraria.funeraria.common.entities.Restos;
 import com.funeraria.funeraria.common.entities.Servicio;
@@ -43,14 +38,11 @@ import java.util.List;
 
 public class PlacaActivity extends Base {
 
-    private ImageView imageViewImagenSuperior;
-    private ImageView imageViewImagenOrla;
     private EditText esquelaPersonal;
 
     private TextView nombre;
     private TextView encabezado;
 
-    private String webResponse = "";
     private String webResponseServices = "";
     private String webResponseRestos = "";
     private String webResponseRegistro = "";
@@ -58,14 +50,11 @@ public class PlacaActivity extends Base {
     private Thread thread;
     private Handler handler = new Handler();
 
-    private Spinner spinnerDifuntos;
-    private Spinner spinnerImagenSuperior;
-    private Spinner spinnerImagenOrla;
     private Spinner spinnerEsquela;
     private Spinner spinnerRestos;
 
     private ViewPager pagerImagenSuperior;
-    private CustomPagerServicesPlacaAdapter mCustomPagerAdapter;
+    private ViewPager pagerOrla;
 
     private Button buttonRegistrar;
 
@@ -74,7 +63,6 @@ public class PlacaActivity extends Base {
     private List<Servicio> servicioImagenEsquelaList = new ArrayList<Servicio>();
     private List<Restos> restosList = new ArrayList<Restos>();
 
-    private final String METHOD_NAME_GET_DIFUNTO_LIST = "getDifuntosList";
     private final String METHOD_NAME_GET_SERVICES_LIST = "getServiciosList";
     private final String METHOD_NAME_GET_RESTOS_LIST = "getRestosList";
     private final String METHOD_NAME_REGISTRAR_PLACA = "registrarPlaca";
@@ -88,32 +76,27 @@ public class PlacaActivity extends Base {
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
 
-        imageViewImagenSuperior = (ImageView)findViewById(R.id.imageViewImagenSuperior);
-        imageViewImagenOrla = (ImageView) findViewById(R.id.imageViewImagenOrla);
         esquelaPersonal = (EditText) findViewById(R.id.esquelaPersonal);
 
         nombre = (TextView) findViewById(R.id.nombre);
         encabezado = (TextView) findViewById(R.id.encabezado);
 
-        spinnerDifuntos = (Spinner) findViewById(R.id.spinnerDifuntos);
-        spinnerImagenSuperior = (Spinner) findViewById(R.id.spinnerImagenSuperior);
-        spinnerImagenOrla = (Spinner) findViewById(R.id.spinnerImagenOrla);
         spinnerEsquela = (Spinner) findViewById(R.id.spinnerEsquela);
         spinnerRestos = (Spinner) findViewById(R.id.spinnerRestos);
 
         pagerImagenSuperior = (ViewPager) findViewById(R.id.pagerImagenSuperior);
+        pagerOrla = (ViewPager) findViewById(R.id.pagerOrla);
 
         showProgress(true);
-        loadDifuntosList();
+        loadServicesList();
 
         buttonRegistrar = (Button) findViewById(R.id.buttonRegistrar);
         buttonRegistrar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
 
-               // Difunto dif = (Difunto) spinnerDifuntos.getSelectedItem();
-                Servicio imagenSuperior = (Servicio)spinnerImagenSuperior.getSelectedItem();
-                Servicio imagenOrla = (Servicio)spinnerImagenOrla.getSelectedItem();
+                Servicio imagenSuperior = servicioImagenSuperiorList.get(pagerImagenSuperior.getCurrentItem());
+                Servicio imagenOrla = servicioImagenOrlaList.get(pagerOrla.getCurrentItem());
                 Servicio esquela = (Servicio)spinnerEsquela.getSelectedItem();
                 Restos restos = (Restos)spinnerRestos.getSelectedItem();
                 String esquelaPersonalText = "";
@@ -132,63 +115,6 @@ public class PlacaActivity extends Base {
             }
         });
     }
-
-    public void loadDifuntosList(){
-        thread = new Thread(){
-            public void run(){
-                try {
-                    SoapObject request = new SoapObject(NAMESPACE_DIFUNTO, METHOD_NAME_GET_DIFUNTO_LIST);
-
-                    SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
-                    envelope.dotNet = true;
-                    envelope.setOutputSoapObject(request);
-                    HttpTransportSE androidHttpTransport = new HttpTransportSE(URL_DIFUNTO);
-
-                    androidHttpTransport.call(SOAP_ACTION_DIFUNTO, envelope);
-                    Object response = envelope.getResponse();
-                    webResponse = response.toString();
-
-                }catch(Exception e){
-                    e.printStackTrace();
-                }
-                handler.post(createUI);
-            }
-        };
-
-        thread.start();
-    }
-
-    final Runnable createUI = new Runnable() {
-
-        public void run(){
-
-            if(!webResponse.equals("")){
-                Type collectionType = new TypeToken<List<Difunto>>(){}.getType();
-                List<Difunto> lcs = new Gson().fromJson( webResponse , collectionType);
-                CustomAdapter adapter = new CustomAdapter(PlacaActivity.this, R.layout.simple_spinner_item,lcs);
-                adapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
-
-                spinnerDifuntos.setAdapter(adapter);
-                spinnerDifuntos.setOnItemSelectedListener(
-                        new AdapterView.OnItemSelectedListener() {
-                            public void onItemSelected(AdapterView<?> parent, View view, int position,long id) {
-
-                                showProgress(true);
-                                loadServicesList();
-                                spinnerDifuntos.setVisibility(View.GONE);
-                            }
-                            public void onNothingSelected(AdapterView<?> parent) {
-                            }
-                        }
-                );
-
-                showProgress(false);
-            }
-            else{
-                showProgress(false);
-            }
-        }
-    };
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -254,55 +180,17 @@ public class PlacaActivity extends Base {
 
                 if(servicioImagenSuperiorList.size() > 0){
 
-                    CustomAdapterServicio adapterImagenSuperior = new CustomAdapterServicio(PlacaActivity.this, R.layout.simple_spinner_item, servicioImagenSuperiorList);
-                    adapterImagenSuperior.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
-                    spinnerImagenSuperior.setAdapter(adapterImagenSuperior);
-
-                    spinnerImagenSuperior.setOnItemSelectedListener(
-                            new AdapterView.OnItemSelectedListener() {
-                                public void onItemSelected(AdapterView<?> parent, View view, int position,long id) {
-                                    Servicio servicio = (Servicio)parent.getItemAtPosition(position);
-
-                                    byte[] decodedString = Base64.decode(servicio.getImagen(), Base64.DEFAULT);
-                                    Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-
-                                    imageViewImagenSuperior.setImageBitmap(decodedByte);
-                                    imageViewImagenSuperior.setVisibility(View.VISIBLE);
-
-                                }
-                                public void onNothingSelected(AdapterView<?> parent) {
-                                }
-                            }
-                    );
-                    mCustomPagerAdapter = new CustomPagerServicesPlacaAdapter(getApplicationContext(), servicioImagenSuperiorList);
+                    CustomPagerServicesPlacaAdapter mCustomPagerAdapter = new CustomPagerServicesPlacaAdapter(getApplicationContext(), servicioImagenSuperiorList);
                     pagerImagenSuperior.setAdapter(mCustomPagerAdapter);
 
                 }
                 if(servicioImagenOrlaList.size() > 0){
 
-                    CustomAdapterServicio adapterImagenOrla = new CustomAdapterServicio(PlacaActivity.this, R.layout.simple_spinner_item,servicioImagenOrlaList);
-                    adapterImagenOrla.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
-                    spinnerImagenOrla.setAdapter(adapterImagenOrla);
+                    CustomPagerServicesPlacaAdapter mCustomPagerAdapter = new CustomPagerServicesPlacaAdapter(getApplicationContext(), servicioImagenOrlaList);
+                    pagerOrla.setAdapter(mCustomPagerAdapter);
 
-                    spinnerImagenOrla.setOnItemSelectedListener(
-                            new AdapterView.OnItemSelectedListener() {
-                                public void onItemSelected(AdapterView<?> parent, View view, int position,long id) {
-                                    Servicio servicio = (Servicio)parent.getItemAtPosition(position);
-
-                                    byte[] decodedString = Base64.decode(servicio.getImagen(), Base64.DEFAULT);
-                                    Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-
-                                    imageViewImagenOrla.setImageBitmap(decodedByte);
-                                    imageViewImagenOrla.setVisibility(View.VISIBLE);
-
-                                    showProgress(true);
-                                    loadRestosList();
-
-                                }
-                                public void onNothingSelected(AdapterView<?> parent) {
-                                }
-                            }
-                    );
+                    showProgress(true);
+                    loadRestosList();
                 }
                 if(servicioImagenEsquelaList.size() > 0){
 
@@ -507,7 +395,6 @@ public class PlacaActivity extends Base {
                 int i = 0;
                 for(Servicio ser : servicioImagenSuperiorList){
                     if(ser.getIdServicio() == placaInformation.getIdImagenSuperior()){
-                        spinnerImagenSuperior.setSelection(i);
                         pagerImagenSuperior.setCurrentItem(i, true);
                     }else{
                         i++;
@@ -517,7 +404,7 @@ public class PlacaActivity extends Base {
                 i = 0;
                 for(Servicio ser : servicioImagenOrlaList){
                     if(ser.getIdServicio() == placaInformation.getIdImagenOrla()){
-                        spinnerImagenOrla.setSelection(i);
+                        pagerOrla.setCurrentItem(i, true);
                     }else{
                         i++;
                     }
