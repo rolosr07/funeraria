@@ -36,6 +36,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileDescriptor;
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.text.Normalizer;
 import java.util.List;
 
 
@@ -260,7 +261,9 @@ public class ImagenesDifuntoActivity extends Base {
 
                     PropertyInfo fromProp1 = new PropertyInfo();
                     fromProp1.setName("nombreImagen");
-                    fromProp1.setValue(nombreImagen);
+                    String nombreImagenL = Normalizer.normalize(nombreImagen, Normalizer.Form.NFD);
+                    nombreImagenL = nombreImagenL.replaceAll("[^\\p{ASCII}]", "");
+                    fromProp1.setValue(nombreImagenL);
                     fromProp1.setType(String.class);
                     request.addProperty(fromProp1);
 
@@ -362,4 +365,13 @@ public class ImagenesDifuntoActivity extends Base {
             }
         }
     };
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(getApplicationContext(), MainActivityAdmin.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        finishAffinity();
+        finish();
+        startActivity(intent);
+    }
 }

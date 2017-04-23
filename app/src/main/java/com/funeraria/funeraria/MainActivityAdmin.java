@@ -64,6 +64,7 @@ public class MainActivityAdmin extends Base {
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(MainActivityAdmin.this, ImagenesDifuntoActivity.class);
+                finish();
                 startActivity(i);
             }
         });
@@ -73,6 +74,7 @@ public class MainActivityAdmin extends Base {
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(MainActivityAdmin.this, ImagenesDifuntoActivity.class);
+                finish();
                 startActivity(i);
             }
         });
