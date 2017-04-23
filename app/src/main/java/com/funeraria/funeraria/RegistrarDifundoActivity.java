@@ -63,6 +63,7 @@ public class RegistrarDifundoActivity extends Base {
 
     private final String METHOD_NAME = "registrarDifunto";
     private final String METHOD_NAME_GET_DIFUNTO_LIST = "getDifuntosPorUsuarioList";
+    private final String METHOD_NAME_LOGIN = "login";
 
     private static Difunto difunto = null;
 
@@ -79,15 +80,9 @@ public class RegistrarDifundoActivity extends Base {
             @Override
             public void onClick(View view) {
                 showProgress(true);
-                Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    public void run() {
-                        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-                        imm.hideSoftInputFromWindow(editNombre.getWindowToken(), 0);
-                        registrarDifunto();
-                    }
-                }, 2000);
-
+                InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(editNombre.getWindowToken(), 0);
+                registrarDifunto();
             }
         });
 
@@ -228,18 +223,9 @@ public class RegistrarDifundoActivity extends Base {
             boolean result = Boolean.valueOf(webResponse);
             if(result){
                 btnRegistrarDifunto.setEnabled(false);
-                showProgress(false);
+
                 Toast.makeText(RegistrarDifundoActivity.this, "Información registrada con exito!", Toast.LENGTH_LONG).show();
                 login(getCurrentUser().getUserName(),getCurrentUser().getPassword());
-                Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    public void run() {
-                        Intent i = new Intent(RegistrarDifundoActivity.this, MainActivityAdmin.class);
-                        finish();
-                        finishAffinity();
-                        startActivity(i);
-                    }
-                }, 2000);
 
             }else{
                 Toast.makeText(RegistrarDifundoActivity.this, getString(R.string.error_server), Toast.LENGTH_LONG).show();
@@ -448,7 +434,7 @@ public class RegistrarDifundoActivity extends Base {
         thread = new Thread(){
             public void run(){
                 try {
-                    SoapObject request = new SoapObject(NAMESPACE_USER, METHOD_NAME);
+                    SoapObject request = new SoapObject(NAMESPACE_USER, METHOD_NAME_LOGIN);
                     PropertyInfo fromProp = new PropertyInfo();
                     fromProp.setName("userName");
                     fromProp.setValue(userName);
@@ -473,7 +459,11 @@ public class RegistrarDifundoActivity extends Base {
                     if(!responseString.equals("") && !responseString.equals("[]")) {
                         SharedPreferences prefs = getSharedPreferences("com.funeraria.funeraria", Context.MODE_PRIVATE);
                         prefs.edit().putString("USER_DATA", responseString).apply();
+                        user = null;
                     }
+
+                    handler.post(createUILogin);
+
                 }catch(Exception e){
                     e.printStackTrace();
                 }
@@ -483,4 +473,21 @@ public class RegistrarDifundoActivity extends Base {
 
         thread.start();
     }
+
+    final Runnable createUILogin = new Runnable() {
+
+        public void run(){
+
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    showProgress(false);
+                    Intent i = new Intent(RegistrarDifundoActivity.this, MainActivityAdmin.class);
+                    finish();
+                    finishAffinity();
+                    startActivity(i);
+                }
+            }, 2000);
+        }
+    };
 }

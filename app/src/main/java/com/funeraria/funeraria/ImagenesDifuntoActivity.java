@@ -44,6 +44,7 @@ public class ImagenesDifuntoActivity extends Base {
 
     private TextView txNumeroImagenes;
     private ImageView imgView;
+    private TextView nombre;
 
     private String webResponseImages = "";
     private String webResponseUpload = "";
@@ -74,6 +75,9 @@ public class ImagenesDifuntoActivity extends Base {
         imgView = (ImageView) findViewById(R.id.imgView);
 
         pagerImagenes = (ViewPager) findViewById(R.id.pagerImagenes);
+
+        nombre = (TextView) findViewById(R.id.nombre);
+        nombre.setText(getCurrentUser().getNombreDifunto());
 
         Button buttonLoadImage = (Button) findViewById(R.id.buttonLoadPicture);
         buttonLoadImage.setOnClickListener(new View.OnClickListener() {

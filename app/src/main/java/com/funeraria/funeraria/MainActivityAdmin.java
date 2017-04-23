@@ -181,9 +181,8 @@ public class MainActivityAdmin extends Base {
 
         TextView nameAdmin = (TextView) findViewById(R.id.nameAdmin);
 
-        Usuario usuario = getCurrentUser();
-        if(usuario != null) {
-            nameAdmin.setText(usuario.getNombre() + " " + usuario.getApellido());
+        if(getCurrentUser() != null) {
+            nameAdmin.setText(getCurrentUser().getNombreDifunto());
         }
     }
 

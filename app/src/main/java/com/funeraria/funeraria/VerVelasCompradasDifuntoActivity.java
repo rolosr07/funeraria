@@ -1,23 +1,17 @@
 package com.funeraria.funeraria;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.widget.AdapterView.OnItemClickListener;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Base64;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ImageView;
-import android.widget.Spinner;
+import android.widget.ListView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.funeraria.funeraria.common.Adapters.CustomAdapterServicio;
+import com.funeraria.funeraria.common.Adapters.LazyAdapter;
 import com.funeraria.funeraria.common.Base;
-import com.funeraria.funeraria.common.Adapters.CustomAdapter;
-import com.funeraria.funeraria.common.entities.Difunto;
 import com.funeraria.funeraria.common.entities.Servicio;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -35,20 +29,17 @@ import java.util.List;
 public class VerVelasCompradasDifuntoActivity extends Base {
 
     private TextView txNumeroVelas;
-    private ImageView imageView;
 
-    private String webResponse = "";
     private String webResponseImages = "";
     private Thread thread;
     private Handler handler = new Handler();
-    private Spinner spinner;
-    private Spinner spinnerVelas;
 
-    private TextView txNombreUsuario;
-    private TextView txFechaCompra;
-
-    private final String METHOD_NAME_GET_DIFUNTO_LIST = "getDifuntosList";
     private final String METHOD_NAME_GET_SERVICIOS_LIST = "getServiciosPorIdDifuntoYTipoDeServicioList";
+
+    private ListView list;
+    private LazyAdapter adapterList;
+
+    private TextView nombre;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,73 +49,14 @@ public class VerVelasCompradasDifuntoActivity extends Base {
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
         txNumeroVelas = (TextView)findViewById(R.id.txNumeroVelas);
-        imageView = (ImageView)findViewById(R.id.imageView);
-        spinner = (Spinner) findViewById(R.id.spinner);
-        spinnerVelas = (Spinner) findViewById(R.id.spinnerVelas);
+        list = (ListView)findViewById(R.id.list);
 
-        txNombreUsuario = (TextView)findViewById(R.id.txNombreUsuario);
-        txFechaCompra = (TextView)findViewById(R.id.txFechaCompra);
+        nombre = (TextView) findViewById(R.id.nombre);
+        nombre.setText(getCurrentUser().getNombreDifunto());
 
         showProgress(true);
-        loadDifuntosList();
+        loadVelasList(getCurrentUser().getIdDifunto());
     }
-
-    public void loadDifuntosList(){
-        thread = new Thread(){
-            public void run(){
-                try {
-
-                    SoapObject request = new SoapObject(NAMESPACE_DIFUNTO, METHOD_NAME_GET_DIFUNTO_LIST);
-
-                    SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
-                    envelope.dotNet = true;
-                    envelope.setOutputSoapObject(request);
-                    HttpTransportSE androidHttpTransport = new HttpTransportSE(URL_DIFUNTO);
-
-                    androidHttpTransport.call(SOAP_ACTION_DIFUNTO, envelope);
-                    Object response = envelope.getResponse();
-                    webResponse = response.toString();
-
-                }catch(Exception e){
-                    e.printStackTrace();
-                }
-                handler.post(createUI);
-            }
-        };
-
-        thread.start();
-    }
-
-    final Runnable createUI = new Runnable() {
-
-        public void run(){
-
-            if(webResponse != null && !webResponse.equals("")){
-                Type collectionType = new TypeToken<List<Difunto>>(){}.getType();
-                List<Difunto> lcs = new Gson().fromJson( webResponse , collectionType);
-
-                CustomAdapter adapter = new CustomAdapter(VerVelasCompradasDifuntoActivity.this, R.layout.simple_spinner_item,lcs);
-                adapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
-                spinner.setAdapter(adapter);
-
-                spinner.setOnItemSelectedListener(
-                        new AdapterView.OnItemSelectedListener() {
-                            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                                Difunto dif = (Difunto) parent.getItemAtPosition(position);
-                                showProgress(true);
-                                loadVelasList(dif.getIdDifunto());
-                            }
-                            public void onNothingSelected(AdapterView<?> parent) {
-                            }
-                        }
-                );
-                showProgress(false);
-            }
-            else{
-                showProgress(false);
-            }
-        }
-    };
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -193,48 +125,28 @@ public class VerVelasCompradasDifuntoActivity extends Base {
                     txNumeroVelas.setText("Cantidad de Velas: "+ lcs.size());
                     txNumeroVelas.setVisibility(View.VISIBLE);
 
-                    CustomAdapterServicio adapter = new CustomAdapterServicio(VerVelasCompradasDifuntoActivity.this, R.layout.simple_spinner_item,lcs);
-                    adapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
-                    spinnerVelas.setAdapter(adapter);
-                    spinnerVelas.setVisibility(View.VISIBLE);
                     showProgress(false);
-                    spinnerVelas.setOnItemSelectedListener(
-                            new AdapterView.OnItemSelectedListener() {
-                                public void onItemSelected(AdapterView<?> parent, View view, int position,long id) {
-                                    Servicio servicio = (Servicio)parent.getItemAtPosition(position);
 
-                                    byte[] decodedString = Base64.decode(servicio.getImagen(), Base64.DEFAULT);
-                                    Glide.with(VerVelasCompradasDifuntoActivity.this).load(decodedString).into(imageView);
-                                    imageView.setVisibility(View.VISIBLE);
+                    adapterList=new LazyAdapter(VerVelasCompradasDifuntoActivity.this, lcs);
+                    list.setAdapter(adapterList);
 
-                                    txNombreUsuario.setText("Comprador: "+servicio.getNombreUsuario() + " " + servicio.getApellidoUsuario());
-                                    txNombreUsuario.setVisibility(View.VISIBLE);
+                    list.setOnItemClickListener(new OnItemClickListener() {
 
-                                    txFechaCompra.setText("Fecha: "+servicio.getFechaCompra()+"");
-                                    txFechaCompra.setVisibility(View.VISIBLE);
+                        @Override
+                        public void onItemClick(AdapterView parent, View view, int position, long id) {
 
-                                    showProgress(false);
+                        }
+                    });
 
-                                }
-                                public void onNothingSelected(AdapterView<?> parent) {
-                                }
-                            }
-                    );
                 }else{
                     txNumeroVelas.setText("Cantidad de Velas: "+ 0);
-                    spinnerVelas.setVisibility(View.GONE);
-                    imageView.setVisibility(View.GONE);
-                    txNombreUsuario.setVisibility(View.GONE);
-                    txFechaCompra.setVisibility(View.GONE);
+                    txNumeroVelas.setVisibility(View.VISIBLE);
                     showProgress(false);
                 }
             }else{
                 showProgress(false);
-                imageView.setVisibility(View.GONE);
                 txNumeroVelas.setText("Cantidad de Velas: "+0);
-                txNombreUsuario.setVisibility(View.GONE);
-                txFechaCompra.setVisibility(View.GONE);
-                spinnerVelas.setVisibility(View.GONE);
+                txNumeroVelas.setVisibility(View.VISIBLE);
             }
         }
     };

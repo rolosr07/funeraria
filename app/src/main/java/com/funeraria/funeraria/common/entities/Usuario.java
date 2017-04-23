@@ -20,6 +20,7 @@ public class Usuario {
     private String fechaAutorizacion;
     private int idUsuarioAutorizado;
     private int idDifunto;
+    private String nombreDifunto;
 
     public Usuario(){
 
@@ -135,5 +136,13 @@ public class Usuario {
 
     public void setIdDifunto(int idDifunto) {
         this.idDifunto = idDifunto;
+    }
+
+    public String getNombreDifunto() {
+        return nombreDifunto;
+    }
+
+    public void setNombreDifunto(String nombreDifunto) {
+        this.nombreDifunto = nombreDifunto;
     }
 }
