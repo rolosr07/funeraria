@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.view.ViewPager;
 import android.util.Base64;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,13 +15,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.funeraria.funeraria.common.Adapters.CustomPagerServicesPlacaAdapter;
 import com.funeraria.funeraria.common.Base;
 import com.funeraria.funeraria.common.Adapters.CustomAdapter;
 import com.funeraria.funeraria.common.Adapters.CustomAdapterRestos;
 import com.funeraria.funeraria.common.Adapters.CustomAdapterServicio;
 import com.funeraria.funeraria.common.entities.Difunto;
+import com.funeraria.funeraria.common.entities.PlacaInformation;
 import com.funeraria.funeraria.common.entities.Restos;
 import com.funeraria.funeraria.common.entities.Servicio;
 import com.google.gson.Gson;
@@ -43,10 +47,14 @@ public class PlacaActivity extends Base {
     private ImageView imageViewImagenOrla;
     private EditText esquelaPersonal;
 
+    private TextView nombre;
+    private TextView encabezado;
+
     private String webResponse = "";
     private String webResponseServices = "";
     private String webResponseRestos = "";
     private String webResponseRegistro = "";
+    private String webResponseServicesAdquiridos= "";
     private Thread thread;
     private Handler handler = new Handler();
 
@@ -56,10 +64,21 @@ public class PlacaActivity extends Base {
     private Spinner spinnerEsquela;
     private Spinner spinnerRestos;
 
+    private ViewPager pagerImagenSuperior;
+    private CustomPagerServicesPlacaAdapter mCustomPagerAdapter;
+
+    private Button buttonRegistrar;
+
+    private List<Servicio> servicioImagenSuperiorList = new ArrayList<Servicio>();
+    private List<Servicio> servicioImagenOrlaList = new ArrayList<Servicio>();
+    private List<Servicio> servicioImagenEsquelaList = new ArrayList<Servicio>();
+    private List<Restos> restosList = new ArrayList<Restos>();
+
     private final String METHOD_NAME_GET_DIFUNTO_LIST = "getDifuntosList";
     private final String METHOD_NAME_GET_SERVICES_LIST = "getServiciosList";
     private final String METHOD_NAME_GET_RESTOS_LIST = "getRestosList";
     private final String METHOD_NAME_REGISTRAR_PLACA = "registrarPlaca";
+    private final String METHOD_NAME_GET_PLACA_INFORMATION = "getPlacaInformation";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,34 +92,43 @@ public class PlacaActivity extends Base {
         imageViewImagenOrla = (ImageView) findViewById(R.id.imageViewImagenOrla);
         esquelaPersonal = (EditText) findViewById(R.id.esquelaPersonal);
 
+        nombre = (TextView) findViewById(R.id.nombre);
+        encabezado = (TextView) findViewById(R.id.encabezado);
+
         spinnerDifuntos = (Spinner) findViewById(R.id.spinnerDifuntos);
         spinnerImagenSuperior = (Spinner) findViewById(R.id.spinnerImagenSuperior);
         spinnerImagenOrla = (Spinner) findViewById(R.id.spinnerImagenOrla);
         spinnerEsquela = (Spinner) findViewById(R.id.spinnerEsquela);
         spinnerRestos = (Spinner) findViewById(R.id.spinnerRestos);
+
+        pagerImagenSuperior = (ViewPager) findViewById(R.id.pagerImagenSuperior);
+
         showProgress(true);
         loadDifuntosList();
-        showProgress(true);
-        loadServicesList();
-        showProgress(true);
-        loadRestosList();
 
-        Button buttonRegistrar = (Button) findViewById(R.id.buttonRegistrar);
+        buttonRegistrar = (Button) findViewById(R.id.buttonRegistrar);
         buttonRegistrar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
 
-                Difunto dif = (Difunto) spinnerDifuntos.getSelectedItem();
+               // Difunto dif = (Difunto) spinnerDifuntos.getSelectedItem();
                 Servicio imagenSuperior = (Servicio)spinnerImagenSuperior.getSelectedItem();
                 Servicio imagenOrla = (Servicio)spinnerImagenOrla.getSelectedItem();
                 Servicio esquela = (Servicio)spinnerEsquela.getSelectedItem();
                 Restos restos = (Restos)spinnerRestos.getSelectedItem();
                 String esquelaPersonalText = "";
+
                 if(!esquela.getTexto().equals(esquelaPersonal.getText().toString())){
                     esquelaPersonalText = esquelaPersonal.getText().toString();
                 }
                 showProgress(true);
-                registarInscripcion(dif.getIdDifunto(),imagenSuperior.getIdServicio(),imagenOrla.getIdServicio(),esquela.getIdServicio(),restos.getIdLugarRestos(),esquelaPersonalText);
+                //registarInscripcion(dif.getIdDifunto(),imagenSuperior.getIdServicio(),imagenOrla.getIdServicio(),esquela.getIdServicio(),restos.getIdLugarRestos(),esquelaPersonalText);
+
+                if(getCurrentUser().getIdDifunto() != 0){
+                    registarInscripcion(getCurrentUser().getIdDifunto(),imagenSuperior.getIdServicio(),imagenOrla.getIdServicio(),esquela.getIdServicio(),restos.getIdLugarRestos(),esquelaPersonalText);
+                }else{
+                    Toast.makeText(getApplicationContext(), "Debe primero registrar un difunto !", Toast.LENGTH_LONG).show();
+                }
             }
         });
     }
@@ -137,10 +165,23 @@ public class PlacaActivity extends Base {
             if(!webResponse.equals("")){
                 Type collectionType = new TypeToken<List<Difunto>>(){}.getType();
                 List<Difunto> lcs = new Gson().fromJson( webResponse , collectionType);
-
                 CustomAdapter adapter = new CustomAdapter(PlacaActivity.this, R.layout.simple_spinner_item,lcs);
                 adapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
+
                 spinnerDifuntos.setAdapter(adapter);
+                spinnerDifuntos.setOnItemSelectedListener(
+                        new AdapterView.OnItemSelectedListener() {
+                            public void onItemSelected(AdapterView<?> parent, View view, int position,long id) {
+
+                                showProgress(true);
+                                loadServicesList();
+                                spinnerDifuntos.setVisibility(View.GONE);
+                            }
+                            public void onNothingSelected(AdapterView<?> parent) {
+                            }
+                        }
+                );
+
                 showProgress(false);
             }
             else{
@@ -199,10 +240,6 @@ public class PlacaActivity extends Base {
                 Type collectionType = new TypeToken<List<Servicio>>(){}.getType();
                 List<Servicio> servicioList = new Gson().fromJson( webResponseServices , collectionType);
 
-                List<Servicio> servicioImagenSuperiorList = new ArrayList<Servicio>();
-                List<Servicio> servicioImagenOrlaList = new ArrayList<Servicio>();
-                List<Servicio> servicioImagenEsquelaList = new ArrayList<Servicio>();
-
                 for(Servicio serv : servicioList){
                     if(serv.getIdTipoServicio() == 1){
                         servicioImagenSuperiorList.add(serv);
@@ -217,9 +254,9 @@ public class PlacaActivity extends Base {
 
                 if(servicioImagenSuperiorList.size() > 0){
 
-                    CustomAdapterServicio adapter = new CustomAdapterServicio(PlacaActivity.this, R.layout.simple_spinner_item,servicioImagenSuperiorList);
-                    adapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
-                    spinnerImagenSuperior.setAdapter(adapter);
+                    CustomAdapterServicio adapterImagenSuperior = new CustomAdapterServicio(PlacaActivity.this, R.layout.simple_spinner_item, servicioImagenSuperiorList);
+                    adapterImagenSuperior.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
+                    spinnerImagenSuperior.setAdapter(adapterImagenSuperior);
 
                     spinnerImagenSuperior.setOnItemSelectedListener(
                             new AdapterView.OnItemSelectedListener() {
@@ -237,12 +274,15 @@ public class PlacaActivity extends Base {
                                 }
                             }
                     );
+                    mCustomPagerAdapter = new CustomPagerServicesPlacaAdapter(getApplicationContext(), servicioImagenSuperiorList);
+                    pagerImagenSuperior.setAdapter(mCustomPagerAdapter);
+
                 }
                 if(servicioImagenOrlaList.size() > 0){
 
-                    CustomAdapterServicio adapter = new CustomAdapterServicio(PlacaActivity.this, R.layout.simple_spinner_item,servicioImagenOrlaList);
-                    adapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
-                    spinnerImagenOrla.setAdapter(adapter);
+                    CustomAdapterServicio adapterImagenOrla = new CustomAdapterServicio(PlacaActivity.this, R.layout.simple_spinner_item,servicioImagenOrlaList);
+                    adapterImagenOrla.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
+                    spinnerImagenOrla.setAdapter(adapterImagenOrla);
 
                     spinnerImagenOrla.setOnItemSelectedListener(
                             new AdapterView.OnItemSelectedListener() {
@@ -255,6 +295,9 @@ public class PlacaActivity extends Base {
                                     imageViewImagenOrla.setImageBitmap(decodedByte);
                                     imageViewImagenOrla.setVisibility(View.VISIBLE);
 
+                                    showProgress(true);
+                                    loadRestosList();
+
                                 }
                                 public void onNothingSelected(AdapterView<?> parent) {
                                 }
@@ -263,9 +306,9 @@ public class PlacaActivity extends Base {
                 }
                 if(servicioImagenEsquelaList.size() > 0){
 
-                    CustomAdapterServicio adapter = new CustomAdapterServicio(PlacaActivity.this, R.layout.simple_spinner_item,servicioImagenEsquelaList);
-                    adapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
-                    spinnerEsquela.setAdapter(adapter);
+                    CustomAdapterServicio adapterEsquela = new CustomAdapterServicio(PlacaActivity.this, R.layout.simple_spinner_item,servicioImagenEsquelaList);
+                    adapterEsquela.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
+                    spinnerEsquela.setAdapter(adapterEsquela);
 
                     spinnerEsquela.setOnItemSelectedListener(
                             new AdapterView.OnItemSelectedListener() {
@@ -273,6 +316,12 @@ public class PlacaActivity extends Base {
                                     Servicio servicio = (Servicio)parent.getItemAtPosition(position);
 
                                     esquelaPersonal.setText(servicio.getTexto());
+
+                                    if(getCurrentUser().getIdDifunto() != 0){
+                                        loadServicesList(getCurrentUser().getIdDifunto());
+                                    }else{
+                                        Toast.makeText(getApplicationContext(), "Debe primero registrar un difunto!", Toast.LENGTH_LONG).show();
+                                    }
 
                                 }
                                 public void onNothingSelected(AdapterView<?> parent) {
@@ -316,7 +365,7 @@ public class PlacaActivity extends Base {
             showProgress(false);
             if(!webResponseRestos.equals("") && !webResponseRestos.equals("[]")){
                 Type collectionType = new TypeToken<List<Restos>>(){}.getType();
-                List<Restos> restosList = new Gson().fromJson( webResponseRestos , collectionType);
+                restosList = new Gson().fromJson( webResponseRestos , collectionType);
 
                 if(restosList.size() > 0){
 
@@ -395,18 +444,102 @@ public class PlacaActivity extends Base {
 
             showProgress(false);
             if(!webResponseRegistro.equals("") && Boolean.valueOf(webResponseRegistro)){
-                Toast.makeText(PlacaActivity.this, "Inscripción realizada con exito!", Toast.LENGTH_LONG).show();
+                Toast.makeText(PlacaActivity.this, "Información enviada con exito!", Toast.LENGTH_LONG).show();
 
                 Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     public void run() {
                         Intent i = new Intent(PlacaActivity.this, MainActivityAdmin.class);
                         finish();
+                        finishAffinity();
                         startActivity(i);
                     }
                 }, 2000);
             }else{
                 Toast.makeText(PlacaActivity.this, "Error al realizar Inscripción!", Toast.LENGTH_LONG).show();
+            }
+        }
+    };
+
+    public void loadServicesList(final int idDifunto){
+        thread = new Thread(){
+            public void run(){
+                try {
+                    SoapObject request = new SoapObject(NAMESPACE_SERVICIO, METHOD_NAME_GET_PLACA_INFORMATION);
+
+                    PropertyInfo fromProp = new PropertyInfo();
+                    fromProp.setName("idDifunto");
+                    fromProp.setValue(idDifunto);
+                    fromProp.setType(int.class);
+                    request.addProperty(fromProp);
+
+                    SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+                    envelope.dotNet = true;
+                    envelope.setOutputSoapObject(request);
+                    HttpTransportSE androidHttpTransport = new HttpTransportSE(URL_SERVICIO);
+
+                    androidHttpTransport.call(SOAP_ACTION_SERVICIO, envelope);
+                    Object response = envelope.getResponse();
+                    webResponseServicesAdquiridos = response.toString();
+
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+                handler.post(createUIServicesAdquiridos);
+            }
+        };
+
+        thread.start();
+    }
+
+    final Runnable createUIServicesAdquiridos = new Runnable() {
+
+        public void run(){
+
+            showProgress(false);
+            if(!webResponseServicesAdquiridos.equals("") && !webResponseServicesAdquiridos.equals("[]")){
+                Type collectionType = new TypeToken<List<PlacaInformation>>(){}.getType();
+                List<PlacaInformation> placaInformationList = new Gson().fromJson( webResponseServicesAdquiridos , collectionType);
+                PlacaInformation placaInformation = placaInformationList.get(0);
+                nombre.setText(placaInformation.getNombre()+" "+placaInformation.getApellidos());
+                encabezado.setText("Actualizar placa de");
+                buttonRegistrar.setText("Actualizar Placa");
+                int i = 0;
+                for(Servicio ser : servicioImagenSuperiorList){
+                    if(ser.getIdServicio() == placaInformation.getIdImagenSuperior()){
+                        spinnerImagenSuperior.setSelection(i);
+                        pagerImagenSuperior.setCurrentItem(i, true);
+                    }else{
+                        i++;
+                    }
+                }
+
+                i = 0;
+                for(Servicio ser : servicioImagenOrlaList){
+                    if(ser.getIdServicio() == placaInformation.getIdImagenOrla()){
+                        spinnerImagenOrla.setSelection(i);
+                    }else{
+                        i++;
+                    }
+                }
+
+                i = 0;
+                for(Servicio ser : servicioImagenEsquelaList){
+                    if(ser.getIdServicio() == placaInformation.getIdEsquela()){
+                        spinnerEsquela.setSelection(i);
+                    }else{
+                        i++;
+                    }
+                }
+
+                i = 0;
+                for(Restos ser : restosList){
+                    if(ser.getIdLugarRestos() == placaInformation.getIdNombreLugarRestos()){
+                        spinnerRestos.setSelection(i);
+                    }else{
+                        i++;
+                    }
+                }
             }
         }
     };

@@ -1,25 +1,18 @@
 package com.funeraria.funeraria;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-
+import com.funeraria.funeraria.common.Base;
 import com.funeraria.funeraria.common.entities.Usuario;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import java.lang.reflect.Type;
-import java.util.List;
 
 
-public class MainActivityAdmin extends Activity {
+
+public class MainActivityAdmin extends Base {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -184,13 +177,11 @@ public class MainActivityAdmin extends Activity {
             }
         });
 
-        SharedPreferences prefs = getSharedPreferences("com.funeraria.funeraria", Context.MODE_PRIVATE);
-        if(!prefs.getString("USER_DATA","").equals(""))
-        {
-            Type collectionType = new TypeToken<List<Usuario>>(){}.getType();
-            List<Usuario> usuarios = new Gson().fromJson( prefs.getString("USER_DATA","") , collectionType);
-            TextView nameAdmin = (TextView) findViewById(R.id.nameAdmin);
-            nameAdmin.setText(usuarios.get(0).getNombre()+" "+usuarios.get(0).getApellido());
+        TextView nameAdmin = (TextView) findViewById(R.id.nameAdmin);
+
+        Usuario usuario = getCurrentUser();
+        if(usuario != null) {
+            nameAdmin.setText(usuario.getNombre() + " " + usuario.getApellido());
         }
     }
 

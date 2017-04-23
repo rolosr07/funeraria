@@ -10,9 +10,13 @@ public class PlacaInformation {
     private String apellidos;
     private String fechaNacimiento;
     private String fechaDefuncion;
+    private int idImagenSuperior;
     private String imagenSuperior;
+    private int idImagenOrla;
     private String imagenOrla;
+    private int idEsquela;
     private String esquela;
+    private int idNombreLugarRestos;
     private String nombreLugarRestos;
     private String ubicacionLugarRestos;
 
@@ -88,5 +92,37 @@ public class PlacaInformation {
 
     public void setUbicacionLugarRestos(String ubicacionLugarRestos) {
         this.ubicacionLugarRestos = ubicacionLugarRestos;
+    }
+
+    public int getIdImagenSuperior() {
+        return idImagenSuperior;
+    }
+
+    public void setIdImagenSuperior(int idImagenSuperior) {
+        this.idImagenSuperior = idImagenSuperior;
+    }
+
+    public int getIdImagenOrla() {
+        return idImagenOrla;
+    }
+
+    public void setIdImagenOrla(int idImagenOrla) {
+        this.idImagenOrla = idImagenOrla;
+    }
+
+    public int getIdEsquela() {
+        return idEsquela;
+    }
+
+    public void setIdEsquela(int idEsquela) {
+        this.idEsquela = idEsquela;
+    }
+
+    public int getIdNombreLugarRestos() {
+        return idNombreLugarRestos;
+    }
+
+    public void setIdNombreLugarRestos(int idNombreLugarRestos) {
+        this.idNombreLugarRestos = idNombreLugarRestos;
     }
 }

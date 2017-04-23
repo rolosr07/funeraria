@@ -40,7 +40,7 @@ public class VerImagenesYMensajesActivity extends Base {
     private Handler handler = new Handler();
     private int page = 0;
     private int pageFlores = 0;
-    private int delay = 5000; //milliseconds
+    private int delay = 10000; //milliseconds
     private ViewPager pager;
     private ViewPager pagerMensajes;
     private CustomPagerAdapter mCustomPagerAdapter;
@@ -55,7 +55,7 @@ public class VerImagenesYMensajesActivity extends Base {
     private int idDifunto = 0;
     private String nombreDifunto = "";
 
-    private int duration = 30000;
+    private int duration = 120000;
 
     private MediaPlayer mPlayer;
 

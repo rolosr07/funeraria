@@ -79,6 +79,7 @@ public class ConfiguracionAdminActivity extends Base {
             public void onClick(View view) {
                 SharedPreferences prefs = getSharedPreferences("com.funeraria.funeraria", Context.MODE_PRIVATE);
                 prefs.edit().putString("USER_DATA", "").apply();
+                user = null;
                 Intent intent = new Intent(ConfiguracionAdminActivity.this, LoginActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 finishAffinity();

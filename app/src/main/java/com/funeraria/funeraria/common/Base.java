@@ -5,15 +5,22 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.view.View;
 
+import com.funeraria.funeraria.common.entities.Usuario;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.paypal.android.MEP.PayPal;
+import java.lang.reflect.Type;
+import java.util.List;
 
 public class Base extends Activity {
 
-    private String IP = "e-propiedadescr.com";
-    //private String IP = "192.168.43.195:1233";
+    //private String IP = "e-propiedadescr.com";
+    private String IP = "192.168.43.195:1233";
     public final String NAMESPACE_USER = "http://"+IP+"/webservices/user.php";
     public final String URL_USER = "http://"+IP+"/webservices/user.php?wsdl";
     public final String SOAP_ACTION_USER = "http://"+IP+"/webservices/user.php?wsdl";
@@ -34,6 +41,7 @@ public class Base extends Activity {
     public final int ENV = PayPal.ENV_LIVE;
     public final String RECIPIENT = "luis@espacioon.com";
 
+    public static Usuario user = null;
 
     public View mProgressView;
     public View mLoginFormView;
@@ -72,4 +80,20 @@ public class Base extends Activity {
         }
     }
 
+    public Usuario getCurrentUser(){
+
+        if(user == null){
+            SharedPreferences prefs = getSharedPreferences("com.funeraria.funeraria", Context.MODE_PRIVATE);
+
+            if(!prefs.getString("USER_DATA","").equals(""))
+            {
+                Type collectionType = new TypeToken<List<Usuario>>(){}.getType();
+                List<Usuario> usuarios = new Gson().fromJson( prefs.getString("USER_DATA","") , collectionType);
+
+                user = usuarios.get(0);
+            }
+        }
+
+        return user;
+    }
 }

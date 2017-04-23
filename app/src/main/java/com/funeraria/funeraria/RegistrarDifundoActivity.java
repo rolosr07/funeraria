@@ -4,6 +4,7 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.TextUtils;
@@ -14,9 +15,12 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
-
 import com.funeraria.funeraria.common.Base;
+import com.funeraria.funeraria.common.entities.Difunto;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.PropertyInfo;
@@ -24,8 +28,9 @@ import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 
+import java.lang.reflect.Type;
 import java.util.Calendar;
-
+import java.util.List;
 
 public class RegistrarDifundoActivity extends Base {
 
@@ -38,18 +43,28 @@ public class RegistrarDifundoActivity extends Base {
     private EditText editNombre;
     private EditText editApellido;
 
+    private TextView encabezado;
+
     private int year;
     private int month;
     private int day;
+
+    private int yearDe;
+    private int monthDe;
+    private int dayDe;
 
     static final int DATE_DIALOG_ID_NACIMIENTO = 999;
     static final int DATE_DIALOG_ID_DECESO = 998;
 
     private String webResponse = "";
+    private String webResponseDifunto = "";
     private Thread thread;
     private Handler handler = new Handler();
 
     private final String METHOD_NAME = "registrarDifunto";
+    private final String METHOD_NAME_GET_DIFUNTO_LIST = "getDifuntosPorUsuarioList";
+
+    private static Difunto difunto = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +92,11 @@ public class RegistrarDifundoActivity extends Base {
         });
 
         editNombre.requestFocus();
+
+        if(getCurrentUser().getIdDifunto()!= 0){
+            showProgress(true);
+            loadDifuntosList();
+        }
     }
 
     public void registrarDifunto() {
@@ -126,18 +146,36 @@ public class RegistrarDifundoActivity extends Base {
             showProgress(false);
         } else {
             String[] feNa =fechaNacimiento.split("-");
-            fechaNacimiento = feNa[2].replace(" ","")+"-"+feNa[0]+"-"+feNa[1];
+            fechaNacimiento = feNa[2].replace(" ","")+"-"+feNa[1]+"-"+feNa[0];
             String[] feDe =fechaDeceso.split("-");
-            fechaDeceso = feDe[2].replace(" ","")+"-"+feDe[0]+"-"+feDe[1];
-            registrarDifunto(name,apellido,fechaNacimiento,fechaDeceso);
+            fechaDeceso = feDe[2].replace(" ","")+"-"+feDe[1]+"-"+feDe[0];
+            int idDifunto = 0;
+            if(difunto != null){
+                idDifunto = difunto.getIdDifunto();
+            }
+
+            registrarDifunto(getCurrentUser().getIdUsuario(),idDifunto, name, apellido, fechaNacimiento, fechaDeceso);
         }
     }
 
-    public void registrarDifunto(final String nombre, final String apellido, final String fechaNacimiento, final String fechaDeceso){
+    public void registrarDifunto(final int idUsuario, final int idDifunto, final String nombre, final String apellido, final String fechaNacimiento, final String fechaDeceso){
         thread = new Thread(){
             public void run(){
                 try {
                     SoapObject request = new SoapObject(NAMESPACE_DIFUNTO, METHOD_NAME);
+
+                    PropertyInfo fromProp0 = new PropertyInfo();
+                    fromProp0.setName("idUsuario");
+                    fromProp0.setValue(idUsuario);
+                    fromProp0.setType(int.class);
+                    request.addProperty(fromProp0);
+
+                    PropertyInfo fromProp1 = new PropertyInfo();
+                    fromProp1.setName("idDifunto");
+                    fromProp1.setValue(idDifunto);
+                    fromProp1.setType(int.class);
+                    request.addProperty(fromProp1);
+
                     PropertyInfo fromProp = new PropertyInfo();
                     fromProp.setName("nombre");
                     fromProp.setValue(nombre);
@@ -191,19 +229,20 @@ public class RegistrarDifundoActivity extends Base {
             if(result){
                 btnRegistrarDifunto.setEnabled(false);
                 showProgress(false);
-                Toast.makeText(RegistrarDifundoActivity.this, "Difunto Registrado con exito!", Toast.LENGTH_LONG).show();
-
+                Toast.makeText(RegistrarDifundoActivity.this, "Información registrada con exito!", Toast.LENGTH_LONG).show();
+                login(getCurrentUser().getUserName(),getCurrentUser().getPassword());
                 Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     public void run() {
                         Intent i = new Intent(RegistrarDifundoActivity.this, MainActivityAdmin.class);
                         finish();
+                        finishAffinity();
                         startActivity(i);
                     }
                 }, 2000);
 
             }else{
-                editNombre.setError(getString(R.string.error_server));
+                Toast.makeText(RegistrarDifundoActivity.this, getString(R.string.error_server), Toast.LENGTH_LONG).show();
                 showProgress(false);
             }
         }
@@ -231,6 +270,7 @@ public class RegistrarDifundoActivity extends Base {
         tvDisplayDateDeceso = (EditText) findViewById(R.id.tvDateDeceso);
         editNombre = (EditText) findViewById(R.id.nombreDifunto);
         editApellido = (EditText) findViewById(R.id.apellidoDifunto);
+        encabezado = (TextView) findViewById(R.id.encabezado);
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
@@ -239,16 +279,19 @@ public class RegistrarDifundoActivity extends Base {
         year = c.get(Calendar.YEAR);
         month = c.get(Calendar.MONTH);
         day = c.get(Calendar.DAY_OF_MONTH);
+        yearDe = c.get(Calendar.YEAR);
+        monthDe = c.get(Calendar.MONTH);
+        dayDe = c.get(Calendar.DAY_OF_MONTH);
 
         // set current date into textview
         tvDateNacimiento.setText(new StringBuilder()
                 // Month is 0 based, just add 1
-                .append(month + 1).append("-").append(day).append("-")
+                .append(day).append("-").append(month + 1).append("-")
                 .append(year).append(" "));
 
         tvDisplayDateDeceso.setText(new StringBuilder()
                 // Month is 0 based, just add 1
-                .append(month + 1).append("-").append(day).append("-")
+                .append(day).append("-").append(month + 1).append("-")
                 .append(year).append(" "));
 
     }
@@ -294,7 +337,7 @@ public class RegistrarDifundoActivity extends Base {
             case DATE_DIALOG_ID_DECESO:
                 // set date picker as current date
                 return new DatePickerDialog(this, datePickerListenerDeceso,
-                        year, month,day);
+                        yearDe, monthDe,dayDe);
         }
         return null;
     }
@@ -310,8 +353,8 @@ public class RegistrarDifundoActivity extends Base {
             day = selectedDay;
 
             // set selected date into textview
-            tvDateNacimiento.setText(new StringBuilder().append(month + 1)
-                    .append("-").append(day).append("-").append(year)
+            tvDateNacimiento.setText(new StringBuilder().append(day).append("-").append(month + 1)
+                    .append("-").append(year)
                     .append(" "));
         }
     };
@@ -327,9 +370,117 @@ public class RegistrarDifundoActivity extends Base {
             day = selectedDay;
 
             // set selected date into textview
-            tvDisplayDateDeceso.setText(new StringBuilder().append(month + 1)
-                    .append("-").append(day).append("-").append(year)
+            tvDisplayDateDeceso.setText(new StringBuilder().append(day).append("-").append(month + 1)
+                    .append("-").append(year)
                     .append(" "));
         }
     };
+
+    public void loadDifuntosList(){
+        thread = new Thread(){
+            public void run(){
+                try {
+
+                    SoapObject request = new SoapObject(NAMESPACE_DIFUNTO, METHOD_NAME_GET_DIFUNTO_LIST);
+
+                    PropertyInfo fromProp = new PropertyInfo();
+                    fromProp.setName("idUsuario");
+                    fromProp.setValue(getCurrentUser().getIdUsuario());
+                    fromProp.setType(int.class);
+                    request.addProperty(fromProp);
+
+                    SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+                    envelope.dotNet = true;
+                    envelope.setOutputSoapObject(request);
+                    HttpTransportSE androidHttpTransport = new HttpTransportSE(URL_DIFUNTO);
+
+                    androidHttpTransport.call(SOAP_ACTION_DIFUNTO, envelope);
+                    Object response = envelope.getResponse();
+                    webResponseDifunto = response.toString();
+
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+                handler.post(createUIDifunto);
+            }
+        };
+
+        thread.start();
+    }
+
+    final Runnable createUIDifunto = new Runnable() {
+
+        public void run(){
+
+            if(webResponseDifunto != null && !webResponseDifunto.equals("")){
+                Type collectionType = new TypeToken<List<Difunto>>(){}.getType();
+                List<Difunto> lcs = new Gson().fromJson( webResponseDifunto , collectionType);
+
+                difunto = lcs.get(0);
+                editNombre.setText(difunto.getNombre());
+                editApellido.setText(difunto.getApellidos());
+
+                String[] feNa =difunto.getFechaNacimiento().split("-");
+                String[] dayL =feNa[2].split(" ");
+                year = Integer.parseInt(feNa[0]);
+                month = Integer.parseInt(feNa[1])-1;
+                day = Integer.parseInt(dayL[0]);
+                tvDateNacimiento.setText(dayL[0]+"-"+feNa[1]+"-"+feNa[0]);
+
+                String[] feDe =difunto.getFechaDefuncion().split("-");
+                String[] dayDeL =feDe[2].split(" ");
+                yearDe = Integer.parseInt(feDe[0]);
+                monthDe = Integer.parseInt(feDe[1])-1;
+                dayDe = Integer.parseInt(dayDeL[0]);
+                tvDisplayDateDeceso.setText(dayDeL[0]+"-"+feDe[1]+"-"+feDe[0]);
+                btnRegistrarDifunto.setText("Actualizar");
+                encabezado.setText("Actualizar Difunto");
+
+                showProgress(false);
+            }
+            else{
+                showProgress(false);
+            }
+        }
+    };
+
+    public void login(final String userName, final String password){
+        thread = new Thread(){
+            public void run(){
+                try {
+                    SoapObject request = new SoapObject(NAMESPACE_USER, METHOD_NAME);
+                    PropertyInfo fromProp = new PropertyInfo();
+                    fromProp.setName("userName");
+                    fromProp.setValue(userName);
+                    fromProp.setType(String.class);
+                    request.addProperty(fromProp);
+
+                    PropertyInfo fromProp2 = new PropertyInfo();
+                    fromProp2.setName("password");
+                    fromProp2.setValue(password);
+                    fromProp2.setType(String.class);
+                    request.addProperty(fromProp2);
+
+                    SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+                    envelope.dotNet = true;
+                    envelope.setOutputSoapObject(request);
+                    HttpTransportSE androidHttpTransport = new HttpTransportSE(URL_USER);
+
+                    androidHttpTransport.call(SOAP_ACTION_USER, envelope);
+                    Object response = envelope.getResponse();
+                    String responseString = response.toString();
+
+                    if(!responseString.equals("") && !responseString.equals("[]")) {
+                        SharedPreferences prefs = getSharedPreferences("com.funeraria.funeraria", Context.MODE_PRIVATE);
+                        prefs.edit().putString("USER_DATA", responseString).apply();
+                    }
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+
+            }
+        };
+
+        thread.start();
+    }
 }
