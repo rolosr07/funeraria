@@ -19,6 +19,7 @@ public class PlacaInformation {
     private int idNombreLugarRestos;
     private String nombreLugarRestos;
     private String ubicacionLugarRestos;
+    private String download;
 
     public PlacaInformation(){}
 
@@ -124,5 +125,13 @@ public class PlacaInformation {
 
     public void setIdNombreLugarRestos(int idNombreLugarRestos) {
         this.idNombreLugarRestos = idNombreLugarRestos;
+    }
+
+    public String getDownload() {
+        return download;
+    }
+
+    public void setDownload(String download) {
+        this.download = download;
     }
 }

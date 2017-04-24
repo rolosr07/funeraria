@@ -459,7 +459,7 @@ public class RegistrarDifundoActivity extends Base {
                     if(!responseString.equals("") && !responseString.equals("[]")) {
                         SharedPreferences prefs = getSharedPreferences("com.funeraria.funeraria", Context.MODE_PRIVATE);
                         prefs.edit().putString("USER_DATA", responseString).apply();
-                        user = null;
+                        setUser(null);
                     }
 
                     handler.post(createUILogin);

@@ -1,6 +1,8 @@
 package com.funeraria.funeraria;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
@@ -25,6 +27,7 @@ import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -32,32 +35,36 @@ public class VerImagenesYMensajesActivity extends Base {
 
     private TextView tvNombre;
 
-    private String webResponseImages = "";
-    private String webResponseMensajes = "";
-    private String webResponseFlores = "";
+    private String webResponseValidarDescarga = "";
 
     private Thread thread;
     private Handler handler = new Handler();
-    private int page = 0;
+
+    private int pageImagenes = 0;
+    private int pageMensajes = 0;
     private int pageFlores = 0;
-    private int delay = 10000; //milliseconds
-    private ViewPager pager;
+    private int delay = 5000; //milliseconds
+
+    private ViewPager pagerImagenes;
     private ViewPager pagerMensajes;
-    private CustomPagerAdapter mCustomPagerAdapter;
-    private CustomPagerServicesMensajesAdapter mCustomPagerAdapterMensajes;
     private ViewPager pagerFlores;
+
+    private CustomPagerAdapter mCustomPagerAdapterImagenes;
+    private CustomPagerServicesMensajesAdapter mCustomPagerAdapterMensajes;
     private CustomPagerServicesAdapter mCustomPagerAdapterFlores;
 
     private final String METHOD_NAME_GET_IMAGENES_LIST = "getImagenesDifuntoList";
     private final String METHOD_NAME_GET_SERVICIOS_LIST_MENSAJES = "getServiciosPorIdDifuntoYTipoDeServicioMensajesList";
     private final String METHOD_NAME_GET_SERVICIOS_LIST = "getServiciosPorIdDifuntoFloresYVelas";
+    private final String METHOD_NAME_VALIDAR_DESCARGA = "placaInformationNeedDownload";
 
-    private int idDifunto = 0;
-    private String nombreDifunto = "";
-
-    private int duration = 120000;
+    private int duration = 20000;
 
     private MediaPlayer mPlayer;
+
+    private List<Imagen> imagenList = new ArrayList<Imagen>();
+    private List<Servicio> listMensajes = new ArrayList<Servicio>();
+    private List<Servicio> listFloresVelas = new ArrayList<Servicio>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,51 +74,80 @@ public class VerImagenesYMensajesActivity extends Base {
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
         tvNombre = (TextView)findViewById(R.id.tvNombre);
-        pager = (ViewPager) findViewById(R.id.pager);
+        pagerImagenes = (ViewPager) findViewById(R.id.pager);
         pagerMensajes = (ViewPager) findViewById(R.id.pagerMensajes);
         pagerFlores = (ViewPager) findViewById(R.id.pagerFlores);
 
         mPlayer = MediaPlayer.create(VerImagenesYMensajesActivity.this, R.raw.music);
         //mPlayer.start();
 
-        if(getIntent().getExtras().containsKey("nombreDifunto")){
-            nombreDifunto = getIntent().getExtras().getString("nombreDifunto");
+        tvNombre.setText(getCurrentUser().getNombreDifunto());
+
+        if(getCurrentImagenes() == null){
+            showProgress(true);
+            loadImagenesList(getCurrentUser().getIdDifunto());
+        }else{
+            imagenList = getCurrentImagenes();
+            cargarInformacionThread();
         }
-        tvNombre.setText(nombreDifunto);
 
-        if(getIntent().getExtras().containsKey("idDifunto")){
-            idDifunto = getIntent().getExtras().getInt("idDifunto");
+        if(getCurrentMensajes() == null){
+            showProgress(true);
+            loadMensajesList(getCurrentUser().getIdDifunto());
+        }else{
+            listMensajes = getCurrentMensajes();
+            cargarInformacionThread();
         }
 
-        showProgress(true);
-        loadImagenesList(idDifunto);
+        if(getCurrentFloresYVelas() == null){
+            showProgress(true);
+            loadFloresList(getCurrentUser().getIdDifunto());
+        }else{
+            listFloresVelas = getCurrentFloresYVelas();
+            cargarInformacionThread();
+        }
 
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            public void run() {
-                Intent i = new Intent(VerImagenesYMensajesActivity.this, VerPlacaActivity.class);
-                i.putExtra("idDifunto", idDifunto);
-                i.putExtra("nombreDifunto", nombreDifunto);
-                finish();
-                startActivity(i);
+        validarDescarga(getCurrentUser().getIdDifunto());
+
+    }
+
+    public void validarDescarga(final int idDifunto){
+        thread = new Thread(){
+            public void run(){
+                try {
+                    SoapObject request = new SoapObject(NAMESPACE_SERVICIO, METHOD_NAME_VALIDAR_DESCARGA);
+
+                    PropertyInfo fromProp = new PropertyInfo();
+                    fromProp.setName("idDifunto");
+                    fromProp.setValue(idDifunto);
+                    fromProp.setType(int.class);
+                    request.addProperty(fromProp);
+
+                    SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+                    envelope.dotNet = true;
+                    envelope.setOutputSoapObject(request);
+                    HttpTransportSE androidHttpTransport = new HttpTransportSE(URL_SERVICIO);
+
+                    androidHttpTransport.call(SOAP_ACTION_SERVICIO, envelope);
+                    Object response = envelope.getResponse();
+                    webResponseValidarDescarga = response.toString();
+
+                    if(!webResponseValidarDescarga.equals("") && Boolean.parseBoolean(webResponseValidarDescarga)) {
+                        setListImagen(null);
+                        SharedPreferences prefs = getSharedPreferences("com.funeraria.funeraria", Context.MODE_PRIVATE);
+                        prefs.edit().putString(IMAGENES_DATA, "").apply();
+                        setListMensajes(null);
+                        prefs.edit().putString(MENSAJES_DATA, "").apply();
+                        setListFloresYVelas(null);
+                        prefs.edit().putString(FLORES_Y_VELAS_DATA, "").apply();
+                    }
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
             }
-        }, duration);
-    }
+        };
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.registrar_difundo, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        return id == R.id.action_settings || super.onOptionsItemSelected(item);
+        thread.start();
     }
 
     public void loadImagenesList(final int idDifunto){
@@ -133,70 +169,23 @@ public class VerImagenesYMensajesActivity extends Base {
 
                     androidHttpTransport.call(SOAP_ACTION_DIFUNTO, envelope);
                     Object response = envelope.getResponse();
-                    webResponseImages = response.toString();
+                    String webResponseImages = response.toString();
 
+                    if(!webResponseImages.equals("") && !webResponseImages.equals("[]")){
+                        Type collectionType = new TypeToken<List<Imagen>>(){}.getType();
+                        imagenList = new Gson().fromJson( webResponseImages , collectionType);
+
+                        SharedPreferences prefs = getSharedPreferences("com.funeraria.funeraria", Context.MODE_PRIVATE);
+                        prefs.edit().putString(IMAGENES_DATA, webResponseImages).apply();
+                    }
                 }catch(Exception e){
                     e.printStackTrace();
                 }
-                handler.post(createUIImages);
+                cargarInformacionThread();
             }
         };
 
         thread.start();
-    }
-
-    final Runnable createUIImages = new Runnable() {
-
-        public void run(){
-
-            if(!webResponseImages.equals("") && !webResponseImages.equals("[]")){
-                showProgress(false);
-
-                Type collectionType = new TypeToken<List<Imagen>>(){}.getType();
-                List<Imagen> lcs = new Gson().fromJson( webResponseImages , collectionType);
-
-                if((lcs.size()*delay) > duration){
-                    duration = lcs.size()*delay;
-                }
-
-                mCustomPagerAdapter = new CustomPagerAdapter(VerImagenesYMensajesActivity.this, lcs);
-                pager.setAdapter(mCustomPagerAdapter);
-                showProgress(true);
-                loadMensajesList(idDifunto);
-                handler.postDelayed(runnable, delay);
-
-            }else{
-                showProgress(false);
-            }
-        }
-    };
-
-    Runnable runnable = new Runnable() {
-        public void run() {
-            if (mCustomPagerAdapter.getCount() == page) {
-                page = 0;
-            } else {
-                page++;
-            }
-            pager.setCurrentItem(page, true);
-            handler.postDelayed(this, delay);
-        }
-    };
-
-    @Override
-    protected void onPause() {
-        handler.removeCallbacks(runnable);
-        finishAffinity();
-        finish();
-        super.onPause();
-    }
-
-    @Override
-    public void onDestroy() {
-        mPlayer.stop();
-        finishAffinity();
-        finish();
-        super.onDestroy();
     }
 
     public void loadMensajesList(final int idDifunto){
@@ -219,45 +208,27 @@ public class VerImagenesYMensajesActivity extends Base {
 
                     androidHttpTransport.call(SOAP_ACTION_SERVICIO, envelope);
                     Object response = envelope.getResponse();
-                    webResponseMensajes = response.toString();
+                    String webResponseMensajes = response.toString();
 
+                    if(!webResponseMensajes.equals("") && !webResponseMensajes.equals("[]")){
+                        showProgress(false);
+
+                        Type collectionType = new TypeToken<List<Servicio>>(){}.getType();
+                        listMensajes = new Gson().fromJson( webResponseMensajes , collectionType);
+
+                        SharedPreferences prefs = getSharedPreferences("com.funeraria.funeraria", Context.MODE_PRIVATE);
+                        prefs.edit().putString(MENSAJES_DATA, webResponseMensajes).apply();
+                    }
                 }catch(Exception e){
                     e.printStackTrace();
                 }
-                handler.post(createUIMensajes);
+
+                cargarInformacionThread();
             }
         };
 
         thread.start();
     }
-
-    final Runnable createUIMensajes = new Runnable() {
-
-        public void run(){
-
-            if(!webResponseMensajes.equals("") && !webResponseMensajes.equals("[]")){
-                showProgress(false);
-
-                Type collectionType = new TypeToken<List<Servicio>>(){}.getType();
-                List<Servicio> lcs = new Gson().fromJson( webResponseMensajes , collectionType);
-
-                if((lcs.size()*delay) > duration){
-                    duration = lcs.size()*delay;
-                }
-
-                mCustomPagerAdapterMensajes = new CustomPagerServicesMensajesAdapter(VerImagenesYMensajesActivity.this, lcs);
-                pagerMensajes.setAdapter(mCustomPagerAdapterMensajes);
-
-                showProgress(true);
-                loadFloresList(idDifunto);
-
-                handler.postDelayed(runnable, delay);
-
-            }else{
-                showProgress(false);
-            }
-        }
-    };
 
     public void loadFloresList(final int idDifunto){
         thread = new Thread(){
@@ -279,44 +250,133 @@ public class VerImagenesYMensajesActivity extends Base {
 
                     androidHttpTransport.call(SOAP_ACTION_SERVICIO, envelope);
                     Object response = envelope.getResponse();
-                    webResponseFlores = response.toString();
+                    String webResponseFlores = response.toString();
 
+                    if(!webResponseFlores.equals("") && !webResponseFlores.equals("[]")) {
+                        showProgress(false);
+
+                        Type collectionType = new TypeToken<List<Servicio>>() {}.getType();
+                        listFloresVelas = new Gson().fromJson(webResponseFlores, collectionType);
+
+                        SharedPreferences prefs = getSharedPreferences("com.funeraria.funeraria", Context.MODE_PRIVATE);
+                        prefs.edit().putString(FLORES_Y_VELAS_DATA, webResponseFlores).apply();
+                    }
                 }catch(Exception e){
                     e.printStackTrace();
                 }
-                handler.post(createUIFlores);
+                cargarInformacionThread();
             }
         };
 
         thread.start();
     }
 
-    final Runnable createUIFlores = new Runnable() {
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.registrar_difundo, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+        return id == R.id.action_settings || super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onPause() {
+        handler.removeCallbacks(runnableImagenes);
+        handler.removeCallbacks(runnableMensajes);
+        handler.removeCallbacks(runnableFlores);
+        finishAffinity();
+        finish();
+        super.onPause();
+    }
+
+    @Override
+    public void onDestroy() {
+        mPlayer.stop();
+        finishAffinity();
+        finish();
+        super.onDestroy();
+    }
+
+    public void cargarInformacionThread(){
+        thread = new Thread(){
+            public void run(){
+                handler.post(createUI);
+            }
+        };
+
+        thread.start();
+    }
+
+    final Runnable createUI = new Runnable() {
 
         public void run(){
 
-            if(!webResponseFlores.equals("") && !webResponseFlores.equals("[]")){
-                showProgress(false);
-
-                Type collectionType = new TypeToken<List<Servicio>>(){}.getType();
-                List<Servicio> lcs = new Gson().fromJson(webResponseFlores, collectionType);
-
-                if((lcs.size()*delay) > duration){
-                    duration = lcs.size()*delay;
+            if(imagenList.size() > 0 ){
+                if((imagenList.size()*delay) > duration){
+                    duration = (imagenList.size()*delay) + delay;
                 }
-
-                mCustomPagerAdapterFlores = new CustomPagerServicesAdapter(VerImagenesYMensajesActivity.this, lcs);
-                pagerFlores.setAdapter(mCustomPagerAdapterFlores);
-
-                handler.postDelayed(runnable2, delay);
-
-            }else{
-                showProgress(false);
+                mCustomPagerAdapterImagenes = new CustomPagerAdapter(VerImagenesYMensajesActivity.this, imagenList);
+                pagerImagenes.setAdapter(mCustomPagerAdapterImagenes);
+                handler.postDelayed(runnableImagenes, delay);
             }
+
+            if(listMensajes.size() > 0 ){
+                if((listMensajes.size()*delay) > duration){
+                    duration = (listMensajes.size() * delay) + delay;
+                }
+                mCustomPagerAdapterMensajes = new CustomPagerServicesMensajesAdapter(VerImagenesYMensajesActivity.this, listMensajes);
+                pagerMensajes.setAdapter(mCustomPagerAdapterMensajes);
+                handler.postDelayed(runnableMensajes, delay);
+            }
+
+            if(listFloresVelas.size() > 0 ){
+                if((listFloresVelas.size()*delay) > duration){
+                    duration = (listFloresVelas.size() * delay ) + delay;
+                }
+                mCustomPagerAdapterFlores = new CustomPagerServicesAdapter(VerImagenesYMensajesActivity.this, listFloresVelas);
+                pagerFlores.setAdapter(mCustomPagerAdapterFlores);
+                handler.postDelayed(runnableFlores, delay);
+            }
+
+            showProgress(false);
+
+            handler.postDelayed(runnableRedirect, duration);
         }
     };
 
-    Runnable runnable2 = new Runnable() {
+    Runnable runnableImagenes = new Runnable() {
+        public void run() {
+            if (mCustomPagerAdapterImagenes.getCount() == pageImagenes) {
+                pageImagenes = 0;
+            } else {
+                pageImagenes++;
+            }
+            pagerImagenes.setCurrentItem(pageImagenes, true);
+            handler.postDelayed(this, delay);
+        }
+    };
+
+    Runnable runnableMensajes = new Runnable() {
+        public void run() {
+            if (mCustomPagerAdapterMensajes.getCount() == pageMensajes) {
+                pageMensajes = 0;
+            } else {
+                pageMensajes++;
+            }
+            pagerMensajes.setCurrentItem(pageMensajes, true);
+            handler.postDelayed(this, delay);
+        }
+    };
+
+    Runnable runnableFlores = new Runnable() {
         public void run() {
             if (mCustomPagerAdapterFlores.getCount() == pageFlores) {
                 pageFlores = 0;
@@ -325,6 +385,15 @@ public class VerImagenesYMensajesActivity extends Base {
             }
             pagerFlores.setCurrentItem(pageFlores, true);
             handler.postDelayed(this, delay);
+        }
+    };
+
+    Runnable runnableRedirect = new Runnable() {
+        public void run() {
+            Intent i = new Intent(VerImagenesYMensajesActivity.this, VerPlacaActivity.class);
+            finish();
+            finishAffinity();
+            startActivity(i);
         }
     };
 }

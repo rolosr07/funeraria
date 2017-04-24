@@ -33,19 +33,19 @@
             <LinearLayout
                 android:id="@+id/email_login_form"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="600dp"
                 android:orientation="vertical"
                 android:gravity="top"
                 android:layout_weight="0.3">
 
                 <TextView
                     android:text="Nombre"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_alignParentTop="true"
                     android:layout_centerHorizontal="true"
                     android:textStyle="bold"
-                    android:textSize="28dp"
+                    android:textSize="40dp"
                     android:gravity="center"
                     android:layout_gravity="center"
                     android:id="@+id/tvNombre"
@@ -54,9 +54,9 @@
                 <android.support.v4.view.ViewPager xmlns:android="http://schemas.android.com/apk/res/android"
                     android:id="@+id/pager"
                     android:layout_width="match_parent"
-                    android:layout_height="350dp"
-                    android:layout_gravity="top"
-                    android:layout_marginTop="-50dp"/>
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="20dp"/>
 
             </LinearLayout>
 
@@ -74,7 +74,7 @@
                     android:layout_alignParentTop="true"
                     android:layout_centerHorizontal="true"
                     android:textStyle="bold"
-                    android:textSize="20dp"
+                    android:textSize="30dp"
                     android:gravity="center"
                     android:layout_gravity="center"
                     android:layout_marginBottom="10dp"
@@ -82,8 +82,8 @@
 
                 <android.support.v4.view.ViewPager xmlns:android="http://schemas.android.com/apk/res/android"
                     android:id="@+id/pagerMensajes"
-                    android:layout_width="250dp"
-                    android:layout_height="400dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     android:orientation="vertical"/>
             </LinearLayout>
 
@@ -101,7 +101,7 @@
                     android:layout_alignParentTop="true"
                     android:layout_centerHorizontal="true"
                     android:textStyle="bold"
-                    android:textSize="20dp"
+                    android:textSize="30dp"
                     android:gravity="center"
                     android:layout_gravity="center"
                     android:layout_marginBottom="10dp"
@@ -110,7 +110,7 @@
                 <android.support.v4.view.ViewPager xmlns:android="http://schemas.android.com/apk/res/android"
                     android:id="@+id/pagerFlores"
                     android:layout_width="match_parent"
-                    android:layout_height="400dp"/>
+                    android:layout_height="match_parent"/>
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

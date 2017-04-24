@@ -79,7 +79,7 @@ public class ConfiguracionUsuarioActivity extends Base {
             public void onClick(View view) {
                 SharedPreferences prefs = getSharedPreferences("com.funeraria.funeraria", Context.MODE_PRIVATE);
                 prefs.edit().putString("USER_DATA", "").apply();
-                user = null;
+                setUser(null);
                 Intent intent = new Intent(ConfiguracionUsuarioActivity.this, LoginActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 finishAffinity();

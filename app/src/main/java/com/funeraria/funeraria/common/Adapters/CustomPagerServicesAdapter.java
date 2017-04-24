@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.support.v4.view.PagerAdapter;
+import android.text.format.DateFormat;
 import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +19,9 @@ import com.funeraria.funeraria.R;
 import com.funeraria.funeraria.common.entities.Imagen;
 import com.funeraria.funeraria.common.entities.Servicio;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -58,15 +62,25 @@ public class CustomPagerServicesAdapter extends PagerAdapter {
 
         Glide.with(mContext).load(decodedString).into(imageView);
 
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        Date convertedDate = new Date();
+        try {
+            convertedDate = dateFormat.parse(this.arrayList.get(position).getFechaCompra());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        String fecha = DateFormat.format("dd-MM-yyyy", convertedDate).toString();
+
         if(this.arrayList.get(position).getIdTipoServicio()==4){
             txNombre.setText(this.arrayList.get(position).getNombreUsuario()+" "+this.arrayList.get(position).getApellidoUsuario()+".");
-            txMensaje.setText("Le envia un ramo de flores el "+this.arrayList.get(position).getFechaCompra()+".");
+            txMensaje.setText("Le envia un ramo de flores el \n"+fecha+".");
         }else if(this.arrayList.get(position).getIdTipoServicio()==3){
             txNombre.setText(this.arrayList.get(position).getNombreUsuario()+" "+this.arrayList.get(position).getApellidoUsuario());
-            txMensaje.setText("Le enciende unas velas el "+this.arrayList.get(position).getFechaCompra()+".");
+            txMensaje.setText("Le enciende unas velas el \n"+fecha+".");
         }else{
             txNombre.setText("Enviado por: "+this.arrayList.get(position).getNombreUsuario()+" "+this.arrayList.get(position).getApellidoUsuario());
-            txMensaje.setText("Le envia un presente el "+this.arrayList.get(position).getFechaCompra()+".");
+            txMensaje.setText("Le envia un presente el \n"+fecha+".");
         }
 
         container.addView(itemView);

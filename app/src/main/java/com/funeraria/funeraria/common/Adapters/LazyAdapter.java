@@ -69,7 +69,6 @@ public class LazyAdapter extends BaseAdapter {
         try {
             convertedDate = dateFormat.parse(serv.getFechaCompra());
         } catch (ParseException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 

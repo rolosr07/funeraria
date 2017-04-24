@@ -10,6 +10,9 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.view.View;
 
+import com.funeraria.funeraria.common.entities.Imagen;
+import com.funeraria.funeraria.common.entities.PlacaInformation;
+import com.funeraria.funeraria.common.entities.Servicio;
 import com.funeraria.funeraria.common.entities.Usuario;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -41,10 +44,59 @@ public class Base extends Activity {
     public final int ENV = PayPal.ENV_LIVE;
     public final String RECIPIENT = "luis@espacioon.com";
 
-    public static Usuario user = null;
+    private static Usuario user = null;
+    private static PlacaInformation placaInformation = null;
+    private static List<Imagen> listImagen = null;
+    private static List<Servicio> listMensajes = null;
+    private static List<Servicio> listFloresYVelas = null;
 
     public View mProgressView;
     public View mLoginFormView;
+
+    public String PLACA_INFORMATION = "PLACA_INFORMATION_DATA";
+    public String IMAGENES_DATA = "IMAGENES__DATA";
+    public String MENSAJES_DATA = "MENSAJES_DATA";
+    public String FLORES_Y_VELAS_DATA = "FLORES_Y_VELAS_DATA";
+
+    private static Usuario getUser() {
+        return user;
+    }
+
+    public static void setUser(Usuario user) {
+        Base.user = user;
+    }
+
+    private static PlacaInformation getPlacaInformation() {
+        return placaInformation;
+    }
+
+    public static void setPlacaInformation(PlacaInformation placaInformation) {
+        Base.placaInformation = placaInformation;
+    }
+
+    private static List<Imagen> getListImagen() {
+        return listImagen;
+    }
+
+    public static void setListImagen(List<Imagen> listImagen) {
+        Base.listImagen = listImagen;
+    }
+
+    private static List<Servicio> getListMensajes() {
+        return listMensajes;
+    }
+
+    public static void setListMensajes(List<Servicio> listMensajes) {
+        Base.listMensajes = listMensajes;
+    }
+
+    private static List<Servicio> getListFloresYVelas() {
+        return listFloresYVelas;
+    }
+
+    public static void setListFloresYVelas(List<Servicio> listFloresYVelas) {
+        Base.listFloresYVelas = listFloresYVelas;
+    }
 
     @SuppressLint("ObsoleteSdkInt")
     @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
@@ -82,7 +134,7 @@ public class Base extends Activity {
 
     public Usuario getCurrentUser(){
 
-        if(user == null){
+        if(getUser() == null){
             SharedPreferences prefs = getSharedPreferences("com.funeraria.funeraria", Context.MODE_PRIVATE);
 
             if(!prefs.getString("USER_DATA","").equals(""))
@@ -90,10 +142,77 @@ public class Base extends Activity {
                 Type collectionType = new TypeToken<List<Usuario>>(){}.getType();
                 List<Usuario> usuarios = new Gson().fromJson( prefs.getString("USER_DATA","") , collectionType);
 
-                user = usuarios.get(0);
+                setUser(usuarios.get(0));
             }
         }
 
-        return user;
+        return getUser();
+    }
+
+    public PlacaInformation getCurrentPlaca(){
+
+        if(getPlacaInformation() == null){
+            SharedPreferences prefs = getSharedPreferences("com.funeraria.funeraria", Context.MODE_PRIVATE);
+
+            if(!prefs.getString(PLACA_INFORMATION,"").equals(""))
+            {
+                Type collectionType = new TypeToken<List<PlacaInformation>>(){}.getType();
+                List<PlacaInformation> placa = new Gson().fromJson( prefs.getString(PLACA_INFORMATION,"") , collectionType);
+
+                setPlacaInformation(placa.get(0));
+            }
+        }
+
+        return getPlacaInformation();
+    }
+
+    public List<Imagen> getCurrentImagenes(){
+
+        if(getListImagen() == null){
+            SharedPreferences prefs = getSharedPreferences("com.funeraria.funeraria", Context.MODE_PRIVATE);
+
+            if(!prefs.getString(IMAGENES_DATA,"").equals(""))
+            {
+                Type collectionType = new TypeToken<List<Imagen>>(){}.getType();
+                List<Imagen> listImagen = new Gson().fromJson( prefs.getString(IMAGENES_DATA,"") , collectionType);
+
+                setListImagen(listImagen);
+            }
+        }
+
+        return getListImagen();
+    }
+
+    public List<Servicio> getCurrentMensajes(){
+
+        if(getListMensajes() == null){
+            SharedPreferences prefs = getSharedPreferences("com.funeraria.funeraria", Context.MODE_PRIVATE);
+
+            if(!prefs.getString(MENSAJES_DATA,"").equals(""))
+            {
+                Type collectionType = new TypeToken<List<Servicio>>(){}.getType();
+                List<Servicio> listServicios = new Gson().fromJson( prefs.getString(MENSAJES_DATA,"") , collectionType);
+
+                setListMensajes(listServicios);
+            }
+        }
+
+        return getListMensajes();
+    }
+
+    public List<Servicio> getCurrentFloresYVelas(){
+
+        if(getListFloresYVelas() == null){
+            SharedPreferences prefs = getSharedPreferences("com.funeraria.funeraria", Context.MODE_PRIVATE);
+
+            if(!prefs.getString(FLORES_Y_VELAS_DATA,"").equals(""))
+            {
+                Type collectionType = new TypeToken<List<Servicio>>(){}.getType();
+                List<Servicio> listServicios = new Gson().fromJson( prefs.getString(FLORES_Y_VELAS_DATA,"") , collectionType);
+
+                setListFloresYVelas(listServicios);
+            }
+        }
+        return getListFloresYVelas();
     }
 }
