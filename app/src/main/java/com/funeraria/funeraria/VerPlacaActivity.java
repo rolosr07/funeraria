@@ -69,7 +69,14 @@ public class VerPlacaActivity extends Base {
         tvFechaDeceso = (TextView) findViewById(R.id.tvFechaDeceso);
         tvEsquela = (TextView) findViewById(R.id.tvEsquela);
 
-        showProgress(true);
+
+        if (getCurrentPlaca() == null) {
+            showProgress(true);
+            loadServicesList(getCurrentUser().getIdDifunto());
+        } else {
+            cargarInformacionThread();
+        }
+
         validarDescarga(getCurrentUser().getIdDifunto());
 
         mPlayer = MediaPlayer.create(VerPlacaActivity.this, R.raw.music);
@@ -82,7 +89,7 @@ public class VerPlacaActivity extends Base {
                 i.putExtra("imagenOrla", imagenOrla);
                 startActivity(i);
             }
-        }, 5000);
+        }, 12000);
     }
 
     public void validarDescarga(final int idDifunto){
@@ -107,13 +114,9 @@ public class VerPlacaActivity extends Base {
                     webResponseServices = response.toString();
 
                     if(!webResponseServices.equals("") && Boolean.parseBoolean(webResponseServices)) {
-                        loadServicesList(idDifunto);
-                    }else{
-                        if (getCurrentPlaca() == null) {
-                            loadServicesList(idDifunto);
-                        } else {
-                            cargarInformacionThread();
-                        }
+                        SharedPreferences prefs = getSharedPreferences("com.funeraria.funeraria", Context.MODE_PRIVATE);
+                        prefs.edit().putString(PLACA_INFORMATION, "").apply();
+                        setPlacaInformation(null);
                     }
                 }catch(Exception e){
                     e.printStackTrace();

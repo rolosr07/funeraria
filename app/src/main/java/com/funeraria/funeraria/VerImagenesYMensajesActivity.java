@@ -106,7 +106,6 @@ public class VerImagenesYMensajesActivity extends Base {
             listFloresVelas = getCurrentFloresYVelas();
             cargarInformacionThread();
         }
-
         validarDescarga(getCurrentUser().getIdDifunto());
 
     }
@@ -181,7 +180,6 @@ public class VerImagenesYMensajesActivity extends Base {
                 }catch(Exception e){
                     e.printStackTrace();
                 }
-                cargarInformacionThread();
             }
         };
 
@@ -211,7 +209,6 @@ public class VerImagenesYMensajesActivity extends Base {
                     String webResponseMensajes = response.toString();
 
                     if(!webResponseMensajes.equals("") && !webResponseMensajes.equals("[]")){
-                        showProgress(false);
 
                         Type collectionType = new TypeToken<List<Servicio>>(){}.getType();
                         listMensajes = new Gson().fromJson( webResponseMensajes , collectionType);
@@ -222,8 +219,6 @@ public class VerImagenesYMensajesActivity extends Base {
                 }catch(Exception e){
                     e.printStackTrace();
                 }
-
-                cargarInformacionThread();
             }
         };
 
@@ -253,7 +248,6 @@ public class VerImagenesYMensajesActivity extends Base {
                     String webResponseFlores = response.toString();
 
                     if(!webResponseFlores.equals("") && !webResponseFlores.equals("[]")) {
-                        showProgress(false);
 
                         Type collectionType = new TypeToken<List<Servicio>>() {}.getType();
                         listFloresVelas = new Gson().fromJson(webResponseFlores, collectionType);
@@ -264,7 +258,8 @@ public class VerImagenesYMensajesActivity extends Base {
                 }catch(Exception e){
                     e.printStackTrace();
                 }
-                cargarInformacionThread();
+
+                handler.post(createUI);
             }
         };
 

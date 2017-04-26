@@ -8,9 +8,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import com.funeraria.funeraria.common.Base;
-import com.funeraria.funeraria.common.entities.Usuario;
-
-
 
 public class MainActivityAdmin extends Base {
 
@@ -199,9 +196,6 @@ public class MainActivityAdmin extends Base {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
+        return id == R.id.action_settings || super.onOptionsItemSelected(item);
     }
 }
