@@ -1,32 +1,23 @@
 package com.funeraria.funeraria;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Base64;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.funeraria.funeraria.common.Adapters.CustomAdapter;
-import com.funeraria.funeraria.common.Adapters.CustomAdapterServicio;
+import com.funeraria.funeraria.common.Adapters.LazyAdapterComprar;
 import com.funeraria.funeraria.common.Base;
-import com.funeraria.funeraria.common.entities.Difunto;
 import com.funeraria.funeraria.common.entities.Servicio;
-import com.funeraria.funeraria.common.entities.Usuario;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.paypal.android.MEP.CheckoutButton;
@@ -46,30 +37,24 @@ import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.util.List;
 
-
 public class ComprarFloresActivity extends Base {
 
     private TextView txNumeroFlores;
-    private ImageView imageView;
-    private TextView txDuracion;
-    private TextView  txPrecio;
 
-    private String webResponse = "";
     private String webResponseImages = "";
     private String webResponseComprar = "";
     private Thread thread;
     private Handler handler = new Handler();
-    private Spinner spinner;
-    private Spinner spinnerFlores;
 
-    private final String METHOD_NAME_GET_DIFUNTO_LIST = "getDifuntosPorUsuarioList";
+    private ListView list;
+    private LazyAdapterComprar adapterList;
+    private List<Servicio> lcs;
+
     private final String METHOD_NAME_GET_SERVICIOS_LIST = "getServiciosPorTipoDeServicioList";
     private final String METHOD_NAME_COMPRAR_SERVICIO = "comprarServicio";
 
-    private Usuario usuarioActual;
-
-    private boolean _paypalLibraryInit = false;
     private CheckoutButton launchPayPalButton;
+    private boolean _paypalLibraryInit = false;
     public static final int PAYPAL_REQUEST_CODE = 1;
 
     @Override
@@ -80,60 +65,50 @@ public class ComprarFloresActivity extends Base {
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
         txNumeroFlores = (TextView)findViewById(R.id.txNumeroFlores);
-        imageView = (ImageView)findViewById(R.id.imageView);
-        spinner = (Spinner) findViewById(R.id.spinner);
-        spinnerFlores = (Spinner) findViewById(R.id.spinnerFlores);
+        list = (ListView)findViewById(R.id.list);
 
-        txDuracion = (TextView)findViewById(R.id.txDuracion);
-        txPrecio = (TextView)findViewById(R.id.txPrecio);
-
-        SharedPreferences prefs = getSharedPreferences("com.funeraria.funeraria", Context.MODE_PRIVATE);
-        if(!prefs.getString("USER_DATA","").equals(""))
-        {
-            Type collectionType = new TypeToken<List<Usuario>>(){}.getType();
-            List<Usuario> usuarios = new Gson().fromJson( prefs.getString("USER_DATA","") , collectionType);
-            usuarioActual = usuarios.get(0);
-        }
         showProgress(true);
-        loadDifuntosList();
+        loadFloresList();
 
         Button buttonComprar = (Button) findViewById(R.id.buttonComprar);
         buttonComprar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showProgress(true);
-                int u = usuarioActual.getIdUsuario();
-                Difunto d = (Difunto) spinner.getSelectedItem();
-                Servicio s = (Servicio)spinnerFlores.getSelectedItem();
-                comprarServicio(u,d.getIdDifunto(),s.getIdServicio());
+
+                if(!validateUser()){
+                    showDialogUser(ComprarFloresActivity.this, 0);
+                }else{
+                    if(!validarUsuarioSeleccionoFamiliar()){
+                        showDialogSeleccionarFamiliar(ComprarFloresActivity.this);
+                    }else{
+                        showProgress(true);
+                        Servicio s = lcs.get(list.getSelectedItemPosition());
+                        comprarServicio(getCurrentUser().getIdUsuario(),getCurrentUser().getIdDifunto(),s.getIdServicio());
+                    }
+                }
             }
         });
 
+        TextView nameAdmin = (TextView) findViewById(R.id.nameAdmin);
+        if(getCurrentUser() != null && getCurrentUser().getIdDifunto() != 0) {
+            nameAdmin.setText(getCurrentUser().getNombreDifunto());
+        }
+
         initLibrary();
-        showPayPalButton();
+        //showPayPalButton();
     }
 
     public void initLibrary() {
         PayPal pp = PayPal.getInstance();
 
-        if (pp == null) {  // Test to see if the library is already initialized
+        if (pp == null) {
 
-            // This main initialization call takes your Context, AppID, and target server
             pp = PayPal.initWithAppID(this, PAYPAL_KEY, ENV);
 
-
-            // Required settings:
-
-            // Set the language for the library
             pp.setLanguage("es_ES");
 
-            // Some Optional settings:
-
-            // Sets who pays any transaction fees. Value is:
-            // FEEPAYER_SENDER, FEEPAYER_PRIMARYRECEIVER, FEEPAYER_EACHRECEIVER, and FEEPAYER_SECONDARYONLY
             pp.setFeesPayer(PayPal.FEEPAYER_EACHRECEIVER);
 
-            // true = transaction requires shipping
             pp.setShippingEnabled(true);
 
             _paypalLibraryInit = true;
@@ -152,9 +127,17 @@ public class ComprarFloresActivity extends Base {
             public void onClick(View v) {
 
                 // Create a basic PayPal payment
-                PayPalPayment payment = createPayment();
-                Intent checkoutIntent = PayPal.getInstance().checkout(payment, getApplicationContext());
-                startActivityForResult(checkoutIntent,PAYPAL_REQUEST_CODE);
+                if(!validateUser()){
+                    showDialogUser(ComprarFloresActivity.this, 0);
+                }else{
+                    if(!validarUsuarioSeleccionoFamiliar()){
+                        showDialogSeleccionarFamiliar(ComprarFloresActivity.this);
+                    }else{
+                        PayPalPayment payment = createPayment(list.getSelectedItemPosition());
+                        Intent checkoutIntent = PayPal.getInstance().checkout(payment, getApplicationContext());
+                        startActivityForResult(checkoutIntent,PAYPAL_REQUEST_CODE);
+                    }
+                }
             }
         });
 
@@ -167,10 +150,9 @@ public class ComprarFloresActivity extends Base {
         ((RelativeLayout) findViewById(R.id.RelativeLayout01)).setGravity(Gravity.CENTER);
     }
 
-    private PayPalPayment createPayment() {
+    private PayPalPayment createPayment(int position) {
 
-        Difunto difunto = (Difunto) spinner.getSelectedItem();
-        Servicio servicio = (Servicio)spinnerFlores.getSelectedItem();
+        Servicio servicio = lcs.get(position);
 
         // Create a basic PayPalPayment.
         PayPalPayment payment = new PayPalPayment();
@@ -201,13 +183,13 @@ public class ComprarFloresActivity extends Base {
         // Sets the merchant name. This is the name of your Application or Company.
         payment.setMerchantName("Memorial Informatica Manchuela");
         // Sets the description of the payment.
-        payment.setDescription("Compra de flores para familiar: "+difunto.getNombre()+" "+difunto.getApellidos());
+        payment.setDescription("Compra de flores para familiar: "+getCurrentUser().getNombreDifunto());
         // Sets the Custom ID. This is any ID that you would like to have associated with the payment.
         payment.setCustomID("8873482296");
         // Sets the Instant Payment Notification url. This url will be hit by the PayPal server upon completion of the payment.
         //payment.setIpnUrl("http://www.exampleapp.com/ipn");
         // Sets the memo. This memo will be part of the notification sent by PayPal to the necessary parties.
-        payment.setMemo("Gracias por su compra de flores para familiar: "+difunto.getNombre()+" "+difunto.getApellidos());
+        payment.setMemo("Gracias por su compra de flores para familiar: "+getCurrentUser().getNombreDifunto());
 
         return payment;
     }
@@ -217,12 +199,10 @@ public class ComprarFloresActivity extends Base {
         switch (resultCode) {
             // The payment succeeded
             case Activity.RESULT_OK:
-                String payKey = intent.getStringExtra(PayPalActivity.EXTRA_PAY_KEY);
+               // String payKey = intent.getStringExtra(PayPalActivity.EXTRA_PAY_KEY);
                 showProgress(true);
-                int u = usuarioActual.getIdUsuario();
-                Difunto d = (Difunto) spinner.getSelectedItem();
-                Servicio s = (Servicio)spinnerFlores.getSelectedItem();
-                comprarServicio(u,d.getIdDifunto(),s.getIdServicio());
+                Servicio servicio = lcs.get(list.getSelectedItemPosition());
+                comprarServicio(getCurrentUser().getIdUsuario(),getCurrentUser().getIdDifunto(),servicio.getIdServicio());
                 break;
 
             // The payment was canceled
@@ -232,73 +212,11 @@ public class ComprarFloresActivity extends Base {
 
             // The payment failed, get the error from the EXTRA_ERROR_ID and EXTRA_ERROR_MESSAGE
             case PayPalActivity.RESULT_FAILURE:
-                String errorID = intent.getStringExtra(PayPalActivity.EXTRA_ERROR_ID);
+                //String errorID = intent.getStringExtra(PayPalActivity.EXTRA_ERROR_ID);
                 String errorMessage = intent.getStringExtra(PayPalActivity.EXTRA_ERROR_MESSAGE);
                 Toast.makeText(ComprarFloresActivity.this, "No se ha podido realizar la compra!"+errorMessage, Toast.LENGTH_LONG).show();
         }
     }
-
-    public void loadDifuntosList(){
-        thread = new Thread(){
-            public void run(){
-                try {
-
-                    SoapObject request = new SoapObject(NAMESPACE_DIFUNTO, METHOD_NAME_GET_DIFUNTO_LIST);
-
-                    PropertyInfo fromProp = new PropertyInfo();
-                    fromProp.setName("idUsuario");
-                    fromProp.setValue(usuarioActual.getIdUsuario());
-                    fromProp.setType(int.class);
-                    request.addProperty(fromProp);
-
-                    SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
-                    envelope.dotNet = true;
-                    envelope.setOutputSoapObject(request);
-                    HttpTransportSE androidHttpTransport = new HttpTransportSE(URL_DIFUNTO);
-
-                    androidHttpTransport.call(SOAP_ACTION_DIFUNTO, envelope);
-                    Object response = envelope.getResponse();
-                    webResponse = response.toString();
-
-                }catch(Exception e){
-                    e.printStackTrace();
-                }
-                handler.post(createUI);
-            }
-        };
-
-        thread.start();
-    }
-
-    final Runnable createUI = new Runnable() {
-
-        public void run(){
-
-            if(webResponse != null && !webResponse.equals("")){
-                Type collectionType = new TypeToken<List<Difunto>>(){}.getType();
-                List<Difunto> lcs = new Gson().fromJson( webResponse , collectionType);
-
-                CustomAdapter adapter = new CustomAdapter(ComprarFloresActivity.this, R.layout.simple_spinner_item,lcs);
-                adapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
-                spinner.setAdapter(adapter);
-
-                spinner.setOnItemSelectedListener(
-                        new AdapterView.OnItemSelectedListener() {
-                            public void onItemSelected(AdapterView<?> parent, View view, int position,long id) {
-                                showProgress(true);
-                                loadFloresList();
-                            }
-                            public void onNothingSelected(AdapterView<?> parent) {
-                            }
-                        }
-                );
-                showProgress(false);
-            }
-            else{
-                showProgress(false);
-            }
-        }
-    };
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -354,56 +272,44 @@ public class ComprarFloresActivity extends Base {
 
             if(!webResponseImages.equals("") && !webResponseImages.equals("[]")){
                 Type collectionType = new TypeToken<List<Servicio>>(){}.getType();
-                List<Servicio> lcs = new Gson().fromJson( webResponseImages , collectionType);
+                lcs = new Gson().fromJson( webResponseImages , collectionType);
 
                 if(lcs.size() > 0){
 
                     txNumeroFlores.setText("Flores disponibles: "+ lcs.size());
                     txNumeroFlores.setVisibility(View.VISIBLE);
 
-                    CustomAdapterServicio adapter = new CustomAdapterServicio(ComprarFloresActivity.this, R.layout.simple_spinner_item,lcs);
-                    adapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
-                    spinnerFlores.setAdapter(adapter);
-                    spinnerFlores.setVisibility(View.VISIBLE);
-                    spinnerFlores.setOnItemSelectedListener(
-                            new AdapterView.OnItemSelectedListener() {
-                                public void onItemSelected(AdapterView<?> parent, View view, int position,long id) {
-                                    showProgress(true);
-                                    Servicio servicio = (Servicio)parent.getItemAtPosition(position);
+                    adapterList = new LazyAdapterComprar(ComprarFloresActivity.this, lcs);
+                    list.setAdapter(adapterList);
 
-                                    byte[] decodedString = Base64.decode(servicio.getImagen(), Base64.DEFAULT);
-                                    Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+                    list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
-                                    imageView.setImageBitmap(decodedByte);
-                                    imageView.setVisibility(View.VISIBLE);
+                        @Override
+                        public void onItemClick(AdapterView parent, View view, int position, long id) {
 
-                                    txDuracion.setText("Duración en pantalla: "+servicio.getTiempoMostrar()+" minutos");
-                                    txDuracion.setVisibility(View.VISIBLE);
-
-                                    txPrecio.setText("Precio: €"+servicio.getPrecio());
-                                    txPrecio.setVisibility(View.VISIBLE);
-                                    showProgress(false);
-                                }
-                                public void onNothingSelected(AdapterView<?> parent) {
+                            if(!validateUser()){
+                                showDialogUser(ComprarFloresActivity.this, 0);
+                            }else{
+                                if(!validarUsuarioSeleccionoFamiliar()){
+                                    showDialogSeleccionarFamiliar(ComprarFloresActivity.this);
+                                }else{
+                                    PayPalPayment payment = createPayment(position);
+                                    Intent checkoutIntent = PayPal.getInstance().checkout(payment, getApplicationContext());
+                                    startActivityForResult(checkoutIntent,PAYPAL_REQUEST_CODE);
                                 }
                             }
-                    );
+
+                        }
+                    });
+
                     showProgress(false);
                 }else{
                     txNumeroFlores.setText("Cantidad de Velas: "+ 0);
-                    spinnerFlores.setVisibility(View.GONE);
-                    imageView.setVisibility(View.GONE);
-                    txDuracion.setVisibility(View.GONE);
-                    txPrecio.setVisibility(View.GONE);
                     showProgress(false);
                 }
             }else{
                 showProgress(false);
-                imageView.setVisibility(View.GONE);
                 txNumeroFlores.setText("Cantidad de Velas: "+0);
-                spinnerFlores.setVisibility(View.GONE);
-                txDuracion.setVisibility(View.GONE);
-                txPrecio.setVisibility(View.GONE);
             }
         }
     };
@@ -467,7 +373,6 @@ public class ComprarFloresActivity extends Base {
                 Toast.makeText(ComprarFloresActivity.this, "No se ha podido realizar la compra!", Toast.LENGTH_LONG).show();
                 showProgress(false);
             }
-
         }
     };
 

@@ -61,7 +61,7 @@ public class LoginActivity extends Base {
         Usuario user = getCurrentUser();
         if(user != null)
         {
-            redirect(user.getRol(), user.getIdDifunto());
+            redirect(user.getRol());
         }else{
 
             userNameView = (EditText) findViewById(R.id.userName);
@@ -197,7 +197,7 @@ public class LoginActivity extends Base {
         thread.start();
     }
 
-    private void redirect(String rol, int idDifunto){
+    private void redirect(String rol){
 
         if(rol.equals("admin")){
             Intent i = new Intent(LoginActivity.this, MainActivityAdmin.class);
@@ -209,7 +209,6 @@ public class LoginActivity extends Base {
             startActivity(i);
         }else if(rol.equals("presenter")){
             Intent i = new Intent(LoginActivity.this, VerPlacaActivity.class);
-            i.putExtra("idDifunto", idDifunto);
             finish();
             startActivity(i);
         }
@@ -226,7 +225,7 @@ public class LoginActivity extends Base {
                 SharedPreferences prefs = getSharedPreferences("com.funeraria.funeraria", Context.MODE_PRIVATE);
                 prefs.edit().putString("USER_DATA", webResponse).apply();
 
-                redirect(usuarios.get(0).getRol(), usuarios.get(0).getIdDifunto());
+                redirect(usuarios.get(0).getRol());
                 showProgress(false);
             }else{
                 userNameView.setError(getString(R.string.error_invalid_email));

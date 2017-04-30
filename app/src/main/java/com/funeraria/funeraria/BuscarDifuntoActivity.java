@@ -1,9 +1,7 @@
 package com.funeraria.funeraria;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -24,7 +22,6 @@ import com.funeraria.funeraria.common.Adapters.CustomAdapterImagenes;
 import com.funeraria.funeraria.common.Base;
 import com.funeraria.funeraria.common.entities.Difunto;
 import com.funeraria.funeraria.common.entities.Imagen;
-import com.funeraria.funeraria.common.entities.Usuario;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -49,13 +46,11 @@ public class BuscarDifuntoActivity extends Base {
     private Handler handler = new Handler();
     private Spinner spinner;
     private Spinner spinnerImages;
-    private String textoBusqueda;
+    private String textoBusqueda = "";
 
     private final String METHOD_NAME_GET_DIFUNTO_LIST = "buscarDifuntosPorNombreOApellido";
     private final String METHOD_NAME_GET_IMAGENES_LIST = "getImagenesDifuntoList";
     private final String METHOD_NAME_GET_SOLICITAR_ACCESO = "solicitarAccesoDifunto";
-
-    private Usuario usuarioActual;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,7 +64,7 @@ public class BuscarDifuntoActivity extends Base {
         spinnerImages = (Spinner) findViewById(R.id.spinnerImagenes);
         imageView = (ImageView)findViewById(R.id.imageView);
 
-        if(getIntent().getExtras().containsKey("textoBusqueda")){
+        if(getIntent().getExtras() != null && getIntent().getExtras().containsKey("textoBusqueda")){
             textoBusqueda = getIntent().getExtras().getString("textoBusqueda");
             edTextoBusqueda.setText(textoBusqueda);
         }
@@ -85,21 +80,17 @@ public class BuscarDifuntoActivity extends Base {
             }
         });
 
-        SharedPreferences prefs = getSharedPreferences("com.funeraria.funeraria", Context.MODE_PRIVATE);
-        if(!prefs.getString("USER_DATA","").equals(""))
-        {
-            Type collectionType = new TypeToken<List<Usuario>>(){}.getType();
-            List<Usuario> usuarios = new Gson().fromJson( prefs.getString("USER_DATA","") , collectionType);
-            usuarioActual = usuarios.get(0);
-        }
-
         Button buttonSolicitarAcceso = (Button) findViewById(R.id.buttonSolicitarAcceso);
         buttonSolicitarAcceso.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 showProgress(true);
                 Difunto difunto = (Difunto)spinner.getSelectedItem();
-                solicitarAcceso(usuarioActual.getIdUsuario(),difunto.getIdDifunto());
+                if(!validateUser()){
+                    showDialogUser(BuscarDifuntoActivity.this, difunto.getIdDifunto());
+                }else{
+                    solicitarAcceso(getCurrentUser().getIdUsuario(),difunto.getIdDifunto());
+                }
             }
         });
 
@@ -307,6 +298,7 @@ public class BuscarDifuntoActivity extends Base {
         public void run(){
 
             if(!webResponseSolicitarAcceso.equals("") && !webResponseSolicitarAcceso.equals("[]") && Boolean.parseBoolean(webResponseSolicitarAcceso)){
+                login(getCurrentUser().getUserName(),getCurrentUser().getPassword());
                 Toast.makeText(BuscarDifuntoActivity.this, "Solicitud realizada exitosamente!", Toast.LENGTH_LONG).show();
                 showProgress(false);
                 Intent i = new Intent(BuscarDifuntoActivity.this, MainActivityUser.class);

@@ -1,28 +1,17 @@
 package com.funeraria.funeraria;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.funeraria.funeraria.common.Adapters.CustomAdapter;
-import com.funeraria.funeraria.common.Adapters.CustomAdapterServicio;
 import com.funeraria.funeraria.common.Base;
-import com.funeraria.funeraria.common.entities.Difunto;
-import com.funeraria.funeraria.common.entities.Servicio;
-import com.funeraria.funeraria.common.entities.Usuario;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import org.ksoap2.SoapEnvelope;
 import org.ksoap2.serialization.PropertyInfo;
@@ -30,25 +19,14 @@ import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 
-import java.lang.reflect.Type;
-import java.util.List;
-
-
 public class ComprarMensajesActivity extends Base {
 
-
     private EditText edMensajePersonal;
-
-    private String webResponse = "";
     private String webResponseComprar = "";
     private Thread thread;
     private Handler handler = new Handler();
-    private Spinner spinner;
 
-    private final String METHOD_NAME_GET_DIFUNTO_LIST = "getDifuntosPorUsuarioList";
     private final String METHOD_NAME_COMPRAR_SERVICIO = "comprarMensaje";
-
-    private Usuario usuarioActual;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,91 +35,39 @@ public class ComprarMensajesActivity extends Base {
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
-        spinner = (Spinner) findViewById(R.id.spinner);
 
         edMensajePersonal = (EditText) findViewById(R.id.edMensajePersonal);
-
-        SharedPreferences prefs = getSharedPreferences("com.funeraria.funeraria", Context.MODE_PRIVATE);
-        if(!prefs.getString("USER_DATA","").equals(""))
-        {
-            Type collectionType = new TypeToken<List<Usuario>>(){}.getType();
-            List<Usuario> usuarios = new Gson().fromJson( prefs.getString("USER_DATA","") , collectionType);
-            usuarioActual = usuarios.get(0);
-        }
-
-        showProgress(true);
-        loadDifuntosList();
 
         Button buttonComprar = (Button) findViewById(R.id.buttonComprar);
         buttonComprar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showProgress(true);
-                int u = usuarioActual.getIdUsuario();
-                Difunto d = (Difunto) spinner.getSelectedItem();
 
                 if(!edMensajePersonal.getText().toString().equals("")){
                     String mensajePersonal = edMensajePersonal.getText().toString();
-                    comprarServicio(u,d.getIdDifunto(),mensajePersonal);
+
+                    if(!validateUser()){
+                        showDialogUser(ComprarMensajesActivity.this, 0);
+                    }else{
+                        if(!validarUsuarioSeleccionoFamiliar()){
+                            showDialogSeleccionarFamiliar(ComprarMensajesActivity.this);
+                        }else{
+                            showProgress(true);
+                            comprarServicio(getCurrentUser().getIdUsuario(),getCurrentUser().getIdDifunto(),mensajePersonal);
+                        }
+                    }
                 }else{
                     edMensajePersonal.setError(getString(R.string.error_field_required));
                     edMensajePersonal.requestFocus();
                 }
             }
         });
-    }
 
-    public void loadDifuntosList(){
-        thread = new Thread(){
-            public void run(){
-                try {
-
-                    SoapObject request = new SoapObject(NAMESPACE_DIFUNTO, METHOD_NAME_GET_DIFUNTO_LIST);
-
-                    PropertyInfo fromProp = new PropertyInfo();
-                    fromProp.setName("idUsuario");
-                    fromProp.setValue(usuarioActual.getIdUsuario());
-                    fromProp.setType(int.class);
-                    request.addProperty(fromProp);
-
-                    SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
-                    envelope.dotNet = true;
-                    envelope.setOutputSoapObject(request);
-                    HttpTransportSE androidHttpTransport = new HttpTransportSE(URL_DIFUNTO);
-
-                    androidHttpTransport.call(SOAP_ACTION_DIFUNTO, envelope);
-                    Object response = envelope.getResponse();
-                    webResponse = response.toString();
-
-                }catch(Exception e){
-                    e.printStackTrace();
-                }
-                handler.post(createUI);
-            }
-        };
-
-        thread.start();
-    }
-
-    final Runnable createUI = new Runnable() {
-
-        public void run(){
-
-            if(webResponse != null && !webResponse.equals("")){
-                Type collectionType = new TypeToken<List<Difunto>>(){}.getType();
-                List<Difunto> lcs = new Gson().fromJson( webResponse , collectionType);
-
-                CustomAdapter adapter = new CustomAdapter(ComprarMensajesActivity.this, R.layout.simple_spinner_item,lcs);
-                adapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
-                spinner.setAdapter(adapter);
-
-                showProgress(false);
-            }
-            else{
-                showProgress(false);
-            }
+        TextView nameAdmin = (TextView) findViewById(R.id.nameAdmin);
+        if(getCurrentUser() != null && getCurrentUser().getIdDifunto() != 0) {
+            nameAdmin.setText(getCurrentUser().getNombreDifunto());
         }
-    };
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

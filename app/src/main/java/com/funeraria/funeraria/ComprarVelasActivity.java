@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -22,6 +23,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.funeraria.funeraria.common.Adapters.CustomAdapter;
 import com.funeraria.funeraria.common.Adapters.CustomAdapterServicio;
+import com.funeraria.funeraria.common.Adapters.LazyAdapterComprar;
 import com.funeraria.funeraria.common.Base;
 import com.funeraria.funeraria.common.entities.Difunto;
 import com.funeraria.funeraria.common.entities.Servicio;
@@ -54,26 +56,22 @@ import java.util.Vector;
 public class ComprarVelasActivity extends Base {
 
     private TextView txNumeroVelas;
-    private ImageView imageView;
-    private TextView txDuracion;
-    private TextView  txPrecio;
 
-    private String webResponse = "";
     private String webResponseImages = "";
     private String webResponseComprar = "";
     private Thread thread;
     private Handler handler = new Handler();
-    private Spinner spinner;
-    private Spinner spinnerVelas;
 
-    private final String METHOD_NAME_GET_DIFUNTO_LIST = "getDifuntosPorUsuarioList";
     private final String METHOD_NAME_GET_SERVICIOS_LIST = "getServiciosPorTipoDeServicioList";
     private final String METHOD_NAME_COMPRAR_SERVICIO = "comprarServicio";
 
-    private Usuario usuarioActual;
     private boolean _paypalLibraryInit = false;
     private CheckoutButton launchPayPalButton;
     public static final int PAYPAL_REQUEST_CODE = 1;
+
+    private ListView list;
+    private LazyAdapterComprar adapterList;
+    private List<Servicio> lcs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,38 +81,38 @@ public class ComprarVelasActivity extends Base {
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
         txNumeroVelas = (TextView)findViewById(R.id.txNumeroVelas);
-        imageView = (ImageView)findViewById(R.id.imageView);
-        spinner = (Spinner) findViewById(R.id.spinner);
-        spinnerVelas = (Spinner) findViewById(R.id.spinnerVelas);
 
-        txDuracion = (TextView)findViewById(R.id.txDuracion);
-        txPrecio = (TextView)findViewById(R.id.txPrecio);
-
-        SharedPreferences prefs = getSharedPreferences("com.funeraria.funeraria", Context.MODE_PRIVATE);
-        if(!prefs.getString("USER_DATA","").equals(""))
-        {
-            Type collectionType = new TypeToken<List<Usuario>>(){}.getType();
-            List<Usuario> usuarios = new Gson().fromJson( prefs.getString("USER_DATA","") , collectionType);
-            usuarioActual = usuarios.get(0);
-        }
+        list = (ListView)findViewById(R.id.list);
 
         showProgress(true);
-        loadDifuntosList();
+        loadVelasList();
 
         Button buttonComprar = (Button) findViewById(R.id.buttonComprar);
         buttonComprar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showProgress(true);
-                int u = usuarioActual.getIdUsuario();
-                Difunto d = (Difunto) spinner.getSelectedItem();
-                Servicio s = (Servicio)spinnerVelas.getSelectedItem();
-                comprarServicio(u,d.getIdDifunto(),s.getIdServicio());
+
+                if(!validateUser()){
+                    showDialogUser(ComprarVelasActivity.this, 0);
+                }else{
+                    if(!validarUsuarioSeleccionoFamiliar()){
+                        showDialogSeleccionarFamiliar(ComprarVelasActivity.this);
+                    }else{
+                        showProgress(true);
+                        Servicio s = lcs.get(list.getSelectedItemPosition());
+                        comprarServicio(getCurrentUser().getIdUsuario(),getCurrentUser().getIdDifunto(),s.getIdServicio());
+                    }
+                }
             }
         });
 
+        TextView nameAdmin = (TextView) findViewById(R.id.nameAdmin);
+        if(getCurrentUser() != null && getCurrentUser().getIdDifunto() != 0) {
+            nameAdmin.setText(getCurrentUser().getNombreDifunto());
+        }
+
         initLibrary();
-        showPayPalButton();
+        //showPayPalButton();
     }
 
     public void initLibrary() {
@@ -155,7 +153,7 @@ public class ComprarVelasActivity extends Base {
             public void onClick(View v) {
 
                 // Create a basic PayPal payment
-                PayPalPayment payment = createPayment();
+                PayPalPayment payment = createPayment(list.getSelectedItemPosition());
                 Intent checkoutIntent = PayPal.getInstance().checkout(payment, getApplicationContext());
 
                 startActivityForResult(checkoutIntent,PAYPAL_REQUEST_CODE);
@@ -171,10 +169,9 @@ public class ComprarVelasActivity extends Base {
         ((RelativeLayout) findViewById(R.id.RelativeLayout01)).setGravity(Gravity.CENTER);
     }
 
-    private PayPalPayment createPayment() {
+    private PayPalPayment createPayment(int position) {
 
-        Difunto difunto = (Difunto) spinner.getSelectedItem();
-        Servicio servicio = (Servicio)spinnerVelas.getSelectedItem();
+        Servicio servicio = lcs.get(position);
 
         // Create a basic PayPalPayment.
         PayPalPayment payment = new PayPalPayment();
@@ -205,13 +202,13 @@ public class ComprarVelasActivity extends Base {
         // Sets the merchant name. This is the name of your Application or Company.
         payment.setMerchantName("Memorial Informatica Manchuela");
         // Sets the description of the payment.
-        payment.setDescription("Compra de flores para familiar: "+difunto.getNombre()+" "+difunto.getApellidos());
+        payment.setDescription("Compra de flores para familiar: "+getCurrentUser().getNombreDifunto());
         // Sets the Custom ID. This is any ID that you would like to have associated with the payment.
         payment.setCustomID("8873482296");
         // Sets the Instant Payment Notification url. This url will be hit by the PayPal server upon completion of the payment.
         //payment.setIpnUrl("http://www.exampleapp.com/ipn");
         // Sets the memo. This memo will be part of the notification sent by PayPal to the necessary parties.
-        payment.setMemo("Gracias por su compra de flores para familiar: "+difunto.getNombre()+" "+difunto.getApellidos());
+        payment.setMemo("Gracias por su compra de flores para familiar: "+getCurrentUser().getNombreDifunto());
 
         return payment;
     }
@@ -223,10 +220,8 @@ public class ComprarVelasActivity extends Base {
             case Activity.RESULT_OK:
                 String payKey = intent.getStringExtra(PayPalActivity.EXTRA_PAY_KEY);
                 showProgress(true);
-                int u = usuarioActual.getIdUsuario();
-                Difunto d = (Difunto) spinner.getSelectedItem();
-                Servicio s = (Servicio)spinnerVelas.getSelectedItem();
-                comprarServicio(u,d.getIdDifunto(),s.getIdServicio());
+                Servicio servicio = lcs.get(list.getSelectedItemPosition());
+                comprarServicio(getCurrentUser().getIdUsuario(),getCurrentUser().getIdDifunto(),servicio.getIdServicio());
                 break;
 
             // The payment was canceled
@@ -241,67 +236,6 @@ public class ComprarVelasActivity extends Base {
                 Toast.makeText(ComprarVelasActivity.this, "No se ha podido realizar la compra!"+errorMessage, Toast.LENGTH_LONG).show();
         }
     }
-
-    public void loadDifuntosList(){
-        thread = new Thread(){
-            public void run(){
-                try {
-
-                    SoapObject request = new SoapObject(NAMESPACE_DIFUNTO, METHOD_NAME_GET_DIFUNTO_LIST);
-
-                    PropertyInfo fromProp = new PropertyInfo();
-                    fromProp.setName("idUsuario");
-                    fromProp.setValue(usuarioActual.getIdUsuario());
-                    fromProp.setType(int.class);
-                    request.addProperty(fromProp);
-
-                    SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
-                    envelope.dotNet = true;
-                    envelope.setOutputSoapObject(request);
-                    HttpTransportSE androidHttpTransport = new HttpTransportSE(URL_DIFUNTO);
-
-                    androidHttpTransport.call(SOAP_ACTION_DIFUNTO, envelope);
-                    Object response = envelope.getResponse();
-                    webResponse = response.toString();
-
-                }catch(Exception e){
-                    e.printStackTrace();
-                }
-                handler.post(createUI);
-            }
-        };
-
-        thread.start();
-    }
-
-    final Runnable createUI = new Runnable() {
-
-        public void run(){
-
-            if(webResponse != null && !webResponse.equals("")){
-                Type collectionType = new TypeToken<List<Difunto>>(){}.getType();
-                List<Difunto> lcs = new Gson().fromJson( webResponse , collectionType);
-
-                CustomAdapter adapter = new CustomAdapter(ComprarVelasActivity.this, R.layout.simple_spinner_item,lcs);
-                adapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
-                spinner.setAdapter(adapter);
-                spinner.setOnItemSelectedListener(
-                        new AdapterView.OnItemSelectedListener() {
-                            public void onItemSelected(AdapterView<?> parent, View view, int position,long id) {
-                                showProgress(true);
-                                loadVelasList();
-                            }
-                            public void onNothingSelected(AdapterView<?> parent) {
-                            }
-                        }
-                );
-                showProgress(false);
-            }
-            else{
-                showProgress(false);
-            }
-        }
-    };
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -357,57 +291,42 @@ public class ComprarVelasActivity extends Base {
 
             if(!webResponseImages.equals("") && !webResponseImages.equals("[]")){
                 Type collectionType = new TypeToken<List<Servicio>>(){}.getType();
-                List<Servicio> lcs = new Gson().fromJson( webResponseImages , collectionType);
+                lcs = new Gson().fromJson( webResponseImages , collectionType);
 
                 if(lcs.size() > 0){
 
                     txNumeroVelas.setText("Velas disponibles: "+ lcs.size());
                     txNumeroVelas.setVisibility(View.VISIBLE);
 
-                    CustomAdapterServicio adapter = new CustomAdapterServicio(ComprarVelasActivity.this, R.layout.simple_spinner_item,lcs);
-                    adapter.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
-                    spinnerVelas.setAdapter(adapter);
-                    spinnerVelas.setVisibility(View.VISIBLE);
+                    adapterList = new LazyAdapterComprar(ComprarVelasActivity.this, lcs);
+                    list.setAdapter(adapterList);
 
-                    spinnerVelas.setOnItemSelectedListener(
-                            new AdapterView.OnItemSelectedListener() {
-                                public void onItemSelected(AdapterView<?> parent, View view, int position,long id) {
-                                    showProgress(true);
-                                    Servicio servicio = (Servicio)parent.getItemAtPosition(position);
+                    list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
-                                    byte[] decodedString = Base64.decode(servicio.getImagen(), Base64.DEFAULT);
-                                    imageView.setVisibility(View.VISIBLE);
+                        @Override
+                        public void onItemClick(AdapterView parent, View view, int position, long id) {
 
-                                    Glide.with(ComprarVelasActivity.this).load(decodedString).into(imageView);
-
-                                    txDuracion.setText("Duración en pantalla: "+servicio.getTiempoMostrar()+" minutos");
-                                    txDuracion.setVisibility(View.VISIBLE);
-
-                                    txPrecio.setText("Precio: €"+servicio.getPrecio());
-                                    txPrecio.setVisibility(View.VISIBLE);
-
-                                    showProgress(false);
-                                }
-                                public void onNothingSelected(AdapterView<?> parent) {
+                            if(!validateUser()){
+                                showDialogUser(ComprarVelasActivity.this, 0);
+                            }else{
+                                if(!validarUsuarioSeleccionoFamiliar()){
+                                    showDialogSeleccionarFamiliar(ComprarVelasActivity.this);
+                                }else{
+                                    PayPalPayment payment = createPayment(position);
+                                    Intent checkoutIntent = PayPal.getInstance().checkout(payment, getApplicationContext());
+                                    startActivityForResult(checkoutIntent,PAYPAL_REQUEST_CODE);
                                 }
                             }
-                    );
+                        }
+                    });
                     showProgress(false);
                 }else{
                     txNumeroVelas.setText("Cantidad de Velas: "+ 0);
-                    spinnerVelas.setVisibility(View.GONE);
-                    imageView.setVisibility(View.GONE);
-                    txDuracion.setVisibility(View.GONE);
-                    txPrecio.setVisibility(View.GONE);
                     showProgress(false);
                 }
             }else{
                 showProgress(false);
-                imageView.setVisibility(View.GONE);
                 txNumeroVelas.setText("Cantidad de Velas: "+0);
-                spinnerVelas.setVisibility(View.GONE);
-                txDuracion.setVisibility(View.GONE);
-                txPrecio.setVisibility(View.GONE);
             }
         }
     };

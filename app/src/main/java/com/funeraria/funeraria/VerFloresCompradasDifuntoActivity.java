@@ -123,7 +123,7 @@ public class VerFloresCompradasDifuntoActivity extends Base {
                     txNumeroFlores.setText("Cantidad de Imagenes: "+ lcs.size());
                     txNumeroFlores.setVisibility(View.VISIBLE);
 
-                    adapterList=new LazyAdapter(VerFloresCompradasDifuntoActivity.this, lcs);
+                    adapterList = new LazyAdapter(VerFloresCompradasDifuntoActivity.this, lcs);
                     list.setAdapter(adapterList);
 
                     list.setOnItemClickListener(new AdapterView.OnItemClickListener() {

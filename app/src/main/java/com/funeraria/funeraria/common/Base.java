@@ -5,11 +5,17 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
+import android.os.Handler;
 import android.view.View;
 
+import com.funeraria.funeraria.BuscarDifuntoActivity;
+import com.funeraria.funeraria.RegistroUsuarioActivity;
 import com.funeraria.funeraria.common.entities.Imagen;
 import com.funeraria.funeraria.common.entities.PlacaInformation;
 import com.funeraria.funeraria.common.entities.Servicio;
@@ -17,6 +23,13 @@ import com.funeraria.funeraria.common.entities.Usuario;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.paypal.android.MEP.PayPal;
+
+import org.ksoap2.SoapEnvelope;
+import org.ksoap2.serialization.PropertyInfo;
+import org.ksoap2.serialization.SoapObject;
+import org.ksoap2.serialization.SoapSerializationEnvelope;
+import org.ksoap2.transport.HttpTransportSE;
+
 import java.lang.reflect.Type;
 import java.util.List;
 
@@ -57,6 +70,11 @@ public class Base extends Activity {
     public String IMAGENES_DATA = "IMAGENES__DATA";
     public String MENSAJES_DATA = "MENSAJES_DATA";
     public String FLORES_Y_VELAS_DATA = "FLORES_Y_VELAS_DATA";
+
+    private String webResponse = "";
+    private Thread thread;
+    private Handler handler = new Handler();
+    private final String METHOD_NAME = "login";
 
     private static Usuario getUser() {
         return user;
@@ -214,5 +232,118 @@ public class Base extends Activity {
             }
         }
         return getListFloresYVelas();
+    }
+
+    public void showDialogUser(final Context context, final int idDifunto){
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+        builder.setTitle("Registro Requerido");
+        builder.setMessage("Desea ingresar sus Datos?");
+
+        builder.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                finish();
+                finishAffinity();
+                Intent i = new Intent(context, RegistroUsuarioActivity.class);
+                i.putExtra("idDifunto", idDifunto);
+                startActivity(i);
+            }
+        });
+
+        builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    public boolean validateUser(){
+
+        //return !(getCurrentUser() == null || getCurrentUser().getRol().equals("admin"));
+        return !(getCurrentUser() == null);
+    }
+
+    public boolean validarUsuarioSeleccionoFamiliar(){
+
+        return (getCurrentUser() != null && getCurrentUser().getIdDifunto() != 0);
+    }
+
+    public void showDialogSeleccionarFamiliar(final Context context){
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+        builder.setTitle("Debe Seleccionar un Familiar");
+        builder.setMessage("Desea ir a pantalla de busqueda?");
+
+        builder.setPositiveButton("Si", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                finish();
+                finishAffinity();
+                Intent i = new Intent(context, BuscarDifuntoActivity.class);
+                startActivity(i);
+            }
+        });
+
+        builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+    public void login(final String userName, final String password){
+        thread = new Thread(){
+            public void run(){
+                try {
+                    SoapObject request = new SoapObject(NAMESPACE_USER, METHOD_NAME);
+                    PropertyInfo fromProp = new PropertyInfo();
+                    fromProp.setName("userName");
+                    fromProp.setValue(userName);
+                    fromProp.setType(String.class);
+                    request.addProperty(fromProp);
+
+                    PropertyInfo fromProp2 = new PropertyInfo();
+                    fromProp2.setName("password");
+                    fromProp2.setValue(password);
+                    fromProp2.setType(String.class);
+                    request.addProperty(fromProp2);
+
+                    SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+                    envelope.dotNet = true;
+                    envelope.setOutputSoapObject(request);
+                    HttpTransportSE androidHttpTransport = new HttpTransportSE(URL_USER);
+
+                    androidHttpTransport.call(SOAP_ACTION_USER, envelope);
+                    Object response = envelope.getResponse();
+                    webResponse = response.toString();
+                    setUser(null);
+                    if(!webResponse.equals("") && !webResponse.equals("[]")){
+
+                        SharedPreferences prefs = getSharedPreferences("com.funeraria.funeraria", Context.MODE_PRIVATE);
+                        prefs.edit().putString("USER_DATA", webResponse).apply();
+                    }
+
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        thread.start();
     }
 }

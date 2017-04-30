@@ -158,7 +158,8 @@
         <activity android:name = "com.paypal.android.MEP.PayPalActivity"
             android:theme = "@android:style/Theme.Translucent.NoTitleBar"
             android:configChanges = "keyboardHidden|orientation"
-            tools:ignore="InnerclassSeparator" />
+            tools:ignore="InnerclassSeparator"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize"/>
         <activity
             android:name=".VerImagenesYMensajesActivity"
             android:label="@string/title_activity_placa"
@@ -174,7 +175,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
+        <activity
+            android:name=".RegistroUsuarioActivity"
+            android:label="@string/title_activity_placa"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustResize">
+        </activity>
     </application>
 
 </manifest>

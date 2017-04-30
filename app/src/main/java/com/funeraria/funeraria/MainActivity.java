@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.funeraria.funeraria.common.Base;
+import com.funeraria.funeraria.common.entities.Usuario;
 
 
 public class MainActivity extends Base {
@@ -17,6 +18,13 @@ public class MainActivity extends Base {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Usuario user = getCurrentUser();
+
+        if(user != null)
+        {
+            redirect(user.getRol());
+        }
 
         Button registrarDifuntoButton = (Button) findViewById(R.id.registrarDifuntoButton);
         registrarDifuntoButton.setOnClickListener(new View.OnClickListener() {
@@ -91,5 +99,20 @@ public class MainActivity extends Base {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         return id == R.id.action_settings || super.onOptionsItemSelected(item);
+    }
+
+    private void redirect(String rol){
+
+        if(rol.equals("admin")){
+
+        }else if(rol.equals("user")){
+            Intent i = new Intent(MainActivity.this, MainActivityUser.class);
+            finish();
+            startActivity(i);
+        }else if(rol.equals("presenter")){
+            Intent i = new Intent(MainActivity.this, VerPlacaActivity.class);
+            finish();
+            startActivity(i);
+        }
     }
 }
