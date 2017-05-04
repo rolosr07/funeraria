@@ -51,10 +51,10 @@
                     android:id="@+id/registrarDifuntoButton"
                     style="?android:textAppearanceSmall"
                     android:layout_width="0dp"
-                    android:layout_height="110dp"
+                    android:layout_height="60dp"
                     android:textStyle="bold"
                     android:background="@drawable/difunto"
-                    android:layout_weight="0.33"/>
+                    android:layout_weight="0.17"/>
 
                 <TextView
                     android:text="Buscar Familiar o Amigo"
@@ -82,10 +82,10 @@
                     android:id="@+id/buttonVelasCompradas"
                     style="?android:textAppearanceSmall"
                     android:layout_width="0dp"
-                    android:layout_height="110dp"
+                    android:layout_height="60dp"
                     android:textStyle="bold"
                     android:background="@drawable/urna"
-                    android:layout_weight="0.33"/>
+                    android:layout_weight="0.17"/>
 
                 <TextView
                     android:text="Administrar Urna Interactiva"
@@ -111,10 +111,10 @@
                     android:id="@+id/buttonAutorizarUsuarios"
                     style="?android:textAppearanceSmall"
                     android:layout_width="0dp"
-                    android:layout_height="110dp"
+                    android:layout_height="60dp"
                     android:textStyle="bold"
                     android:background="@drawable/columbario"
-                    android:layout_weight="0.33"/>
+                    android:layout_weight="0.17"/>
 
                 <TextView
                     android:text="Administrar Columbario"
@@ -140,10 +140,10 @@
                     android:id="@+id/configButton"
                     style="?android:textAppearanceSmall"
                     android:layout_width="0dp"
-                    android:layout_height="80dp"
+                    android:layout_height="85dp"
                     android:textStyle="bold"
                     android:background="@drawable/logo"
-                    android:layout_weight="0.6"
+                    android:layout_weight="0.8"
                     android:layout_marginTop="10dp"/>
 
             </LinearLayout>

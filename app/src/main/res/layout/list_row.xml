@@ -60,13 +60,15 @@
         android:layout_marginRight="5dip"
         android:textSize="10dip"
         android:textColor="#10bcc9"
-        android:textStyle="bold"/>
+        android:textStyle="bold"
+        android:visibility="gone"/>
 
     <!-- Rightend Arrow -->
     <ImageView android:layout_width="20dp"
         android:layout_height="20dp"
         android:src="@drawable/fecha"
         android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"/>
+        android:layout_centerVertical="true"
+        android:visibility="gone"/>
 
 </RelativeLayout>

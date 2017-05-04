@@ -1,12 +1,16 @@
 package com.funeraria.funeraria;
 
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.funeraria.funeraria.common.Base;
 
 public class MainActivityAdmin extends Base {
@@ -181,6 +185,34 @@ public class MainActivityAdmin extends Base {
         if(getCurrentUser() != null) {
             nameAdmin.setText(getCurrentUser().getNombreDifunto());
         }
+
+        Button btnShare = (Button) findViewById(R.id.btnShare);
+        btnShare.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                PackageManager pm=getPackageManager();
+                try {
+
+                    Intent waIntent = new Intent(Intent.ACTION_SEND);
+                    waIntent.setType("text/plain");
+                    String text = "Te recomiendo que te bajes esta app\n" +
+                            "Con la app memorial puedes enviar tus condolencias a tus seres queridos.\n" +
+                            "Y el enlace para bajarla cuando la tengamos en el play store";
+
+                    PackageInfo info = pm.getPackageInfo("com.whatsapp", PackageManager.GET_META_DATA);
+                    //Check if package exists or not. If not then code
+                    //in catch block will be called
+                    waIntent.setPackage("com.whatsapp");
+
+                    waIntent.putExtra(Intent.EXTRA_TEXT, text);
+                    startActivity(Intent.createChooser(waIntent, "Share with"));
+
+                } catch (PackageManager.NameNotFoundException e) {
+                    Toast.makeText(getApplicationContext(), "WhatsApp not Installed", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
     @Override

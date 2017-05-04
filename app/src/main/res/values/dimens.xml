@@ -4,4 +4,5 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="size_icons">60dp</dimen>
     <item name="layout_weight_admin" format="float" type="dimen">0.25</item>
+    <item name="layout_weight_admin_buttons" format="float" type="dimen">0.2</item>
 </resources>

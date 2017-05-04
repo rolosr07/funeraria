@@ -80,35 +80,37 @@
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
                 android:gravity="center"
-                android:weightSum="3.5"
+                android:weightSum="1"
                 android:layout_marginTop="10dp">
 
                 <Button
                     android:id="@+id/buttonComprarVelas"
                     style="?android:textAppearanceSmall"
                     android:layout_width="0dp"
-                    android:layout_height="90dp"
+                    android:layout_height="80dp"
                     android:textStyle="bold"
-                    android:background="@drawable/velas"
-                    android:layout_weight="1"/>
+                    android:background="@drawable/velasencendias"
+                    android:layout_weight="0.2"
+                    android:layout_marginRight="40dp"/>
 
                 <Button
                     android:id="@+id/buttonComprarFlores"
                     style="?android:textAppearanceSmall"
                     android:layout_width="0dp"
-                    android:layout_height="90dp"
+                    android:layout_height="80dp"
                     android:textStyle="bold"
-                    android:background="@drawable/flores"
-                    android:layout_weight="1"/>
+                    android:background="@drawable/floresrecibidas"
+                    android:layout_weight="0.2"
+                    android:layout_marginRight="40dp"/>
 
                 <Button
                     android:id="@+id/buttonMensajes"
                     style="?android:textAppearanceSmall"
                     android:layout_width="0dp"
-                    android:layout_height="90dp"
+                    android:layout_height="80dp"
                     android:textStyle="bold"
-                    android:background="@drawable/mensajes"
-                    android:layout_weight="1"/>
+                    android:background="@drawable/mensajesrecibidos"
+                    android:layout_weight="0.2"/>
 
             </LinearLayout>
             <LinearLayout
@@ -155,17 +157,18 @@
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
                 android:gravity="center"
-                android:weightSum="3.5"
-                android:layout_marginTop="10dp">
+                android:weightSum="1"
+                android:layout_marginTop="20dp">
 
                 <Button
                     android:id="@+id/imagenesButton"
                     style="?android:textAppearanceSmall"
                     android:layout_width="0dp"
-                    android:layout_height="90dp"
+                    android:layout_height="70dp"
                     android:textStyle="bold"
                     android:background="@drawable/fotos"
-                    android:layout_weight="1"/>
+                    android:layout_weight="0.2"
+                    android:layout_marginRight="60dp"/>
 
                 <Button
                     android:id="@+id/email_sign_in_butto233"
@@ -174,17 +177,17 @@
                     android:layout_height="70dp"
                     android:textStyle="bold"
                     android:background="@drawable/carro"
-                    android:layout_weight="1"
+                    android:layout_weight="0.2"
                     android:visibility="gone"/>
 
                 <Button
                     android:id="@+id/configButton"
                     style="?android:textAppearanceSmall"
                     android:layout_width="0dp"
-                    android:layout_height="90dp"
+                    android:layout_height="70dp"
                     android:textStyle="bold"
                     android:background="@drawable/configuracion"
-                    android:layout_weight="1"/>
+                    android:layout_weight="0.2"/>
 
             </LinearLayout>
             <LinearLayout
@@ -192,30 +195,28 @@
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
                 android:gravity="center"
-                android:weightSum="3.5">
+                android:weightSum="1"
+                android:layout_marginTop="5dp">
 
                 <TextView
                     android:text="Enviar Imagenes"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentTop="true"
-                    android:layout_centerHorizontal="true"
                     android:textStyle="bold"
                     android:textSize="16dp"
                     android:gravity="center"
-                    android:layout_weight="1"
-                    android:id="@+id/tvImagenesDifunto"/>
+                    android:layout_weight="0.33"
+                    android:id="@+id/tvImagenesDifunto"
+                    android:layout_marginRight="5dp"/>
 
                 <TextView
                     android:text="solicitar Urna"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentTop="true"
-                    android:layout_centerHorizontal="true"
                     android:textStyle="bold"
                     android:textSize="16dp"
                     android:gravity="center"
-                    android:layout_weight="1"
+                    android:layout_weight="0.33"
                     android:visibility="gone"/>
 
                 <TextView
@@ -228,7 +229,7 @@
                     android:textSize="16dp"
                     android:gravity="center"
                     android:id="@+id/configText"
-                    android:layout_weight="1.1"
+                    android:layout_weight="0.33"
                     android:layout_marginRight="-10dp"/>
             </LinearLayout>
         </LinearLayout>
@@ -245,7 +246,7 @@
 
         <Button
             android:text="..."
-            android:id="@+id/Button"
+            android:id="@+id/btnShare"
             android:layout_alignParentRight="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -257,7 +258,7 @@
         <TextView
             android:id="@+id/EditText"
             android:layout_width="fill_parent"
-            android:layout_toLeftOf="@id/Button"
+            android:layout_toLeftOf="@id/btnShare"
             android:layout_height="wrap_content">
         </TextView>
 

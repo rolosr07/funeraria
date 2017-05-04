@@ -69,7 +69,8 @@
                         android:layout_height="@dimen/size_icons"
                         android:textStyle="bold"
                         android:background="@drawable/difunto"
-                        android:layout_weight="@dimen/layout_weight_admin"/>
+                        android:layout_weight="@dimen/layout_weight_admin_buttons"
+                        android:layout_marginRight="40dp"/>
 
                     <Button
                         android:id="@+id/buttonRegistrarPlaca"
@@ -78,7 +79,8 @@
                         android:layout_height="@dimen/size_icons"
                         android:textStyle="bold"
                         android:background="@drawable/placa"
-                        android:layout_weight="@dimen/layout_weight_admin"/>
+                        android:layout_weight="@dimen/layout_weight_admin_buttons"
+                        android:layout_marginRight="40dp"/>
 
                     <Button
                         android:id="@+id/buttonImagenesDifunto"
@@ -87,7 +89,7 @@
                         android:layout_height="@dimen/size_icons"
                         android:textStyle="bold"
                         android:background="@drawable/fotos"
-                        android:layout_weight="@dimen/layout_weight_admin"/>
+                        android:layout_weight="@dimen/layout_weight_admin_buttons"/>
 
                 </LinearLayout>
                 <LinearLayout
@@ -108,7 +110,8 @@
                         android:textSize="18dp"
                         android:gravity="center"
                         android:id="@+id/registrarDifuntoTextView"
-                        android:layout_weight="@dimen/layout_weight_admin"/>
+                        android:layout_weight="@dimen/layout_weight_admin"
+                        android:layout_marginRight="10dp"/>
 
                     <TextView
                         android:text="Registrar Placa"
@@ -120,7 +123,8 @@
                         android:textSize="18dp"
                         android:gravity="center"
                         android:layout_weight="@dimen/layout_weight_admin"
-                        android:id="@+id/tvRegistrarPlaca"/>
+                        android:id="@+id/tvRegistrarPlaca"
+                        android:layout_marginRight="10dp"/>
 
                     <TextView
                         android:text="Imagenes Difunto"
@@ -150,7 +154,8 @@
                         android:layout_height="@dimen/size_icons"
                         android:textStyle="bold"
                         android:background="@drawable/velas"
-                        android:layout_weight="@dimen/layout_weight_admin"/>
+                        android:layout_weight="@dimen/layout_weight_admin_buttons"
+                        android:layout_marginRight="40dp"/>
 
                     <Button
                         android:id="@+id/buttonFloresCompradas"
@@ -159,7 +164,8 @@
                         android:layout_height="@dimen/size_icons"
                         android:textStyle="bold"
                         android:background="@drawable/flores"
-                        android:layout_weight="@dimen/layout_weight_admin"/>
+                        android:layout_weight="@dimen/layout_weight_admin_buttons"
+                        android:layout_marginRight="40dp"/>
 
                     <Button
                         android:id="@+id/buttonMensajes"
@@ -168,7 +174,7 @@
                         android:layout_height="@dimen/size_icons"
                         android:textStyle="bold"
                         android:background="@drawable/mensajes"
-                        android:layout_weight="@dimen/layout_weight_admin"/>
+                        android:layout_weight="@dimen/layout_weight_admin_buttons"/>
 
                 </LinearLayout>
                 <LinearLayout
@@ -187,7 +193,8 @@
                         android:textSize="18dp"
                         android:gravity="center"
                         android:layout_weight="@dimen/layout_weight_admin"
-                        android:id="@+id/tvVelasCompradas"/>
+                        android:id="@+id/tvVelasCompradas"
+                        android:layout_marginRight="10dp"/>
 
                     <TextView
                         android:text="Flores"
@@ -197,7 +204,8 @@
                         android:textSize="18dp"
                         android:gravity="center"
                         android:layout_weight="@dimen/layout_weight_admin"
-                        android:id="@+id/tvFloresCompradas"/>
+                        android:id="@+id/tvFloresCompradas"
+                        android:layout_marginRight="10dp"/>
 
                     <TextView
                         android:text="Mensajes"
@@ -224,8 +232,9 @@
                         android:layout_width="0dp"
                         android:layout_height="@dimen/size_icons"
                         android:textStyle="bold"
-                        android:background="@drawable/velas"
-                        android:layout_weight="@dimen/layout_weight_admin"/>
+                        android:background="@drawable/velasencendias"
+                        android:layout_weight="@dimen/layout_weight_admin_buttons"
+                        android:layout_marginRight="40dp"/>
 
                     <Button
                         android:id="@+id/buttonComprarFlores"
@@ -233,8 +242,9 @@
                         android:layout_width="0dp"
                         android:layout_height="@dimen/size_icons"
                         android:textStyle="bold"
-                        android:background="@drawable/flores"
-                        android:layout_weight="@dimen/layout_weight_admin"/>
+                        android:background="@drawable/floresrecibidas"
+                        android:layout_weight="@dimen/layout_weight_admin_buttons"
+                        android:layout_marginRight="40dp"/>
 
                     <Button
                         android:id="@+id/buttonEnviarMensajes"
@@ -242,8 +252,8 @@
                         android:layout_width="0dp"
                         android:layout_height="@dimen/size_icons"
                         android:textStyle="bold"
-                        android:background="@drawable/mensajes"
-                        android:layout_weight="@dimen/layout_weight_admin"/>
+                        android:background="@drawable/mensajesrecibidos"
+                        android:layout_weight="@dimen/layout_weight_admin_buttons"/>
 
                 </LinearLayout>
                 <LinearLayout
@@ -262,7 +272,8 @@
                         android:textSize="18dp"
                         android:gravity="center"
                         android:layout_weight="@dimen/layout_weight_admin"
-                        android:id="@+id/tvComprarVelas"/>
+                        android:id="@+id/tvComprarVelas"
+                        android:layout_marginRight="10dp"/>
 
                     <TextView
                         android:text="Enviar      Flores"
@@ -272,7 +283,8 @@
                         android:textSize="18dp"
                         android:gravity="center"
                         android:layout_weight="@dimen/layout_weight_admin"
-                        android:id="@+id/tvComprarFlores"/>
+                        android:id="@+id/tvComprarFlores"
+                        android:layout_marginRight="10dp"/>
 
                     <TextView
                         android:text="Enviar Mensajes"
@@ -317,10 +329,10 @@
                         android:id="@+id/configButton"
                         style="?android:textAppearanceSmall"
                         android:layout_width="0dp"
-                        android:layout_height="@dimen/size_icons"
+                        android:layout_height="50dp"
                         android:textStyle="bold"
                         android:background="@drawable/configuracion"
-                        android:layout_weight="0.20"/>
+                        android:layout_weight="0.13"/>
 
                 </LinearLayout>
                 <LinearLayout
@@ -365,7 +377,7 @@
                         android:textSize="18dp"
                         android:gravity="center"
                         android:id="@+id/configText"
-                        android:layout_weight="0.27"/>
+                        android:layout_weight="0.3"/>
 
                 </LinearLayout>
             </LinearLayout>
@@ -382,7 +394,7 @@
 
         <Button
             android:text="..."
-            android:id="@+id/Button"
+            android:id="@+id/btnShare"
             android:layout_alignParentRight="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -394,7 +406,7 @@
         <TextView
             android:id="@+id/EditText"
             android:layout_width="fill_parent"
-            android:layout_toLeftOf="@id/Button"
+            android:layout_toLeftOf="@id/btnShare"
             android:layout_height="wrap_content">
         </TextView>
 
