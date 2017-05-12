@@ -89,7 +89,8 @@
                         android:layout_width="60dp"
                         android:layout_height="80dp"
                         android:src="@drawable/fecha"
-                        android:rotation="180"/>
+                        android:rotation="180"
+                        android:id="@+id/prePagerImagenes"/>
 
                     <android.support.v4.view.ViewPager xmlns:android="http://schemas.android.com/apk/res/android"
                         android:id="@+id/pagerImagenes"
@@ -100,7 +101,8 @@
                     <ImageView
                         android:layout_width="60dp"
                         android:layout_height="80dp"
-                        android:src="@drawable/fecha"/>
+                        android:src="@drawable/fecha"
+                        android:id="@+id/nextPagerImagenes"/>
 
                 </LinearLayout>
 

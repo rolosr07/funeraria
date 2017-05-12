@@ -213,6 +213,60 @@ public class MainActivityAdmin extends Base {
                 }
             }
         });
+
+        Button buttonComprarVelas = (Button) findViewById(R.id.buttonComprarVelas);
+        buttonComprarVelas.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(MainActivityAdmin.this, ComprarVelasActivity.class);
+                startActivity(i);
+            }
+        });
+
+        TextView tvComprarVelas = (TextView) findViewById(R.id.tvComprarVelas);
+        tvComprarVelas.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(MainActivityAdmin.this, ComprarVelasActivity.class);
+                startActivity(i);
+            }
+        });
+
+        Button buttonComprarFlores = (Button) findViewById(R.id.buttonComprarFlores);
+        buttonComprarFlores.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(MainActivityAdmin.this, ComprarFloresActivity.class);
+                startActivity(i);
+            }
+        });
+
+        TextView tvComprarFlores = (TextView) findViewById(R.id.tvComprarFlores);
+        tvComprarFlores.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(MainActivityAdmin.this, ComprarFloresActivity.class);
+                startActivity(i);
+            }
+        });
+
+        Button buttonEnviarMensajes = (Button) findViewById(R.id.buttonEnviarMensajes);
+        buttonEnviarMensajes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(MainActivityAdmin.this, ComprarMensajesActivity.class);
+                startActivity(i);
+            }
+        });
+
+        TextView tvEnviarMensajes = (TextView) findViewById(R.id.tvEnviarMensajes);
+        tvEnviarMensajes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent i = new Intent(MainActivityAdmin.this, ComprarMensajesActivity.class);
+                startActivity(i);
+            }
+        });
     }
 
     @Override

@@ -47,7 +47,9 @@ public class ComprarMensajesActivity extends Base {
                     String mensajePersonal = edMensajePersonal.getText().toString();
 
                     if(!validateUser()){
-                        showDialogUser(ComprarMensajesActivity.this, 0);
+                        //showDialogUser(ComprarMensajesActivity.this, 0);
+                        Intent i = new Intent(ComprarMensajesActivity.this, RegistroUsuarioActivity.class);
+                        startActivity(i);
                     }else{
                         if(!validarUsuarioSeleccionoFamiliar()){
                             showDialogSeleccionarFamiliar(ComprarMensajesActivity.this);

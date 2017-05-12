@@ -76,7 +76,9 @@ public class ComprarFloresActivity extends Base {
             public void onClick(View view) {
 
                 if(!validateUser()){
-                    showDialogUser(ComprarFloresActivity.this, 0);
+                    //showDialogUser(ComprarFloresActivity.this, 0);
+                    Intent i = new Intent(ComprarFloresActivity.this, RegistroUsuarioActivity.class);
+                    startActivity(i);
                 }else{
                     if(!validarUsuarioSeleccionoFamiliar()){
                         showDialogSeleccionarFamiliar(ComprarFloresActivity.this);
@@ -128,7 +130,9 @@ public class ComprarFloresActivity extends Base {
 
                 // Create a basic PayPal payment
                 if(!validateUser()){
-                    showDialogUser(ComprarFloresActivity.this, 0);
+                    //showDialogUser(ComprarFloresActivity.this, 0);
+                    Intent i = new Intent(ComprarFloresActivity.this, RegistroUsuarioActivity.class);
+                    startActivity(i);
                 }else{
                     if(!validarUsuarioSeleccionoFamiliar()){
                         showDialogSeleccionarFamiliar(ComprarFloresActivity.this);
@@ -288,7 +292,9 @@ public class ComprarFloresActivity extends Base {
                         public void onItemClick(AdapterView parent, View view, int position, long id) {
 
                             if(!validateUser()){
-                                showDialogUser(ComprarFloresActivity.this, 0);
+                                //showDialogUser(ComprarFloresActivity.this, 0);
+                                Intent i = new Intent(ComprarFloresActivity.this, RegistroUsuarioActivity.class);
+                                startActivity(i);
                             }else{
                                 if(!validarUsuarioSeleccionoFamiliar()){
                                     showDialogSeleccionarFamiliar(ComprarFloresActivity.this);

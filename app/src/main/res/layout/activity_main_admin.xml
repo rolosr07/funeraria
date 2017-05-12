@@ -9,7 +9,9 @@
         android:layout_height="match_parent"
         android:gravity="center_horizontal"
         android:orientation="vertical"
-        tools:context="com.funeraria.funeraria.MainActivityAdmin">
+        tools:context="com.funeraria.funeraria.MainActivityAdmin"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -60,7 +62,7 @@
                     android:orientation="horizontal"
                     android:gravity="center"
                     android:weightSum="1"
-                    android:layout_marginTop="10dp">
+                    android:layout_marginTop="5dp">
 
                     <Button
                         android:id="@+id/registrarDifuntoButton"
@@ -107,7 +109,7 @@
                         android:layout_alignParentTop="true"
                         android:layout_centerHorizontal="true"
                         android:textStyle="bold"
-                        android:textSize="18dp"
+                        android:textSize="16dp"
                         android:gravity="center"
                         android:id="@+id/registrarDifuntoTextView"
                         android:layout_weight="@dimen/layout_weight_admin"
@@ -120,7 +122,7 @@
                         android:layout_alignParentTop="true"
                         android:layout_centerHorizontal="true"
                         android:textStyle="bold"
-                        android:textSize="18dp"
+                        android:textSize="16dp"
                         android:gravity="center"
                         android:layout_weight="@dimen/layout_weight_admin"
                         android:id="@+id/tvRegistrarPlaca"
@@ -133,7 +135,7 @@
                         android:layout_alignParentTop="true"
                         android:layout_centerHorizontal="true"
                         android:textStyle="bold"
-                        android:textSize="18dp"
+                        android:textSize="16dp"
                         android:gravity="center"
                         android:layout_weight="@dimen/layout_weight_admin"
                         android:id="@+id/tvImagenesDifunto"/>
@@ -190,7 +192,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textStyle="bold"
-                        android:textSize="18dp"
+                        android:textSize="16dp"
                         android:gravity="center"
                         android:layout_weight="@dimen/layout_weight_admin"
                         android:id="@+id/tvVelasCompradas"
@@ -201,7 +203,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textStyle="bold"
-                        android:textSize="18dp"
+                        android:textSize="16dp"
                         android:gravity="center"
                         android:layout_weight="@dimen/layout_weight_admin"
                         android:id="@+id/tvFloresCompradas"
@@ -212,7 +214,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textStyle="bold"
-                        android:textSize="18dp"
+                        android:textSize="16dp"
                         android:gravity="center"
                         android:layout_weight="@dimen/layout_weight_admin"
                         android:id="@+id/tvMensajes"/>
@@ -269,7 +271,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textStyle="bold"
-                        android:textSize="18dp"
+                        android:textSize="16dp"
                         android:gravity="center"
                         android:layout_weight="@dimen/layout_weight_admin"
                         android:id="@+id/tvComprarVelas"
@@ -280,7 +282,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textStyle="bold"
-                        android:textSize="18dp"
+                        android:textSize="16dp"
                         android:gravity="center"
                         android:layout_weight="@dimen/layout_weight_admin"
                         android:id="@+id/tvComprarFlores"
@@ -291,7 +293,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textStyle="bold"
-                        android:textSize="18dp"
+                        android:textSize="16dp"
                         android:gravity="center"
                         android:layout_weight="@dimen/layout_weight_admin"
                         android:id="@+id/tvEnviarMensajes"/>
@@ -374,7 +376,7 @@
                         android:layout_alignParentTop="true"
                         android:layout_centerHorizontal="true"
                         android:textStyle="bold"
-                        android:textSize="18dp"
+                        android:textSize="16dp"
                         android:gravity="center"
                         android:id="@+id/configText"
                         android:layout_weight="0.3"/>

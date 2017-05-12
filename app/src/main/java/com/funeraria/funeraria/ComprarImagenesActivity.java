@@ -77,7 +77,9 @@ public class ComprarImagenesActivity extends Base {
                 if(!encodeImage.equals("")){
 
                     if(!validateUser()){
-                        showDialogUser(ComprarImagenesActivity.this, 0);
+                        //showDialogUser(ComprarImagenesActivity.this, 0);
+                        Intent i = new Intent(ComprarImagenesActivity.this, RegistroUsuarioActivity.class);
+                        startActivity(i);
                     }else{
                         if(!validarUsuarioSeleccionoFamiliar()){
                             showDialogSeleccionarFamiliar(ComprarImagenesActivity.this);

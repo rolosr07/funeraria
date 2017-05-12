@@ -62,7 +62,7 @@ public class LazyAdapterMensajes extends BaseAdapter {
 
         nombre.setText(servicio.getNombre());
         txMensaje.setText(servicio.getTexto());
-        txNombreUsuario.setText("Comprador: "+servicio.getNombreUsuario() + " " + servicio.getApellidoUsuario());
+        txNombreUsuario.setText("Enviado por: "+servicio.getNombreUsuario() + " " + servicio.getApellidoUsuario());
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         Date convertedDate = new Date();

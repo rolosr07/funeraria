@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -111,6 +112,38 @@ public class PlacaActivity extends Base {
                 }else{
                     Toast.makeText(getApplicationContext(), "Debe primero registrar un difunto !", Toast.LENGTH_LONG).show();
                 }
+            }
+        });
+
+        ImageView nextImagenSuperior = (ImageView) findViewById(R.id.nextImagenSuperior);
+        nextImagenSuperior.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                pagerImagenSuperior.setCurrentItem(pagerImagenSuperior.getCurrentItem()+1);
+            }
+        });
+
+        ImageView prevImagenSuperior = (ImageView) findViewById(R.id.prevImagenSuperior);
+        prevImagenSuperior.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                pagerImagenSuperior.setCurrentItem(pagerImagenSuperior.getCurrentItem()-1);
+            }
+        });
+
+        ImageView nextOrla = (ImageView) findViewById(R.id.nextOrla);
+        nextOrla.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                pagerOrla.setCurrentItem(pagerOrla.getCurrentItem()+1);
+            }
+        });
+
+        ImageView prevImagenOrla = (ImageView) findViewById(R.id.prevImagenOrla);
+        prevImagenOrla.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                pagerOrla.setCurrentItem(pagerOrla.getCurrentItem()-1);
             }
         });
     }

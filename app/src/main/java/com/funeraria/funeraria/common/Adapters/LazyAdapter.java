@@ -63,7 +63,7 @@ public class LazyAdapter extends BaseAdapter {
         byte[] decodedString = Base64.decode(serv.getImagen(), Base64.DEFAULT);
         Glide.with(activity).load(decodedString).into(thumb_image);
 
-        title.setText("Comprador: " + serv.getNombreUsuario() + " " + serv.getApellidoUsuario());
+        title.setText("Enviado por: " + serv.getNombreUsuario() + " " + serv.getApellidoUsuario());
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
 
         if(serv.getFechaCompra() != null){

@@ -93,7 +93,9 @@ public class ComprarVelasActivity extends Base {
             public void onClick(View view) {
 
                 if(!validateUser()){
-                    showDialogUser(ComprarVelasActivity.this, 0);
+                    //showDialogUser(ComprarVelasActivity.this, 0);
+                    Intent i = new Intent(ComprarVelasActivity.this, RegistroUsuarioActivity.class);
+                    startActivity(i);
                 }else{
                     if(!validarUsuarioSeleccionoFamiliar()){
                         showDialogSeleccionarFamiliar(ComprarVelasActivity.this);
@@ -307,7 +309,9 @@ public class ComprarVelasActivity extends Base {
                         public void onItemClick(AdapterView parent, View view, int position, long id) {
 
                             if(!validateUser()){
-                                showDialogUser(ComprarVelasActivity.this, 0);
+                                //showDialogUser(ComprarVelasActivity.this, 0);
+                                Intent i = new Intent(ComprarVelasActivity.this, RegistroUsuarioActivity.class);
+                                startActivity(i);
                             }else{
                                 if(!validarUsuarioSeleccionoFamiliar()){
                                     showDialogSeleccionarFamiliar(ComprarVelasActivity.this);

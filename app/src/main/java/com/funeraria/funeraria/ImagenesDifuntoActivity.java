@@ -116,6 +116,22 @@ public class ImagenesDifuntoActivity extends Base {
             }
         });
 
+        ImageView prePagerImagenes = (ImageView) findViewById(R.id.prePagerImagenes);
+        prePagerImagenes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                pagerImagenes.setCurrentItem(pagerImagenes.getCurrentItem()-1);
+            }
+        });
+
+        ImageView nextPagerImagenes = (ImageView) findViewById(R.id.nextPagerImagenes);
+        nextPagerImagenes.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                pagerImagenes.setCurrentItem(pagerImagenes.getCurrentItem()+1);
+            }
+        });
+
         showProgress(true);
         loadImagenesList(getCurrentUser().getIdDifunto());
     }

@@ -84,10 +84,13 @@ public class BuscarDifuntoActivity extends Base {
         buttonSolicitarAcceso.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showProgress(true);
+                //showProgress(true);
                 Difunto difunto = (Difunto)spinner.getSelectedItem();
                 if(!validateUser()){
-                    showDialogUser(BuscarDifuntoActivity.this, difunto.getIdDifunto());
+                    //showDialogUser(BuscarDifuntoActivity.this, difunto.getIdDifunto());
+                    Intent i = new Intent(BuscarDifuntoActivity.this, RegistroUsuarioActivity.class);
+                    i.putExtra("idDifunto", difunto.getIdDifunto());
+                    startActivity(i);
                 }else{
                     solicitarAcceso(getCurrentUser().getIdUsuario(),difunto.getIdDifunto());
                 }
