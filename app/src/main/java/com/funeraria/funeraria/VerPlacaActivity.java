@@ -190,15 +190,14 @@ public class VerPlacaActivity extends Base {
 
     @Override
     protected void onPause() {
+        handler.removeCallbacks(createUIServices);
         finishAffinity();
         finish();
-        handler.removeCallbacks(createUIServices);
         super.onPause();
     }
 
     @Override
     public void onDestroy() {
-        mPlayer.stop();
         finishAffinity();
         finish();
         super.onDestroy();
@@ -275,5 +274,4 @@ public class VerPlacaActivity extends Base {
         imageViewImagenOrlaFinal.setImageBitmap(imagenOrla);
         showProgress(false);
     }
-
 }

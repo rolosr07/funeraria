@@ -74,6 +74,7 @@ public class VerImagenesYMensajesActivity extends Base {
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
         tvNombre = (TextView)findViewById(R.id.tvNombre);
+
         pagerImagenes = (ViewPager) findViewById(R.id.pager);
         pagerMensajes = (ViewPager) findViewById(R.id.pagerMensajes);
         pagerFlores = (ViewPager) findViewById(R.id.pagerFlores);
@@ -88,7 +89,6 @@ public class VerImagenesYMensajesActivity extends Base {
             loadImagenesList(getCurrentUser().getIdDifunto());
         }else{
             imagenList = getCurrentImagenes();
-            cargarInformacionThread();
         }
 
         if(getCurrentMensajes() == null){
@@ -96,7 +96,6 @@ public class VerImagenesYMensajesActivity extends Base {
             loadMensajesList(getCurrentUser().getIdDifunto());
         }else{
             listMensajes = getCurrentMensajes();
-            cargarInformacionThread();
         }
 
         if(getCurrentFloresYVelas() == null){
@@ -104,10 +103,13 @@ public class VerImagenesYMensajesActivity extends Base {
             loadFloresList(getCurrentUser().getIdDifunto());
         }else{
             listFloresVelas = getCurrentFloresYVelas();
+        }
+
+        if(getCurrentImagenes() != null || getCurrentMensajes() != null || getCurrentFloresYVelas()!= null){
             cargarInformacionThread();
         }
-        validarDescarga(getCurrentUser().getIdDifunto());
 
+        validarDescarga(getCurrentUser().getIdDifunto());
     }
 
     public void validarDescarga(final int idDifunto){
@@ -284,9 +286,9 @@ public class VerImagenesYMensajesActivity extends Base {
 
     @Override
     protected void onPause() {
-        handler.removeCallbacks(runnableImagenes);
-        handler.removeCallbacks(runnableMensajes);
-        handler.removeCallbacks(runnableFlores);
+        handler.removeCallbacksAndMessages(runnableImagenes);
+        handler.removeCallbacksAndMessages(runnableMensajes);
+        handler.removeCallbacksAndMessages(runnableFlores);
         finishAffinity();
         finish();
         super.onPause();
@@ -294,7 +296,6 @@ public class VerImagenesYMensajesActivity extends Base {
 
     @Override
     public void onDestroy() {
-        mPlayer.stop();
         finishAffinity();
         finish();
         super.onDestroy();
