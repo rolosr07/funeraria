@@ -9,6 +9,8 @@ import android.os.Handler;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.funeraria.funeraria.common.Adapters.CustomPagerAdapter;
@@ -73,6 +75,10 @@ public class VerImagenesYMensajesActivity extends Base {
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        mLoginFormView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+
         tvNombre = (TextView)findViewById(R.id.tvNombre);
 
         pagerImagenes = (ViewPager) findViewById(R.id.pager);

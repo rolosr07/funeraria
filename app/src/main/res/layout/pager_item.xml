@@ -13,8 +13,7 @@
         android:layout_gravity="center"
         android:id="@+id/txNombre"
         android:text=""
-        android:textColor="#ffffff"
-        android:visibility="gone"/>
+        android:textColor="#ffffff"/>
 
     <TextView
         android:layout_width="match_parent"

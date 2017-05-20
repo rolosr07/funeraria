@@ -34,8 +34,7 @@
         android:textColor="#040404"
         android:typeface="sans"
         android:textSize="15dip"
-        android:textStyle="bold"
-        android:visibility="gone"/>
+        android:textStyle="bold"/>
 
     <!-- Artist Name -->
     <TextView
