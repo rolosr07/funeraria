@@ -158,7 +158,7 @@
                 </LinearLayout>
 
                 <TextView
-                    android:text="Esquela de ejemplo o escribala:"
+                    android:text="Escriba la Esquela:"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentTop="true"
@@ -174,7 +174,8 @@
                     android:layout_height="wrap_content"
                     android:id="@+id/spinnerEsquela"
                     android:layout_weight="1"
-                    android:spinnerMode="dialog"/>
+                    android:spinnerMode="dialog"
+                    android:visibility="gone"/>
 
                 <EditText
                     android:id="@+id/esquelaPersonal"

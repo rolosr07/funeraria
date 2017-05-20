@@ -12,6 +12,8 @@ import android.os.Handler;
 import android.util.Base64;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -59,6 +61,9 @@ public class VerPlacaActivity extends Base {
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        mLoginFormView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
 
         imageViewImagenSuperior = (ImageView)findViewById(R.id.imageViewImagenSuperior);
         imageViewImagenOrla = (ImageView) findViewById(R.id.imageViewImagenOrla);
