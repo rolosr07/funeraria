@@ -47,7 +47,7 @@ public class VerMensajesActivity extends Base {
     private ViewPager pager;
     private CustomPagerServicesMensajesAdapter mCustomPagerAdapter;
 
-    private MediaPlayer mPlayer;
+    //private MediaPlayer mPlayer;
 
     private ImageView imageViewImagenOrla;
     private ImageView imageViewImagenOrlaFinal;
@@ -66,7 +66,7 @@ public class VerMensajesActivity extends Base {
         imageViewImagenOrla = (ImageView) findViewById(R.id.imageViewImagenOrla);
         imageViewImagenOrlaFinal = (ImageView) findViewById(R.id.imageViewImagenFinal);
 
-        mPlayer = MediaPlayer.create(VerMensajesActivity.this, R.raw.music);
+        //mPlayer = MediaPlayer.create(VerMensajesActivity.this, R.raw.music);
         //mPlayer.start();
 
         if(getIntent().getExtras().containsKey("imagenOrla")){
@@ -198,7 +198,7 @@ public class VerMensajesActivity extends Base {
 
     @Override
     public void onDestroy() {
-        mPlayer.stop();
+        //mPlayer.stop();
         finishAffinity();
         finish();
         super.onDestroy();

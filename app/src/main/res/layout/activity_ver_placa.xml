@@ -10,7 +10,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".VerPlacaActivity"
     android:background="#010000"
-    android:rotation="180">
+    android:rotation="0">
 
     <ProgressBar
         android:id="@+id/login_progress"
@@ -76,8 +76,8 @@
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
                     android:layout_gravity="center"
                     android:src="@drawable/estrella" />
 
@@ -95,8 +95,8 @@
                 android:textColor="#ffffff"/>
 
                 <ImageView
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
+                    android:layout_width="50dp"
+                    android:layout_height="60dp"
                     android:layout_gravity="center"
                     android:src="@drawable/cruz" />
 

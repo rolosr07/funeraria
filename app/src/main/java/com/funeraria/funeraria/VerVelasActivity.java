@@ -3,7 +3,7 @@ package com.funeraria.funeraria;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.MediaPlayer;
+//import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.view.ViewPager;
@@ -47,7 +47,7 @@ public class VerVelasActivity extends Base {
     private ViewPager pager;
     private CustomPagerServicesAdapter mCustomPagerAdapter;
 
-    private MediaPlayer mPlayer;
+    //private MediaPlayer mPlayer;
 
     private ImageView imageViewImagenOrla;
     private ImageView imageViewImagenOrlaFinal;
@@ -66,7 +66,7 @@ public class VerVelasActivity extends Base {
         imageViewImagenOrla = (ImageView) findViewById(R.id.imageViewImagenOrla);
         imageViewImagenOrlaFinal = (ImageView) findViewById(R.id.imageViewImagenFinal);
 
-        mPlayer = MediaPlayer.create(VerVelasActivity.this, R.raw.music);
+        //mPlayer = MediaPlayer.create(VerVelasActivity.this, R.raw.music);
         //mPlayer.start();
 
         if(getIntent().getExtras().containsKey("idDifunto")){
@@ -202,7 +202,7 @@ public class VerVelasActivity extends Base {
 
     @Override
     public void onDestroy() {
-        mPlayer.stop();
+        //mPlayer.stop();
         finishAffinity();
         finish();
         super.onDestroy();

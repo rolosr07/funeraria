@@ -62,7 +62,7 @@ public class VerImagenesYMensajesActivity extends Base {
 
     private int duration = 20000;
 
-    private MediaPlayer mPlayer;
+    //private MediaPlayer mPlayer;
 
     private List<Imagen> imagenList = new ArrayList<Imagen>();
     private List<Servicio> listMensajes = new ArrayList<Servicio>();
@@ -85,7 +85,7 @@ public class VerImagenesYMensajesActivity extends Base {
         pagerMensajes = (ViewPager) findViewById(R.id.pagerMensajes);
         pagerFlores = (ViewPager) findViewById(R.id.pagerFlores);
 
-        mPlayer = MediaPlayer.create(VerImagenesYMensajesActivity.this, R.raw.music);
+        //mPlayer = MediaPlayer.create(VerImagenesYMensajesActivity.this, R.raw.music);
         //mPlayer.start();
 
         tvNombre.setText(getCurrentUser().getNombreDifunto());

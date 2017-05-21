@@ -238,10 +238,13 @@ public class PlacaActivity extends Base {
                                     esquelaPersonal.setText(servicio.getTexto());
 
                                     if(getCurrentUser().getIdDifunto() != 0){
+                                        showProgress(true);
                                         loadServicesList(getCurrentUser().getIdDifunto());
                                     }else{
                                         Toast.makeText(getApplicationContext(), "Debe primero registrar un difunto!", Toast.LENGTH_LONG).show();
                                     }
+
+
 
                                 }
                                 public void onNothingSelected(AdapterView<?> parent) {

@@ -175,7 +175,7 @@
                     android:id="@+id/spinnerEsquela"
                     android:layout_weight="1"
                     android:spinnerMode="dialog"
-                    android:visibility="gone"/>
+                    android:visibility="invisible"/>
 
                 <EditText
                     android:id="@+id/esquelaPersonal"
@@ -184,7 +184,8 @@
                     android:inputType="textEmailAddress"
                     android:lines="2"
                     android:gravity="center_horizontal"
-                    android:layout_gravity="center_horizontal" />
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="-20dp"/>
 
                 <TextView
                     android:text="Lugar donde descanzan los restos:"

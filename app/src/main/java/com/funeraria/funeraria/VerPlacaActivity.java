@@ -52,7 +52,7 @@ public class VerPlacaActivity extends Base {
     private final String METHOD_NAME_GET_PLACA_INFORMATION = "getPlacaInformation";
     private final String METHOD_NAME_VALIDAR_DESCARGA = "placaInformationNeedDownload";
 
-    private MediaPlayer mPlayer;
+    //private MediaPlayer mPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,7 +84,7 @@ public class VerPlacaActivity extends Base {
 
         validarDescarga(getCurrentUser().getIdDifunto());
 
-        mPlayer = MediaPlayer.create(VerPlacaActivity.this, R.raw.music);
+        //mPlayer = MediaPlayer.create(VerPlacaActivity.this, R.raw.music);
         //mPlayer.start();
 
         Handler handler = new Handler();

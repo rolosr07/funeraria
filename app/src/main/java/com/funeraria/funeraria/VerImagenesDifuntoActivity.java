@@ -49,7 +49,7 @@ public class VerImagenesDifuntoActivity extends Base {
     private String nombreDifunto = "";
     private String imagenOrla = "";
 
-    private MediaPlayer mPlayer;
+    //private MediaPlayer mPlayer;
 
     private ImageView imageViewImagenOrla;
     private ImageView imageViewImagenOrlaFinal;
@@ -67,7 +67,7 @@ public class VerImagenesDifuntoActivity extends Base {
         imageViewImagenOrla = (ImageView) findViewById(R.id.imageViewImagenOrla);
         imageViewImagenOrlaFinal = (ImageView) findViewById(R.id.imageViewImagenFinal);
 
-        mPlayer = MediaPlayer.create(VerImagenesDifuntoActivity.this, R.raw.music);
+        //mPlayer = MediaPlayer.create(VerImagenesDifuntoActivity.this, R.raw.music);
         //mPlayer.start();
 
         showProgress(true);
@@ -196,7 +196,7 @@ public class VerImagenesDifuntoActivity extends Base {
 
     @Override
     public void onDestroy() {
-        mPlayer.stop();
+        //mPlayer.stop();
         finishAffinity();
         finish();
         super.onDestroy();
