@@ -1,5 +1,6 @@
 package com.funeraria.funeraria;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -45,7 +46,7 @@ public class VerImagenesYMensajesActivity extends Base {
     private int pageImagenes = 0;
     private int pageMensajes = 0;
     private int pageFlores = 0;
-    private int delay = 5000; //milliseconds
+    private int delay = 7500; //milliseconds
 
     private ViewPager pagerImagenes;
     private ViewPager pagerMensajes;
@@ -60,7 +61,7 @@ public class VerImagenesYMensajesActivity extends Base {
     private final String METHOD_NAME_GET_SERVICIOS_LIST = "getServiciosPorIdDifuntoFloresYVelas";
     private final String METHOD_NAME_VALIDAR_DESCARGA = "placaInformationNeedDownload";
 
-    private int duration = 20000;
+    private int duration = 22000;
 
     //private MediaPlayer mPlayer;
 
@@ -297,6 +298,7 @@ public class VerImagenesYMensajesActivity extends Base {
         handler.removeCallbacksAndMessages(runnableFlores);
         finishAffinity();
         finish();
+        freeMemory();
         super.onPause();
     }
 
@@ -304,6 +306,7 @@ public class VerImagenesYMensajesActivity extends Base {
     public void onDestroy() {
         finishAffinity();
         finish();
+        freeMemory();
         super.onDestroy();
     }
 
@@ -393,6 +396,8 @@ public class VerImagenesYMensajesActivity extends Base {
     Runnable runnableRedirect = new Runnable() {
         public void run() {
             Intent i = new Intent(VerImagenesYMensajesActivity.this, VerPlacaActivity.class);
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             finish();
             finishAffinity();
             startActivity(i);

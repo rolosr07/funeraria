@@ -1,6 +1,9 @@
 package com.funeraria.funeraria;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,6 +13,7 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Base64;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -52,12 +56,18 @@ public class VerPlacaActivity extends Base {
     private final String METHOD_NAME_GET_PLACA_INFORMATION = "getPlacaInformation";
     private final String METHOD_NAME_VALIDAR_DESCARGA = "placaInformationNeedDownload";
 
+    private Activity ACTIVITY;
+    private PendingIntent RESTART_INTENT;
     //private MediaPlayer mPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ver_placa);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
+        String currentDateandTime = sdf.format(new Date());
+
+        Log.w("MEMORIAL APP", currentDateandTime);
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
@@ -73,6 +83,9 @@ public class VerPlacaActivity extends Base {
         tvFechaNacimiento = (TextView) findViewById(R.id.tvFechaNacimiento);
         tvFechaDeceso = (TextView) findViewById(R.id.tvFechaDeceso);
         tvEsquela = (TextView) findViewById(R.id.tvEsquela);
+
+        ACTIVITY = this;
+        RESTART_INTENT = PendingIntent.getActivity(this.getBaseContext(), 0, new Intent(getIntent()), PendingIntent.FLAG_ONE_SHOT);
 
 
         if (getCurrentPlaca() == null) {
@@ -92,9 +105,13 @@ public class VerPlacaActivity extends Base {
             public void run() {
                 Intent i = new Intent(VerPlacaActivity.this, VerImagenesYMensajesActivity.class);
                 i.putExtra("imagenOrla", imagenOrla);
+                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(i);
+                finishAffinity();
+                finish();
             }
-        }, 12000);
+        }, 20000);
     }
 
     public void validarDescarga(final int idDifunto){
@@ -198,6 +215,7 @@ public class VerPlacaActivity extends Base {
         handler.removeCallbacks(createUIServices);
         finishAffinity();
         finish();
+        freeMemory();
         super.onPause();
     }
 
@@ -205,6 +223,7 @@ public class VerPlacaActivity extends Base {
     public void onDestroy() {
         finishAffinity();
         finish();
+        freeMemory();
         super.onDestroy();
     }
 

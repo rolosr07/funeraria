@@ -346,4 +346,10 @@ public class Base extends Activity {
 
         thread.start();
     }
+
+    public void freeMemory(){
+        System.runFinalization();
+        Runtime.getRuntime().gc();
+        System.gc();
+    }
 }
