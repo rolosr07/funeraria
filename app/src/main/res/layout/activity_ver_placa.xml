@@ -10,7 +10,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".VerPlacaActivity"
     android:background="#010000"
-    android:rotation="0">
+    android:rotation="180">
 
     <ProgressBar
         android:id="@+id/login_progress"
