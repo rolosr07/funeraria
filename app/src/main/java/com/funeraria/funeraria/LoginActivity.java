@@ -208,7 +208,7 @@ public class LoginActivity extends Base {
             finish();
             startActivity(i);
         }else if(rol.equals("presenter")){
-            Intent i = new Intent(LoginActivity.this, VerPlacaActivity.class);
+            Intent i = new Intent(LoginActivity.this, VerImagenesYMensajesActivity.class);
             finish();
             startActivity(i);
         }

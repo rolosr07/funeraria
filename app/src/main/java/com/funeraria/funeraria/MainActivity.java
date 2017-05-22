@@ -110,7 +110,7 @@ public class MainActivity extends Base {
             finish();
             startActivity(i);
         }else if(rol.equals("presenter")){
-            Intent i = new Intent(MainActivity.this, VerPlacaActivity.class);
+            Intent i = new Intent(MainActivity.this, VerImagenesYMensajesActivity.class);
             finish();
             startActivity(i);
         }

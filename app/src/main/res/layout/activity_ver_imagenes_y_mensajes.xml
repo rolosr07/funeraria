@@ -22,7 +22,8 @@
         android:id="@+id/login_form"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="10dp">
+        android:layout_marginTop="10dp"
+        android:visibility="gone">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -112,6 +113,141 @@
                     android:id="@+id/pagerFlores"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"/>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+    <ScrollView
+        android:id="@+id/login_form2"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:layout_weight="1.5">
+
+                <ImageView
+                    android:id="@+id/imageViewImagenSuperior"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_horizontal"
+                    android:gravity="center_horizontal"
+                    android:src="@drawable/defuncion" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/email_login_form2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:layout_weight="0.5">
+
+                <TextView
+                    android:id="@+id/tvNombre2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:text="Nombre"
+                    android:textSize="55dp"
+                    android:textStyle="bold"
+                    android:textColor="#ffffff"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/estrella" />
+
+                    <TextView
+                        android:id="@+id/tvFechaNacimiento"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:layout_centerHorizontal="true"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:text="Fecha nacimiento"
+                        android:textSize="35dp"
+                        android:textStyle="bold"
+                        android:textColor="#ffffff"/>
+
+                    <ImageView
+                        android:layout_width="50dp"
+                        android:layout_height="60dp"
+                        android:layout_gravity="center"
+                        android:src="@drawable/cruz" />
+
+                    <TextView
+                        android:id="@+id/tvFechaDeceso"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentTop="true"
+                        android:layout_centerHorizontal="true"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="00dp"
+                        android:gravity="center"
+                        android:text="Fecha Deceso"
+                        android:textSize="35dp"
+                        android:textStyle="bold"
+                        android:textColor="#ffffff"/>
+
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/imageViewImagenOrla"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:gravity="center_horizontal"
+                    android:minHeight="100dp"
+                    android:minWidth="250dp"
+                    android:src="@drawable/orla2"
+                    android:layout_marginBottom="-20dp"/>
+
+                <TextView
+                    android:id="@+id/tvEsquela"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:text="Siempre en nuestros corazones"
+                    android:textSize="44dp"
+                    android:textStyle="bold"
+                    android:textColor="#ffffff"/>
+
+                <ImageView
+                    android:id="@+id/imageViewImagenFinal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:gravity="center_horizontal"
+                    android:minHeight="100dp"
+                    android:minWidth="250dp"
+                    android:src="@drawable/orla2"
+                    android:rotation="180"
+                    android:layout_marginTop="-10dp"/>
+
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

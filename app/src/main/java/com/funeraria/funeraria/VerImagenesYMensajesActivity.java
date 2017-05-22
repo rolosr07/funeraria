@@ -1,17 +1,23 @@
 package com.funeraria.funeraria;
 
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.view.ViewPager;
+import android.util.Base64;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.funeraria.funeraria.common.Adapters.CustomPagerAdapter;
@@ -19,6 +25,7 @@ import com.funeraria.funeraria.common.Adapters.CustomPagerServicesAdapter;
 import com.funeraria.funeraria.common.Adapters.CustomPagerServicesMensajesAdapter;
 import com.funeraria.funeraria.common.Base;
 import com.funeraria.funeraria.common.entities.Imagen;
+import com.funeraria.funeraria.common.entities.PlacaInformation;
 import com.funeraria.funeraria.common.entities.Servicio;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -30,7 +37,11 @@ import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
 
 import java.lang.reflect.Type;
+import java.text.DateFormatSymbols;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -46,7 +57,7 @@ public class VerImagenesYMensajesActivity extends Base {
     private int pageImagenes = 0;
     private int pageMensajes = 0;
     private int pageFlores = 0;
-    private int delay = 7500; //milliseconds
+    private int delay = 10000; //milliseconds
 
     private ViewPager pagerImagenes;
     private ViewPager pagerMensajes;
@@ -69,17 +80,49 @@ public class VerImagenesYMensajesActivity extends Base {
     private List<Servicio> listMensajes = new ArrayList<Servicio>();
     private List<Servicio> listFloresVelas = new ArrayList<Servicio>();
 
+    private ImageView imageViewImagenSuperior;
+    private ImageView imageViewImagenOrla;
+    private ImageView imageViewImagenOrlaFinal;
+
+    private TextView tvNombre2;
+    private TextView tvFechaNacimiento;
+    private TextView tvFechaDeceso;
+    private TextView tvEsquela;
+
+    private String webResponseServices = "";
+    private String nombreDifunto = "";
+    private String  imagenOrla = "";
+
+    public View mLoginFormView2;
+
+    private boolean fr = true;
+
+    private final String METHOD_NAME_GET_PLACA_INFORMATION = "getPlacaInformation";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ver_imagenes_y_mensajes);
 
         mLoginFormView = findViewById(R.id.login_form);
+        mLoginFormView2 = findViewById(R.id.login_form2);
         mProgressView = findViewById(R.id.login_progress);
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         mLoginFormView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
 
+        Imagenes();
+        placa();
+
+        if(getCurrentImagenes() != null || getCurrentMensajes() != null || getCurrentFloresYVelas()!= null){
+            cargarInformacionThread();
+        }
+
+
+        validarDescarga(getCurrentUser().getIdDifunto());
+    }
+
+    private void Imagenes(){
         tvNombre = (TextView)findViewById(R.id.tvNombre);
 
         pagerImagenes = (ViewPager) findViewById(R.id.pager);
@@ -111,12 +154,27 @@ public class VerImagenesYMensajesActivity extends Base {
         }else{
             listFloresVelas = getCurrentFloresYVelas();
         }
+    }
 
-        if(getCurrentImagenes() != null || getCurrentMensajes() != null || getCurrentFloresYVelas()!= null){
-            cargarInformacionThread();
+    private void placa(){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd_HHmmss");
+        String currentDateandTime = sdf.format(new Date());
+
+        Log.w("MEMORIAL APP", currentDateandTime);
+
+        imageViewImagenSuperior = (ImageView)findViewById(R.id.imageViewImagenSuperior);
+        imageViewImagenOrla = (ImageView) findViewById(R.id.imageViewImagenOrla);
+        imageViewImagenOrlaFinal = (ImageView) findViewById(R.id.imageViewImagenFinal);
+
+        tvNombre2 = (TextView) findViewById(R.id.tvNombre2);
+        tvFechaNacimiento = (TextView) findViewById(R.id.tvFechaNacimiento);
+        tvFechaDeceso = (TextView) findViewById(R.id.tvFechaDeceso);
+        tvEsquela = (TextView) findViewById(R.id.tvEsquela);
+
+
+        if (getCurrentPlaca() == null) {
+            loadServicesList(getCurrentUser().getIdDifunto());
         }
-
-        validarDescarga(getCurrentUser().getIdDifunto());
     }
 
     public void validarDescarga(final int idDifunto){
@@ -314,6 +372,7 @@ public class VerImagenesYMensajesActivity extends Base {
         thread = new Thread(){
             public void run(){
                 handler.post(createUI);
+                handler.post(createUIServices);
             }
         };
 
@@ -395,12 +454,121 @@ public class VerImagenesYMensajesActivity extends Base {
 
     Runnable runnableRedirect = new Runnable() {
         public void run() {
-            Intent i = new Intent(VerImagenesYMensajesActivity.this, VerPlacaActivity.class);
-            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            finish();
-            finishAffinity();
-            startActivity(i);
+
+            if(fr){
+                fr = false;
+            }else{
+
+                if(mLoginFormView.getVisibility() == View.VISIBLE){
+                    mLoginFormView.setVisibility(View.GONE);
+                    mLoginFormView2.setVisibility(View.VISIBLE);
+                }else{
+                    mLoginFormView.setVisibility(View.VISIBLE);
+                    mLoginFormView2.setVisibility(View.GONE);
+                }
+                fr = true;
+            }
+            handler.postDelayed(this, duration);
         }
     };
+
+    public void loadServicesList(final int idDifunto){
+        thread = new Thread(){
+            public void run(){
+                try {
+                    SoapObject request = new SoapObject(NAMESPACE_SERVICIO, METHOD_NAME_GET_PLACA_INFORMATION);
+
+                    PropertyInfo fromProp = new PropertyInfo();
+                    fromProp.setName("idDifunto");
+                    fromProp.setValue(idDifunto);
+                    fromProp.setType(int.class);
+                    request.addProperty(fromProp);
+
+                    SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+                    envelope.dotNet = true;
+                    envelope.setOutputSoapObject(request);
+                    HttpTransportSE androidHttpTransport = new HttpTransportSE(URL_SERVICIO);
+
+                    androidHttpTransport.call(SOAP_ACTION_SERVICIO, envelope);
+                    Object response = envelope.getResponse();
+                    webResponseServices = response.toString();
+
+                    if(!webResponseServices.equals("") && !webResponseServices.equals("[]")){
+
+                        SharedPreferences prefs = getSharedPreferences("com.funeraria.funeraria", Context.MODE_PRIVATE);
+                        prefs.edit().putString(PLACA_INFORMATION, webResponseServices).apply();
+
+                        handler.post(createUIServices);
+                    }
+
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+            }
+        };
+
+        thread.start();
+    }
+
+    final Runnable createUIServices = new Runnable() {
+        public void run(){
+            showProgress(false);
+            cargarInformacion(getCurrentPlaca());
+        }
+    };
+
+    private String getMonth(int month) {
+        return capitalizeFirstLetter(new DateFormatSymbols().getMonths()[month]);
+    }
+
+    private String capitalizeFirstLetter(String original) {
+        if (original == null || original.length() == 0) {
+            return original;
+        }
+        return original.substring(0, 1).toUpperCase() + original.substring(1);
+    }
+
+    private void cargarInformacion(PlacaInformation placaInformation){
+        byte[] decodedStringimagenSuperior = Base64.decode(placaInformation.getImagenSuperior(), Base64.DEFAULT);
+        Bitmap imagenSuperior = BitmapFactory.decodeByteArray(decodedStringimagenSuperior, 0, decodedStringimagenSuperior.length);
+
+        imageViewImagenSuperior.setImageBitmap(imagenSuperior);
+
+        nombreDifunto = placaInformation.getNombre()+ " " + placaInformation.getApellidos();
+
+        tvNombre2.setText(nombreDifunto);
+
+        SimpleDateFormat format= new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        try {
+            Date date = format.parse(placaInformation.getFechaNacimiento());
+
+            SimpleDateFormat year = new SimpleDateFormat("yyyy");
+            SimpleDateFormat day = new SimpleDateFormat("dd");
+
+            tvFechaNacimiento.setText(day.format(date) +" "+ getMonth(date.getMonth()) +" "+year.format(date) );
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            Date date = format.parse(placaInformation.getFechaDefuncion());
+
+            SimpleDateFormat year = new SimpleDateFormat("yyyy");
+            SimpleDateFormat day = new SimpleDateFormat("dd");
+
+            tvFechaDeceso.setText(day.format(date) +" "+ getMonth(date.getMonth()) +" "+ year.format(date));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        imagenOrla = placaInformation.getImagenOrla();
+        byte[] decodedStringImagenOrla = Base64.decode(placaInformation.getImagenOrla(), Base64.DEFAULT);
+        Bitmap imagenOrla = BitmapFactory.decodeByteArray(decodedStringImagenOrla, 0, decodedStringImagenOrla.length);
+
+        imageViewImagenOrla.setImageBitmap(imagenOrla);
+        tvEsquela.setText(placaInformation.getEsquela());
+        imageViewImagenOrlaFinal.setImageBitmap(imagenOrla);
+        showProgress(false);
+    }
+
 }
