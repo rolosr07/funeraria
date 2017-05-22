@@ -97,18 +97,18 @@ public class PlacaActivity extends Base {
 
                 Servicio imagenSuperior = servicioImagenSuperiorList.get(pagerImagenSuperior.getCurrentItem());
                 Servicio imagenOrla = servicioImagenOrlaList.get(pagerOrla.getCurrentItem());
-                Servicio esquela = (Servicio)spinnerEsquela.getSelectedItem();
+                //Servicio esquela = (Servicio)spinnerEsquela.getSelectedItem();
                 Restos restos = (Restos)spinnerRestos.getSelectedItem();
                 String esquelaPersonalText = "";
 
-                if(!esquela.getTexto().equals(esquelaPersonal.getText().toString())){
+                //if(!esquela.getTexto().equals(esquelaPersonal.getText().toString())){
                     esquelaPersonalText = esquelaPersonal.getText().toString();
-                }
+                //}
                 showProgress(true);
                 //registarInscripcion(dif.getIdDifunto(),imagenSuperior.getIdServicio(),imagenOrla.getIdServicio(),esquela.getIdServicio(),restos.getIdLugarRestos(),esquelaPersonalText);
 
                 if(getCurrentUser().getIdDifunto() != 0){
-                    registarInscripcion(getCurrentUser().getIdDifunto(),imagenSuperior.getIdServicio(),imagenOrla.getIdServicio(),esquela.getIdServicio(),restos.getIdLugarRestos(),esquelaPersonalText);
+                    registarInscripcion(getCurrentUser().getIdDifunto(),imagenSuperior.getIdServicio(),imagenOrla.getIdServicio(),0,restos.getIdLugarRestos(),esquelaPersonalText);
                 }else{
                     Toast.makeText(getApplicationContext(), "Debe primero registrar un difunto !", Toast.LENGTH_LONG).show();
                 }

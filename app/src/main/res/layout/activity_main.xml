@@ -99,7 +99,7 @@
                     android:textStyle="bold"
                     android:textSize="18dp"
                     android:gravity="center"
-                    android:layout_weight="0.66"
+                    android:layout_weight="0.76"
                     android:id="@+id/tvVelasCompradas"/>
 
             </LinearLayout>
