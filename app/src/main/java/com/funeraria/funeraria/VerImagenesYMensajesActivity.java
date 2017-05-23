@@ -1,13 +1,9 @@
 package com.funeraria.funeraria;
 
-import android.app.Activity;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.view.ViewPager;
@@ -46,8 +42,6 @@ import java.util.List;
 
 
 public class VerImagenesYMensajesActivity extends Base {
-
-    private TextView tvNombre;
 
     private String webResponseValidarDescarga = "";
 
@@ -90,12 +84,11 @@ public class VerImagenesYMensajesActivity extends Base {
     private TextView tvEsquela;
 
     private String webResponseServices = "";
-    private String nombreDifunto = "";
-    private String  imagenOrla = "";
 
     public View mLoginFormView2;
 
     private boolean fr = true;
+    private boolean loadData = false;
 
     private final String METHOD_NAME_GET_PLACA_INFORMATION = "getPlacaInformation";
 
@@ -114,23 +107,29 @@ public class VerImagenesYMensajesActivity extends Base {
         Imagenes();
         placa();
 
-        if(getCurrentImagenes() != null || getCurrentMensajes() != null || getCurrentFloresYVelas()!= null){
+        if(imagenList.size() == 0){
+
+            Handler handler = new Handler();
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    if(getCurrentImagenes() != null || getCurrentMensajes() != null || getCurrentFloresYVelas()!= null){
+                        cargarInformacionThread();
+                    }
+                }
+            }, 22000);
+        }else{
             cargarInformacionThread();
         }
-
 
         validarDescarga(getCurrentUser().getIdDifunto());
     }
 
     private void Imagenes(){
-        tvNombre = (TextView)findViewById(R.id.tvNombre);
+        TextView tvNombre = (TextView) findViewById(R.id.tvNombre);
 
         pagerImagenes = (ViewPager) findViewById(R.id.pager);
         pagerMensajes = (ViewPager) findViewById(R.id.pagerMensajes);
         pagerFlores = (ViewPager) findViewById(R.id.pagerFlores);
-
-        //mPlayer = MediaPlayer.create(VerImagenesYMensajesActivity.this, R.raw.music);
-        //mPlayer.start();
 
         tvNombre.setText(getCurrentUser().getNombreDifunto());
 
@@ -206,6 +205,10 @@ public class VerImagenesYMensajesActivity extends Base {
                         prefs.edit().putString(MENSAJES_DATA, "").apply();
                         setListFloresYVelas(null);
                         prefs.edit().putString(FLORES_Y_VELAS_DATA, "").apply();
+                        setPlacaInformation(null);
+                        prefs.edit().putString(PLACA_INFORMATION, "").apply();
+
+                        loadData = true;
                     }
                 }catch(Exception e){
                     e.printStackTrace();
@@ -325,8 +328,6 @@ public class VerImagenesYMensajesActivity extends Base {
                 }catch(Exception e){
                     e.printStackTrace();
                 }
-
-                handler.post(createUI);
             }
         };
 
@@ -354,6 +355,9 @@ public class VerImagenesYMensajesActivity extends Base {
         handler.removeCallbacksAndMessages(runnableImagenes);
         handler.removeCallbacksAndMessages(runnableMensajes);
         handler.removeCallbacksAndMessages(runnableFlores);
+        handler.removeCallbacksAndMessages(createUI);
+        handler.removeCallbacksAndMessages(createUIPlaca);
+        handler.removeCallbacksAndMessages(runnableRedirect);
         finishAffinity();
         finish();
         freeMemory();
@@ -371,8 +375,16 @@ public class VerImagenesYMensajesActivity extends Base {
     public void cargarInformacionThread(){
         thread = new Thread(){
             public void run(){
+
+                handler.removeCallbacks(runnableImagenes);
+                handler.removeCallbacks(runnableMensajes);
+                handler.removeCallbacks(runnableFlores);
+                handler.removeCallbacks(createUI);
+                handler.removeCallbacks(createUIPlaca);
+                handler.removeCallbacks(runnableRedirect);
+
                 handler.post(createUI);
-                handler.post(createUIServices);
+                handler.post(createUIPlaca);
             }
         };
 
@@ -410,9 +422,7 @@ public class VerImagenesYMensajesActivity extends Base {
                 handler.postDelayed(runnableFlores, delay);
             }
 
-            showProgress(false);
-
-            handler.postDelayed(runnableRedirect, duration);
+            handler.postDelayed(runnableRedirect, 5000);
         }
     };
 
@@ -468,7 +478,25 @@ public class VerImagenesYMensajesActivity extends Base {
                 }
                 fr = true;
             }
-            handler.postDelayed(this, duration);
+
+            validarDescarga(getCurrentUser().getIdDifunto());
+
+            if(loadData){
+                Imagenes();
+                placa();
+
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    public void run() {
+                        if(getCurrentImagenes() != null || getCurrentMensajes() != null || getCurrentFloresYVelas()!= null){
+                            cargarInformacionThread();
+                            loadData = false;
+                        }
+                    }
+                }, 5000);
+            }
+
+            handler.postDelayed(this, 5000);
         }
     };
 
@@ -497,8 +525,6 @@ public class VerImagenesYMensajesActivity extends Base {
 
                         SharedPreferences prefs = getSharedPreferences("com.funeraria.funeraria", Context.MODE_PRIVATE);
                         prefs.edit().putString(PLACA_INFORMATION, webResponseServices).apply();
-
-                        handler.post(createUIServices);
                     }
 
                 }catch(Exception e){
@@ -510,7 +536,7 @@ public class VerImagenesYMensajesActivity extends Base {
         thread.start();
     }
 
-    final Runnable createUIServices = new Runnable() {
+    final Runnable createUIPlaca = new Runnable() {
         public void run(){
             showProgress(false);
             cargarInformacion(getCurrentPlaca());
@@ -534,7 +560,7 @@ public class VerImagenesYMensajesActivity extends Base {
 
         imageViewImagenSuperior.setImageBitmap(imagenSuperior);
 
-        nombreDifunto = placaInformation.getNombre()+ " " + placaInformation.getApellidos();
+        String nombreDifunto = placaInformation.getNombre() + " " + placaInformation.getApellidos();
 
         tvNombre2.setText(nombreDifunto);
 
@@ -561,7 +587,6 @@ public class VerImagenesYMensajesActivity extends Base {
             e.printStackTrace();
         }
 
-        imagenOrla = placaInformation.getImagenOrla();
         byte[] decodedStringImagenOrla = Base64.decode(placaInformation.getImagenOrla(), Base64.DEFAULT);
         Bitmap imagenOrla = BitmapFactory.decodeByteArray(decodedStringImagenOrla, 0, decodedStringImagenOrla.length);
 
