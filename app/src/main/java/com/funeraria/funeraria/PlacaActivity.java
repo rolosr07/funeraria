@@ -193,7 +193,7 @@ public class PlacaActivity extends Base {
 
         public void run(){
 
-            showProgress(false);
+            //showProgress(false);
             if(!webResponseServices.equals("") && !webResponseServices.equals("[]")){
                 Type collectionType = new TypeToken<List<Servicio>>(){}.getType();
                 List<Servicio> servicioList = new Gson().fromJson( webResponseServices , collectionType);
@@ -221,36 +221,21 @@ public class PlacaActivity extends Base {
                     CustomPagerServicesPlacaAdapter mCustomPagerAdapter = new CustomPagerServicesPlacaAdapter(getApplicationContext(), servicioImagenOrlaList);
                     pagerOrla.setAdapter(mCustomPagerAdapter);
 
-                    showProgress(true);
+                    //showProgress(true);
                     loadRestosList();
                 }
-                if(servicioImagenEsquelaList.size() > 0){
+                //if(servicioImagenEsquelaList.size() > 0){
 
-                    CustomAdapterServicio adapterEsquela = new CustomAdapterServicio(PlacaActivity.this, R.layout.simple_spinner_item,servicioImagenEsquelaList);
-                    adapterEsquela.setDropDownViewResource(R.layout.simple_spinner_dropdown_item);
-                    spinnerEsquela.setAdapter(adapterEsquela);
-
-                    spinnerEsquela.setOnItemSelectedListener(
-                            new AdapterView.OnItemSelectedListener() {
-                                public void onItemSelected(AdapterView<?> parent, View view, int position,long id) {
-                                    Servicio servicio = (Servicio)parent.getItemAtPosition(position);
-
-                                    esquelaPersonal.setText(servicio.getTexto());
-
-                                    if(getCurrentUser().getIdDifunto() != 0){
-                                        showProgress(true);
-                                        loadServicesList(getCurrentUser().getIdDifunto());
-                                    }else{
-                                        Toast.makeText(getApplicationContext(), "Debe primero registrar un difunto!", Toast.LENGTH_LONG).show();
-                                    }
+                    //esquelaPersonal.setText(servicioImagenEsquelaList.get(servicioImagenEsquelaList.size()-1).getTexto());
 
 
+               // }
 
-                                }
-                                public void onNothingSelected(AdapterView<?> parent) {
-                                }
-                            }
-                    );
+                if(getCurrentUser().getIdDifunto() != 0){
+                    showProgress(true);
+                    loadServicesList(getCurrentUser().getIdDifunto());
+                }else{
+                    Toast.makeText(getApplicationContext(), "Debe primero registrar un difunto!", Toast.LENGTH_LONG).show();
                 }
             }
         }
@@ -285,7 +270,7 @@ public class PlacaActivity extends Base {
 
         public void run(){
 
-            showProgress(false);
+            //showProgress(false);
             if(!webResponseRestos.equals("") && !webResponseRestos.equals("[]")){
                 Type collectionType = new TypeToken<List<Restos>>(){}.getType();
                 restosList = new Gson().fromJson( webResponseRestos , collectionType);
@@ -419,7 +404,6 @@ public class PlacaActivity extends Base {
 
         public void run(){
 
-            showProgress(false);
             if(!webResponseServicesAdquiridos.equals("") && !webResponseServicesAdquiridos.equals("[]")){
                 Type collectionType = new TypeToken<List<PlacaInformation>>(){}.getType();
                 List<PlacaInformation> placaInformationList = new Gson().fromJson( webResponseServicesAdquiridos , collectionType);
@@ -445,14 +429,17 @@ public class PlacaActivity extends Base {
                     }
                 }
 
-                i = 0;
+                /*i = 0;
                 for(Servicio ser : servicioImagenEsquelaList){
                     if(ser.getIdServicio() == placaInformation.getIdEsquela()){
-                        spinnerEsquela.setSelection(i);
+                        //spinnerEsquela.setSelection(i);
+
                     }else{
                         i++;
                     }
-                }
+                }*/
+
+                esquelaPersonal.setText(placaInformation.getEsquela());
 
                 i = 0;
                 for(Restos ser : restosList){
@@ -462,7 +449,10 @@ public class PlacaActivity extends Base {
                         i++;
                     }
                 }
+
+                showProgress(false);
             }
+            showProgress(false);
         }
     };
 }
