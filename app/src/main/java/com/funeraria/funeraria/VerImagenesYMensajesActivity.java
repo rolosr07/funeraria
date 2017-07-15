@@ -422,7 +422,7 @@ public class VerImagenesYMensajesActivity extends Base {
                 handler.postDelayed(runnableFlores, delay);
             }
 
-            handler.postDelayed(runnableRedirect, 5000);
+            handler.postDelayed(runnableRedirect, duration);
         }
     };
 
@@ -493,10 +493,10 @@ public class VerImagenesYMensajesActivity extends Base {
                             loadData = false;
                         }
                     }
-                }, 5000);
+                }, 22000);
             }
 
-            handler.postDelayed(this, 5000);
+            handler.postDelayed(this, duration);
         }
     };
 
